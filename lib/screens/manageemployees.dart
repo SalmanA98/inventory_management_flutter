@@ -1,0 +1,205 @@
+import 'package:flutter/material.dart';
+import 'package:inventory_management/models/database.dart';
+import 'package:inventory_management/models/employee.dart';
+import 'package:inventory_management/screens/addEmployee.dart';
+import 'package:inventory_management/screens/editEmployee.dart';
+import 'package:inventory_management/widgets/customAppBar.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
+class ManageEmployees extends StatefulWidget {
+  @override
+  _ManageEmployeesState createState() => _ManageEmployeesState();
+}
+
+class _ManageEmployeesState extends State<ManageEmployees> {
+  List<Employee> employeesList = [];
+
+  Future<void> getAllEmployees(BuildContext context) async {
+    await databaseReference
+        .child('D')
+        .child('Employees')
+        .once()
+        .then((snapshot) {
+      Map<dynamic, dynamic> results = snapshot.value;
+      results.forEach((id, details) {
+        setState(() {
+          employeesList.add(Employee(
+              id: id,
+              name: details['Name'],
+              number: details['Number'].toString(),
+              adminPriv: details['Admin Privilege'],
+              age: details['Age'].toString(),
+              lastActivity: details['Last Activity'].toString()));
+        });
+      });
+    }).onError((error, stackTrace) {
+      Fluttertoast.showToast(
+          msg: error.toString(),
+          toastLength: Toast.LENGTH_SHORT,
+          timeInSecForIosWeb: 1,
+          fontSize: 16.0);
+    });
+  }
+
+  void _addEmployees() {
+    Navigator.push(context, MaterialPageRoute(builder: (_) => AddEmployee()));
+  }
+
+  void _editEmployee(int index) {
+    Navigator.push(context,
+        MaterialPageRoute(builder: (_) => EditEmployee(employeesList[index])));
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    getAllEmployees(context);
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var screenMaxHeight = MediaQuery.of(context).size.height;
+    return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(
+          Icons.add_box_outlined,
+          color: Colors.white,
+        ),
+        onPressed: _addEmployees,
+      ),
+      bottomNavigationBar: BottomAppBar(
+        color: Colors.indigo,
+        shape: CircularNotchedRectangle(),
+        notchMargin: 2.0,
+        elevation: 5,
+        child: new Row(
+          children: <Widget>[
+            SizedBox(
+              height: screenMaxHeight * 0.060,
+            ),
+          ],
+        ),
+      ),
+      body: Column(
+        children: [
+          CustomAppBar(
+              title: 'Manage Employees',
+              subtitle: 'Edit, Add or Remove Employees!'),
+          Container(
+            height: screenMaxHeight * .683,
+            margin: EdgeInsets.all(9),
+            child: ListView.builder(
+              itemCount:
+                  employeesList.length == null ? 0 : employeesList.length,
+              itemBuilder: (context, index) {
+                return createCartListItem(index);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  createCartListItem(int index) {
+    return Card(
+        elevation: 5,
+        child: Stack(
+          children: <Widget>[
+            Container(
+              margin: EdgeInsets.only(left: 5, right: 16, top: 10, bottom: 10),
+              decoration: BoxDecoration(
+                  // color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(16))),
+              child: Row(
+                children: <Widget>[
+                  Container(
+                    margin:
+                        EdgeInsets.only(right: 8, left: 8, top: 8, bottom: 8),
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(14)),
+                        color: Colors.blue.shade200,
+                        image: DecorationImage(
+                            image: AssetImage("assets/images/logo.png"))),
+                  ),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Container(
+                            padding: EdgeInsets.only(right: 8, top: 4),
+                            child: Text(
+                              employeesList[index].name,
+                              style: GoogleFonts.openSans(
+                                  textStyle: TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold)),
+                              maxLines: 2,
+                              softWrap: true,
+                            ),
+                          ),
+                          Container(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text(
+                                  "ID: ${employeesList[index].id}",
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    padding: const EdgeInsets.only(
+                                        bottom: 2, right: 12, left: 12),
+                                    child: Text(
+                                      employeesList[index].number,
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    flex: 100,
+                  )
+                ],
+              ),
+            ),
+            Align(
+                alignment: Alignment.topRight,
+                child: Container(
+                  width: 30,
+                  height: 30,
+                  alignment: Alignment.center,
+                  margin: EdgeInsets.only(right: 15, top: 8),
+                  child: Container(
+                    alignment: Alignment.center,
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.edit_sharp,
+                        color: Colors.white,
+                        size: 15,
+                      ),
+                      onPressed: () {
+                        _editEmployee(index);
+                      },
+                    ),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(4)),
+                        color: Colors.green),
+                  ),
+                ))
+          ],
+        ));
+  }
+}
