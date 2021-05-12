@@ -67,7 +67,6 @@ class _HomePageState extends State<HomePage> {
         builder: (ctx, snapchot) {
           if (snapchot.connectionState == ConnectionState.done) {
             return Scaffold(
-              backgroundColor: Colors.grey[900],
               body: Column(
                 children: <Widget>[
                   SizedBox(
@@ -84,7 +83,6 @@ class _HomePageState extends State<HomePage> {
                             Text("Hekayet Etr",
                                 style: GoogleFonts.openSans(
                                   textStyle: TextStyle(
-                                      color: Colors.white,
                                       fontSize: 30,
                                       fontWeight: FontWeight.bold),
                                 )),
@@ -105,7 +103,7 @@ class _HomePageState extends State<HomePage> {
                           alignment: Alignment.topCenter,
                           icon: Icon(
                             Icons.exit_to_app,
-                            color: Colors.white,
+                            //  color: Colors.white,
                             size: 30,
                           ),
                           onPressed: () => signOut(),

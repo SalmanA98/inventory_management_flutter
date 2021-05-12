@@ -99,19 +99,17 @@ class _SellProductsState extends State<SellProducts> {
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
-        child: const Icon(
-          Icons.shopping_bag_rounded,
-          color: Colors.white,
-        ),
+        elevation: 10,
+        child: const Icon(Icons.shopping_bag_outlined),
         onPressed: () {
           _showCart(toCart);
         },
       ),
       bottomNavigationBar: BottomAppBar(
-        color: Colors.indigo,
+        color: Theme.of(context).primaryColor,
         shape: CircularNotchedRectangle(),
-        notchMargin: 2.0,
-        elevation: 5,
+        notchMargin: 1.0,
+        elevation: 24,
         child: new Row(
           children: <Widget>[
             SizedBox(
@@ -126,14 +124,21 @@ class _SellProductsState extends State<SellProducts> {
             title: 'Sell Products',
             subtitle: 'Add Products to cart!',
           ),
-          Container(
-            height: screenMaxHeight * .683,
-            margin: EdgeInsets.all(9),
-            child: ListView.builder(
-              itemCount: products.length == null ? 0 : products.length,
-              itemBuilder: (context, index) {
-                return createCartListItem(index);
-              },
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    height: screenMaxHeight * .80,
+                    child: ListView.builder(
+                      itemCount: products.length == null ? 0 : products.length,
+                      itemBuilder: (context, index) {
+                        return createCartListItem(index);
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -142,121 +147,107 @@ class _SellProductsState extends State<SellProducts> {
   }
 
   createCartListItem(int index) {
-    return Card(
-        elevation: 5,
-        child: Stack(
-          children: <Widget>[
-            Container(
-              margin: EdgeInsets.only(left: 5, right: 16, top: 10, bottom: 10),
-              decoration: BoxDecoration(
-                  //color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(16))),
-              child: Row(
-                children: <Widget>[
-                  Container(
-                    margin:
-                        EdgeInsets.only(right: 8, left: 8, top: 8, bottom: 8),
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(14)),
-                        color: Colors.blue,
-                        image: DecorationImage(
-                            image: AssetImage("assets/images/logo.png"))),
-                  ),
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.all(5.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Container(
-                            padding: EdgeInsets.only(right: 8, top: 4),
-                            child: Text(
-                              products[index].name,
-                              style: GoogleFonts.openSans(
-                                  textStyle: TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold)),
-                              maxLines: 2,
-                              softWrap: true,
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+      child: Card(
+          elevation: 5,
+          child: Stack(
+            children: <Widget>[
+              Container(
+                margin:
+                    EdgeInsets.only(left: 5, right: 16, top: 10, bottom: 10),
+                decoration: BoxDecoration(
+                    //color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(16))),
+                child: Row(
+                  children: <Widget>[
+                    Container(
+                      margin:
+                          EdgeInsets.only(right: 8, left: 8, top: 8, bottom: 8),
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(14)),
+                          color: Theme.of(context).primaryColor,
+                          image: DecorationImage(
+                              image: AssetImage("assets/images/logo.png"))),
+                    ),
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Container(
+                              padding:
+                                  EdgeInsets.only(right: 8, top: 4, bottom: 15),
+                              child: Text(
+                                products[index].name,
+                                style: GoogleFonts.openSans(
+                                    textStyle: TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.bold)),
+                                maxLines: 2,
+                                softWrap: true,
+                              ),
                             ),
-                          ),
-                          Container(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                Text(
-                                  "AED: ${products[index].price}",
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Container(
-                                    color: Colors.grey,
-                                    padding: const EdgeInsets.only(
-                                        bottom: 2, right: 12, left: 12),
-                                    child: Text(
-                                      products[index].qty,
-                                    ),
+                            Container(
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Text(
+                                    "AED: ${products[index].price}",
                                   ),
-                                )
-                              ],
+
+                                  // Padding(
+                                  //   padding: const EdgeInsets.all(8.0),
+                                  //   child: Container(
+                                  //     // color: Theme.of(context).primaryColor,
+                                  //     padding: const EdgeInsets.only(
+                                  //         bottom: 2, right: 12, left: 12),
+                                  //     child: Text(
+                                  //       'Qty: ${products[index].qty}',
+                                  //     ),
+                                  //   ),
+                                  // )
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    flex: 100,
-                  )
-                ],
+                      flex: 100,
+                    )
+                  ],
+                ),
               ),
-            ),
-            Align(
-                alignment: Alignment.topRight,
-                child: Container(
-                  width: 30,
-                  height: 30,
-                  alignment: Alignment.center,
-                  margin: EdgeInsets.only(right: 15, top: 8),
+              Align(
+                  alignment: Alignment.topRight,
                   child: Container(
+                    width: 30,
+                    height: 30,
                     alignment: Alignment.center,
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.add_shopping_cart,
-                        color: Colors.white,
-                        size: 15,
-                      ),
-                      onPressed: () {
-                        _addItemToCart(products[index]);
-                      },
-                    ),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                        color: Colors.green),
-                  ),
-                ))
-          ],
-        ));
+                    margin: EdgeInsets.only(right: 15, top: 8),
+                    child: Container(
+                        alignment: Alignment.center,
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.add_shopping_cart,
+                            color: Colors.black,
+                            size: 15,
+                          ),
+                          onPressed: () {
+                            _addItemToCart(products[index]);
+                          },
+                        ),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(4)),
+                            color: Theme.of(context).accentColor)),
+                  ))
+            ],
+          )),
+    );
   }
 }
-
-// Card(
-//                   elevation: 5,
-//                   child: Container(
-//                     margin: EdgeInsets.all(10),
-//                     child: ListTile(
-//                       leading: CircleAvatar(
-//                           child: FittedBox(child: Text('${(index + 1)}'))),
-//                       title: Text(products[index].name),
-//                       subtitle: Text(
-//                           'Price: ${products[index].price}\nQty Available: ${products[index].qty}'),
-//                       trailing: IconButton(
-//                         icon: Icon(Icons.add_shopping_cart),
-//                         onPressed: () {
-//                           _addItemToCart(products[index]);
-//                         },
-//                       ),
-//                     ),
-//                   ),
-//                 );

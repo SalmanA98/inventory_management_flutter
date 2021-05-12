@@ -130,116 +130,135 @@ class _EditProductState extends State<EditProduct> {
   Widget build(BuildContext context) {
     var screenMaxHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-        body: GestureDetector(
-      onTap: () {
-        FocusScopeNode currentFocus = FocusScope.of(context);
-        if (!currentFocus.hasPrimaryFocus) {
-          currentFocus.unfocus();
-        }
-      },
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            CustomAppBar(
-                title: 'Edit Product',
-                subtitle: 'Update/Remove the product chosen'),
-            Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(10),
-                margin: EdgeInsets.only(top: 15),
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Product Details',
-                  style: GoogleFonts.openSans(
-                    textStyle:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                )),
-            ...productDetails.map((element) {
-              return Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(10),
-                  child: Column(children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          element.title,
-                          style: GoogleFonts.openSans(
-                            textStyle: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.bold),
-                          ),
+        body: Column(
+      children: [
+        CustomAppBar(
+            title: 'Edit Product',
+            subtitle: 'Update/Remove the product chosen'),
+        Expanded(
+          child: GestureDetector(
+            onTap: () {
+              FocusScopeNode currentFocus = FocusScope.of(context);
+              if (!currentFocus.hasPrimaryFocus) {
+                currentFocus.unfocus();
+              }
+            },
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(10),
+                      margin: EdgeInsets.only(top: 15),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Product Details',
+                        style: GoogleFonts.openSans(
+                          textStyle: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         ),
-                        Text(element.value),
-                      ],
-                    ),
-                    Divider(
-                      color: Colors.black,
-                    )
-                  ]));
-            }).toList(),
-            Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(10),
-                margin: EdgeInsets.only(top: 15),
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Update Product',
-                  style: GoogleFonts.openSans(
-                    textStyle:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      )),
+                  ...productDetails.map((element) {
+                    return Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(10),
+                        child: Column(children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                element.title,
+                                style: GoogleFonts.openSans(
+                                  textStyle: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              Text(element.value),
+                            ],
+                          ),
+                          Divider(
+                            color: Colors.black,
+                          )
+                        ]));
+                  }).toList(),
+                  Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(10),
+                      margin: EdgeInsets.only(top: 15),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Update Product',
+                        style: GoogleFonts.openSans(
+                          textStyle: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                      )),
+                  Container(
+                    margin: EdgeInsets.symmetric(horizontal: 10),
+                    width: double.infinity,
+                    child: Card(
+                        elevation: 3,
+                        child: Container(
+                          padding: EdgeInsets.all(10),
+                          child: ListTile(
+                              leading: Icon(Icons.info_outline),
+                              title:
+                                  Text('Leave the unchanged data field blank')),
+                        )),
                   ),
-                )),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 10),
-              width: double.infinity,
-              child: Card(
-                  elevation: 3,
-                  child: Container(
-                    padding: EdgeInsets.all(10),
-                    child: ListTile(
-                        leading: Icon(Icons.info_outline),
-                        title: Text('Leave the unchanged field blank')),
-                  )),
-            ),
-            CustomTextField(
-              textController: _priceInput,
-              textHint: 'Price',
-              textIcon: Icon(Icons.attach_money_outlined),
-              keyboardType: TextInputType.number,
-            ),
-            SizedBox(
-              height: screenMaxHeight * 0.02,
-            ),
-            CustomTextField(
-              textController: _qtyInput,
-              textIcon: Icon(Icons.donut_small_outlined),
-              textHint: 'Quantity',
-              maximumLength: 3,
-              keyboardType: TextInputType.number,
-            ),
-            SizedBox(
-              height: screenMaxHeight * 0.02,
-            ),
-            if (!_updateSuccess)
-              CustomButton(
-                buttonFunction: () => _updateProduct(widget.productName),
-                buttonText: 'Update Product',
+                  Container(
+                    margin: EdgeInsets.all(10),
+                    child: CustomTextField(
+                      textController: _priceInput,
+                      textHint: 'Price',
+                      textIcon: Icon(Icons.attach_money_outlined),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.all(10),
+                    child: CustomTextField(
+                      textController: _qtyInput,
+                      textIcon: Icon(Icons.donut_small_outlined),
+                      textHint: 'Quantity',
+                      maximumLength: 3,
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  if (!_updateSuccess)
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 10),
+                      child: CustomButton(
+                        buttonFunction: () =>
+                            _updateProduct(widget.productName),
+                        buttonText: 'Update Product',
+                      ),
+                    ),
+                  if (_updateSuccess)
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 10),
+                      child: CustomButton(
+                        buttonFunction: () => Navigator.push(context,
+                            MaterialPageRoute(builder: (_) => HomePage())),
+                        buttonText: 'Go Home',
+                      ),
+                    ),
+                  if (!_updateSuccess)
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 10),
+                      child: CustomButton(
+                        buttonFunction: () =>
+                            _deleteProduct(widget.productName),
+                        buttonText: 'Delete Product',
+                      ),
+                    )
+                ],
               ),
-            if (_updateSuccess)
-              CustomButton(
-                buttonFunction: () => Navigator.push(
-                    context, MaterialPageRoute(builder: (_) => HomePage())),
-                buttonText: 'Go Home',
-              ),
-            if (!_updateSuccess)
-              CustomButton(
-                buttonFunction: () => _deleteProduct(widget.productName),
-                buttonText: 'Delete Product',
-              )
-          ],
+            ),
+          ),
         ),
-      ),
+      ],
     ));
   }
 }

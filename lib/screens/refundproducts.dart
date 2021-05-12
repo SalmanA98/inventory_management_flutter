@@ -275,196 +275,211 @@ class _RefundProductsState extends State<RefundProducts> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GestureDetector(
-        onTap: () {
-          FocusScopeNode currentFocus = FocusScope.of(context);
-          if (!currentFocus.hasPrimaryFocus) {
-            currentFocus.unfocus();
-          }
-        },
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              CustomAppBar(
-                  needBackButton: true,
-                  title: 'Refund Products',
-                  subtitle: 'Sale ID: ${widget.saleID}'),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 10),
-                width: double.infinity,
-                child: Card(
-                  elevation: 3,
-                  child: Container(
+      body: Column(
+        children: [
+          CustomAppBar(
+              needBackButton: true,
+              title: 'Refund Products',
+              subtitle: 'Sale ID: ${widget.saleID}'),
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                FocusScopeNode currentFocus = FocusScope.of(context);
+                if (!currentFocus.hasPrimaryFocus) {
+                  currentFocus.unfocus();
+                }
+              },
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 10),
+                      width: double.infinity,
+                      child: Card(
+                        elevation: 3,
+                        child: Container(
+                            padding: EdgeInsets.all(10),
+                            child: ListTile(
+                              leading: Icon(Icons.info_outline),
+                              title: Text(
+                                  'Refund should be completed by admins only'),
+                            )),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 10),
+                      width: double.infinity,
                       padding: EdgeInsets.all(10),
-                      child: ListTile(
-                        leading: Icon(Icons.info_outline),
-                        title:
-                            Text('Refund should be completed by admins only'),
-                      )),
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.only(top: 10),
-                width: double.infinity,
-                padding: EdgeInsets.all(10),
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Payment Details',
-                  style: GoogleFonts.openSans(
-                    textStyle:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-              ...paymentDetails.map((element) {
-                return Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(10),
-                    child: Column(
-                      children: [
-                        Row(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Payment Details',
+                        style: GoogleFonts.openSans(
+                          textStyle: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    ...paymentDetails.map((element) {
+                      return Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.all(10),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    element.title,
+                                    style: GoogleFonts.openSans(
+                                      textStyle: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  Text(element.value),
+                                ],
+                              ),
+                              Divider(
+                                color: Colors.black,
+                              )
+                            ],
+                          ));
+                    }),
+                    Container(
+                        margin: EdgeInsets.only(top: 10),
+                        width: double.infinity,
+                        padding: EdgeInsets.all(10),
+                        alignment: Alignment.centerLeft,
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              element.title,
-                              style: GoogleFonts.openSans(
-                                textStyle: TextStyle(
-                                    fontSize: 15, fontWeight: FontWeight.bold),
+                            if (products.isNotEmpty)
+                              Text(
+                                'Choose Products',
+                                style: GoogleFonts.openSans(
+                                  textStyle: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
+                                ),
                               ),
-                            ),
-                            Text(element.value),
+                            if (products.isNotEmpty)
+                              Switch.adaptive(
+                                  value: _refundEach,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      _refundEach = val;
+                                    });
+                                  })
                           ],
-                        ),
-                        Divider(
-                          color: Colors.black,
-                        )
-                      ],
-                    ));
-              }),
-              Container(
-                  margin: EdgeInsets.only(top: 10),
-                  width: double.infinity,
-                  padding: EdgeInsets.all(10),
-                  alignment: Alignment.centerLeft,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      if (products.isNotEmpty)
-                        Text(
-                          'Choose Products',
-                          style: GoogleFonts.openSans(
-                            textStyle: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      if (products.isNotEmpty)
-                        Switch.adaptive(
-                            value: _refundEach,
-                            onChanged: (val) {
-                              setState(() {
-                                _refundEach = val;
-                              });
-                            })
-                    ],
-                  )),
-              if (_refundEach && products.isNotEmpty)
-                ...products.map(
-                  (product) {
-                    return Container(
-                        padding: EdgeInsets.symmetric(horizontal: 5),
-                        width: double.infinity,
-                        child: GestureDetector(
-                          onTap: () {
-                            _onSelectedItem(products.indexOf(product), product);
-                          },
-                          child: Card(
-                            shape: _selectedIndex != null &&
-                                    _selectedIndex == products.indexOf(product)
-                                ? new RoundedRectangleBorder(
-                                    side: new BorderSide(
-                                        color: Colors.blue, width: 2.0),
-                                    borderRadius: BorderRadius.circular(4.0))
-                                : new RoundedRectangleBorder(
-                                    side: new BorderSide(
-                                        color: Colors.white, width: 2.0),
-                                    borderRadius: BorderRadius.circular(4.0)),
-                            elevation: 5,
-                            child: Container(
-                              padding: EdgeInsets.all(10),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    alignment: Alignment.centerLeft,
-                                    padding: EdgeInsets.all(5),
+                        )),
+                    if (_refundEach && products.isNotEmpty)
+                      ...products.map(
+                        (product) {
+                          return Container(
+                              padding: EdgeInsets.symmetric(horizontal: 5),
+                              width: double.infinity,
+                              child: GestureDetector(
+                                onTap: () {
+                                  _onSelectedItem(
+                                      products.indexOf(product), product);
+                                },
+                                child: Card(
+                                  shape: _selectedIndex != null &&
+                                          _selectedIndex ==
+                                              products.indexOf(product)
+                                      ? new RoundedRectangleBorder(
+                                          side: new BorderSide(
+                                              color: Colors.blue, width: 2.0),
+                                          borderRadius:
+                                              BorderRadius.circular(4.0))
+                                      : new RoundedRectangleBorder(
+                                          side: new BorderSide(
+                                              color: Colors.white, width: 2.0),
+                                          borderRadius:
+                                              BorderRadius.circular(4.0)),
+                                  elevation: 5,
+                                  child: Container(
+                                    padding: EdgeInsets.all(10),
                                     child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          product.name,
-                                          style: GoogleFonts.openSans(
-                                            textStyle: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold),
+                                        Container(
+                                          alignment: Alignment.centerLeft,
+                                          padding: EdgeInsets.all(5),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                product.name,
+                                                style: GoogleFonts.openSans(
+                                                  textStyle: TextStyle(
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ),
+                                              Text('Price: ${product.price}'),
+                                              Text('Qty: ${product.qty}'),
+                                            ],
                                           ),
                                         ),
-                                        Text('Price: ${product.price}'),
-                                        Text('Qty: ${product.qty}'),
                                       ],
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ));
-                  },
-                ),
-              if (_refundEach && products.isNotEmpty)
-                Container(
-                  padding: EdgeInsets.all(10),
-                  child: CustomTextField(
-                      textController: _qtyController,
-                      textHint: 'Qty to refund',
-                      keyboardType: TextInputType.number,
-                      textIcon: Icon(Icons.refresh)),
-                ),
-              if (!_refundEach)
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: 10),
-                  width: double.infinity,
-                  child: Card(
-                    elevation: 3,
-                    child: Container(
+                                ),
+                              ));
+                        },
+                      ),
+                    if (_refundEach && products.isNotEmpty)
+                      Container(
                         padding: EdgeInsets.all(10),
-                        child: ListTile(
-                          leading: Icon(Icons.info_outline),
-                          title: products.isEmpty
-                              ? Text('All products have been refunded')
-                              : Text('This will refund all the products'),
+                        child: CustomTextField(
+                            textController: _qtyController,
+                            textHint: 'Qty to refund',
+                            keyboardType: TextInputType.number,
+                            textIcon: Icon(Icons.refresh)),
+                      ),
+                    if (!_refundEach)
+                      Container(
+                        margin: EdgeInsets.symmetric(horizontal: 10),
+                        width: double.infinity,
+                        child: Card(
+                          elevation: 3,
+                          child: Container(
+                              padding: EdgeInsets.all(10),
+                              child: ListTile(
+                                leading: Icon(Icons.info_outline),
+                                title: products.isEmpty
+                                    ? Text('All products have been refunded')
+                                    : Text('This will refund all the products'),
+                              )),
+                        ),
+                      ),
+                    Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                        child: Visibility(
+                          visible: products.isEmpty
+                              ? false
+                              : _refundEach
+                                  ? _selectedIndex >= 0
+                                      ? true
+                                      : false
+                                  : true,
+                          child: CustomButton(
+                            buttonFunction: () => _refundEach
+                                ? _refundToDb(context, productToRefund, false)
+                                : _refundToDb(context, productToRefund, true),
+                            buttonText: 'Confirm Refund',
+                          ),
                         )),
-                  ),
+                  ],
                 ),
-              Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                  child: Visibility(
-                    visible: products.isEmpty
-                        ? false
-                        : _refundEach
-                            ? _selectedIndex >= 0
-                                ? true
-                                : false
-                            : true,
-                    child: CustomButton(
-                      buttonFunction: () => _refundEach
-                          ? _refundToDb(context, productToRefund, false)
-                          : _refundToDb(context, productToRefund, true),
-                      buttonText: 'Confirm Refund',
-                    ),
-                  )),
-            ],
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

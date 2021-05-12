@@ -13,39 +13,43 @@ class CustomAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var screenMaxHeight = MediaQuery.of(context).size.height;
-    return Column(children: [
-      SizedBox(height: screenMaxHeight * 0.10),
-      if (needBackButton)
-        Container(
-          width: double.infinity,
-          alignment: Alignment.centerLeft,
-          child: IconButton(
-            icon: Icon(Icons.arrow_back_ios_outlined),
-            onPressed: () => Navigator.pop(context),
+    var screenHeight = MediaQuery.of(context).size.height;
+    return Container(
+      margin: EdgeInsets.only(top: screenHeight * 0.07),
+      child: Column(children: [
+        if (needBackButton)
+          Container(
+            width: double.infinity,
+            alignment: Alignment.centerLeft,
+            child: IconButton(
+              icon: Icon(Icons.arrow_back_ios_outlined),
+              onPressed: () => Navigator.pop(context),
+            ),
           ),
-        ),
-      if (needBackButton || !needBackButton)
         Container(
-          height: screenMaxHeight * 0.08,
           child: Column(
             children: [
-              Text(title,
+              FittedBox(
+                child: Text(title,
+                    style: GoogleFonts.openSans(
+                      textStyle:
+                          TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                    )),
+              ),
+              FittedBox(
+                child: Text(
+                  subtitle,
                   style: GoogleFonts.openSans(
-                    textStyle:
-                        TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                  )),
-              Text(
-                subtitle,
-                style: GoogleFonts.openSans(
-                    textStyle: TextStyle(
-                        color: Color(0xffa29aac),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600)),
+                      textStyle: TextStyle(
+                          color: Color(0xffa29aac),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600)),
+                ),
               ),
             ],
           ),
         ),
-    ]);
+      ]),
+    );
   }
 }

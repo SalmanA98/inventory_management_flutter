@@ -77,56 +77,62 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     var screenMaxHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            SizedBox(
-              height: 100,
-            ),
-            Container(
-                margin: EdgeInsets.all(10),
-                height: 150,
-                width: double.infinity,
-                alignment: Alignment.centerLeft,
-                child: Image.asset('assets/images/logo.png')),
-            CustomAppBar(
-              title: 'Hekayet Etr',
-              subtitle: 'Login to continue',
-              needBackButton: false,
-            ),
-            Container(
-              padding: EdgeInsets.all(10),
-              margin: EdgeInsets.only(top: 50),
-              width: 400,
+      body: Column(
+        children: [
+          CustomAppBar(
+            title: 'Hekayet Etr',
+            subtitle: 'Login to continue',
+            needBackButton: false,
+          ),
+          Expanded(
+            child: SingleChildScrollView(
               child: Column(
-                children: [
-                  CustomTextField(
-                    textController: _usernameInput,
-                    textIcon: Icon(Icons.account_circle_outlined),
-                    textHint: 'Username',
-                    maximumLength: 7,
-                  ),
+                children: <Widget>[
                   SizedBox(
-                    height: 20,
+                    height: 100,
                   ),
-                  CustomTextField(
-                      textController: _pwdInput,
-                      keyboardType: TextInputType.visiblePassword,
-                      hideText: true,
-                      textIcon: Icon(Icons.admin_panel_settings_outlined),
-                      textHint: 'Password'),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  CustomButton(
-                    buttonFunction: _authenticateUser,
-                    buttonText: 'Login',
+                  Container(
+                      margin: EdgeInsets.all(10),
+                      height: 150,
+                      width: double.infinity,
+                      alignment: Alignment.centerLeft,
+                      child: Image.asset('assets/images/logo.png')),
+                  Container(
+                    padding: EdgeInsets.all(10),
+                    margin: EdgeInsets.only(top: 50),
+                    width: 400,
+                    child: Column(
+                      children: [
+                        CustomTextField(
+                          textController: _usernameInput,
+                          textIcon: Icon(Icons.account_circle_outlined),
+                          textHint: 'Username',
+                          maximumLength: 7,
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        CustomTextField(
+                            textController: _pwdInput,
+                            keyboardType: TextInputType.visiblePassword,
+                            hideText: true,
+                            textIcon: Icon(Icons.admin_panel_settings_outlined),
+                            textHint: 'Password'),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        CustomButton(
+                          buttonFunction: _authenticateUser,
+                          buttonText: 'Login',
+                        )
+                      ],
+                    ),
                   )
                 ],
               ),
-            )
-          ],
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }

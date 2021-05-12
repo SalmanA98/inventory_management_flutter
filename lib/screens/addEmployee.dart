@@ -73,72 +73,78 @@ class _AddEmployeeState extends State<AddEmployee> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: GestureDetector(
-      onTap: () {
-        FocusScopeNode currentFocus = FocusScope.of(context);
-        if (!currentFocus.hasPrimaryFocus) {
-          currentFocus.unfocus();
-        }
-      },
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            CustomAppBar(
-                title: 'Add Employee',
-                subtitle: 'Add new user and login credentials'),
-            Container(
-              margin: EdgeInsets.only(top: 70),
-              padding: EdgeInsets.all(10),
-              child: CustomTextField(
-                  textController: _nameInput,
-                  textHint: 'Name',
-                  textIcon: Icon(Icons.person)),
-            ),
-            Container(
-              padding: EdgeInsets.all(10),
-              child: CustomTextField(
-                  textController: _ageInput,
-                  textHint: 'Age',
-                  keyboardType: TextInputType.number,
-                  maximumLength: 2,
-                  textIcon: Icon(Icons.view_agenda)),
-            ),
-            Container(
-              padding: EdgeInsets.all(10),
-              child: CustomTextField(
-                  textController: _numberInput,
-                  textHint: 'Number',
-                  maximumLength: 10,
-                  keyboardType: TextInputType.phone,
-                  textIcon: Icon(Icons.phone)),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Radio(
-                  value: 0,
-                  groupValue: _adminRadio,
-                  onChanged: _onAdminRadioChanged,
-                ),
-                Text('Admin'),
-                Radio(
-                  value: 1,
-                  groupValue: _adminRadio,
-                  onChanged: _onAdminRadioChanged,
-                ),
-                Text('Not Admin')
-              ],
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: CustomButton(
-                buttonFunction: _registerUser,
-                buttonText: 'Register User',
+        body: Column(
+      children: [
+        CustomAppBar(
+            title: 'Add Employee',
+            subtitle: 'Add new user and login credentials'),
+        Expanded(
+          child: GestureDetector(
+            onTap: () {
+              FocusScopeNode currentFocus = FocusScope.of(context);
+              if (!currentFocus.hasPrimaryFocus) {
+                currentFocus.unfocus();
+              }
+            },
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(top: 70),
+                    padding: EdgeInsets.all(10),
+                    child: CustomTextField(
+                        textController: _nameInput,
+                        textHint: 'Name',
+                        textIcon: Icon(Icons.person)),
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(10),
+                    child: CustomTextField(
+                        textController: _ageInput,
+                        textHint: 'Age',
+                        keyboardType: TextInputType.number,
+                        maximumLength: 2,
+                        textIcon: Icon(Icons.view_agenda)),
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(10),
+                    child: CustomTextField(
+                        textController: _numberInput,
+                        textHint: 'Number',
+                        maximumLength: 10,
+                        keyboardType: TextInputType.phone,
+                        textIcon: Icon(Icons.phone)),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Radio(
+                        value: 0,
+                        groupValue: _adminRadio,
+                        onChanged: _onAdminRadioChanged,
+                      ),
+                      Text('Admin'),
+                      Radio(
+                        value: 1,
+                        groupValue: _adminRadio,
+                        onChanged: _onAdminRadioChanged,
+                      ),
+                      Text('Not Admin')
+                    ],
+                  ),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    child: CustomButton(
+                      buttonFunction: _registerUser,
+                      buttonText: 'Register User',
+                    ),
+                  )
+                ],
               ),
-            )
-          ],
+            ),
+          ),
         ),
-      ),
+      ],
     ));
   }
 }

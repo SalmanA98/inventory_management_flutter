@@ -51,9 +51,7 @@ class GridDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var mediaQuery = MediaQuery.of(context);
     List<DashItems> myList = [item1, item2, item3, item4, item5, item6];
-    var color = 0xff453658;
     return Flexible(
       child: GridView.count(
           childAspectRatio: 1.0,
@@ -71,25 +69,30 @@ class GridDashboard extends StatelessWidget {
                   },
                   child: Container(
                     decoration: BoxDecoration(
-                        color: Color(color),
+                        color: Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(10)),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Image.asset(
-                          data.img,
-                          width: 42,
+                        Container(
+                          margin: EdgeInsets.symmetric(vertical: 5),
+                          child: Image.asset(
+                            data.img,
+                            width: 42,
+                          ),
                         ),
-                        SizedBox(
-                          height: mediaQuery.size.height * 0.02,
-                        ),
-                        Text(
-                          data.title,
-                          style: GoogleFonts.openSans(
-                              textStyle: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600)),
+                        Container(
+                          margin: EdgeInsets.all(10),
+                          child: FittedBox(
+                            fit: BoxFit.contain,
+                            child: Text(
+                              data.title,
+                              style: GoogleFonts.openSans(
+                                  textStyle: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600)),
+                            ),
+                          ),
                         ),
                       ],
                     ),

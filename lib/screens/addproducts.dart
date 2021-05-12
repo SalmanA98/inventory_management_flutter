@@ -40,62 +40,68 @@ class _AddProductsState extends State<AddProducts> {
   Widget build(BuildContext context) {
     var screenMaxHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      body: GestureDetector(
-        onTap: () {
-          FocusScopeNode currentFocus = FocusScope.of(context);
-          if (!currentFocus.hasPrimaryFocus) {
-            currentFocus.unfocus();
-          }
-        },
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              CustomAppBar(
-                title: 'Add Products',
-                subtitle: 'Enter the product details!',
-              ),
-              Container(
-                padding: EdgeInsets.all(10),
-                margin: EdgeInsets.only(top: 50),
-                width: double.infinity,
+      body: Column(
+        children: [
+          CustomAppBar(
+            title: 'Add Products',
+            subtitle: 'Enter the product details!',
+          ),
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                FocusScopeNode currentFocus = FocusScope.of(context);
+                if (!currentFocus.hasPrimaryFocus) {
+                  currentFocus.unfocus();
+                }
+              },
+              child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    CustomTextField(
-                        textController: _nameInput,
-                        textIcon: Icon(Icons.horizontal_split_outlined),
-                        textHint: 'Product Name'),
-                    SizedBox(
-                      height: screenMaxHeight * 0.02,
-                    ),
-                    CustomTextField(
-                      textController: _priceInput,
-                      textHint: 'Price',
-                      textIcon: Icon(Icons.attach_money_outlined),
-                      keyboardType: TextInputType.number,
-                    ),
-                    SizedBox(
-                      height: screenMaxHeight * 0.02,
-                    ),
-                    CustomTextField(
-                      textController: _qtyInput,
-                      textIcon: Icon(Icons.donut_small_outlined),
-                      textHint: 'Quantity',
-                      maximumLength: 3,
-                      keyboardType: TextInputType.number,
-                    ),
-                    SizedBox(
-                      height: screenMaxHeight * 0.02,
-                    ),
-                    CustomButton(
-                      buttonFunction: _uploadData,
-                      buttonText: 'Upload Product',
+                    Container(
+                      padding: EdgeInsets.all(10),
+                      margin: EdgeInsets.only(top: 50),
+                      width: double.infinity,
+                      child: Column(
+                        children: [
+                          CustomTextField(
+                              textController: _nameInput,
+                              textIcon: Icon(Icons.horizontal_split_outlined),
+                              textHint: 'Product Name'),
+                          SizedBox(
+                            height: screenMaxHeight * 0.02,
+                          ),
+                          CustomTextField(
+                            textController: _priceInput,
+                            textHint: 'Price',
+                            textIcon: Icon(Icons.attach_money_outlined),
+                            keyboardType: TextInputType.number,
+                          ),
+                          SizedBox(
+                            height: screenMaxHeight * 0.02,
+                          ),
+                          CustomTextField(
+                            textController: _qtyInput,
+                            textIcon: Icon(Icons.donut_small_outlined),
+                            textHint: 'Quantity',
+                            maximumLength: 3,
+                            keyboardType: TextInputType.number,
+                          ),
+                          SizedBox(
+                            height: screenMaxHeight * 0.02,
+                          ),
+                          CustomButton(
+                            buttonFunction: _uploadData,
+                            buttonText: 'Upload Product',
+                          )
+                        ],
+                      ),
                     )
                   ],
                 ),
-              )
-            ],
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

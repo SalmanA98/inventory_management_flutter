@@ -72,7 +72,7 @@ class _ManageEmployeesState extends State<ManageEmployees> {
         onPressed: _addEmployees,
       ),
       bottomNavigationBar: BottomAppBar(
-        color: Colors.indigo,
+        color: Theme.of(context).primaryColor,
         shape: CircularNotchedRectangle(),
         notchMargin: 2.0,
         elevation: 5,
@@ -89,15 +89,23 @@ class _ManageEmployeesState extends State<ManageEmployees> {
           CustomAppBar(
               title: 'Manage Employees',
               subtitle: 'Edit, Add or Remove Employees!'),
-          Container(
-            height: screenMaxHeight * .683,
-            margin: EdgeInsets.all(9),
-            child: ListView.builder(
-              itemCount:
-                  employeesList.length == null ? 0 : employeesList.length,
-              itemBuilder: (context, index) {
-                return createCartListItem(index);
-              },
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    height: screenMaxHeight * .80,
+                    child: ListView.builder(
+                      itemCount: employeesList.length == null
+                          ? 0
+                          : employeesList.length,
+                      itemBuilder: (context, index) {
+                        return createCartListItem(index);
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -106,100 +114,105 @@ class _ManageEmployeesState extends State<ManageEmployees> {
   }
 
   createCartListItem(int index) {
-    return Card(
-        elevation: 5,
-        child: Stack(
-          children: <Widget>[
-            Container(
-              margin: EdgeInsets.only(left: 5, right: 16, top: 10, bottom: 10),
-              decoration: BoxDecoration(
-                  // color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(16))),
-              child: Row(
-                children: <Widget>[
-                  Container(
-                    margin:
-                        EdgeInsets.only(right: 8, left: 8, top: 8, bottom: 8),
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(14)),
-                        color: Colors.blue.shade200,
-                        image: DecorationImage(
-                            image: AssetImage("assets/images/logo.png"))),
-                  ),
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.all(5.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Container(
-                            padding: EdgeInsets.only(right: 8, top: 4),
-                            child: Text(
-                              employeesList[index].name,
-                              style: GoogleFonts.openSans(
-                                  textStyle: TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold)),
-                              maxLines: 2,
-                              softWrap: true,
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 3, horizontal: 10),
+      child: Card(
+          elevation: 5,
+          child: Stack(
+            children: <Widget>[
+              Container(
+                margin:
+                    EdgeInsets.only(left: 5, right: 16, top: 10, bottom: 10),
+                decoration: BoxDecoration(
+                    // color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(16))),
+                child: Row(
+                  children: <Widget>[
+                    Container(
+                      margin:
+                          EdgeInsets.only(right: 8, left: 8, top: 8, bottom: 8),
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(14)),
+                          color: Colors.blue.shade200,
+                          image: DecorationImage(
+                              image: AssetImage("assets/images/logo.png"))),
+                    ),
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Container(
+                              padding: EdgeInsets.only(right: 8, top: 4),
+                              child: Text(
+                                employeesList[index].name,
+                                style: GoogleFonts.openSans(
+                                    textStyle: TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.bold)),
+                                maxLines: 2,
+                                softWrap: true,
+                              ),
                             ),
-                          ),
-                          Container(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                Text(
-                                  "ID: ${employeesList[index].id}",
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Container(
-                                    padding: const EdgeInsets.only(
-                                        bottom: 2, right: 12, left: 12),
-                                    child: Text(
-                                      employeesList[index].number,
-                                    ),
+                            Container(
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Text(
+                                    "ID: ${employeesList[index].id}",
                                   ),
-                                )
-                              ],
+                                  Padding(
+                                    padding: const EdgeInsets.all(5.0),
+                                    child: Container(
+                                      child: FittedBox(
+                                        child: Text(
+                                          employeesList[index].number,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    flex: 100,
-                  )
-                ],
+                      flex: 100,
+                    )
+                  ],
+                ),
               ),
-            ),
-            Align(
-                alignment: Alignment.topRight,
-                child: Container(
-                  width: 30,
-                  height: 30,
-                  alignment: Alignment.center,
-                  margin: EdgeInsets.only(right: 15, top: 8),
+              Align(
+                  alignment: Alignment.topRight,
                   child: Container(
+                    width: 30,
+                    height: 30,
                     alignment: Alignment.center,
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.edit_sharp,
-                        color: Colors.white,
-                        size: 15,
+                    margin: EdgeInsets.only(right: 15, top: 8),
+                    child: Container(
+                      alignment: Alignment.center,
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.edit_sharp,
+                          color: Colors.white,
+                          size: 15,
+                        ),
+                        onPressed: () {
+                          _editEmployee(index);
+                        },
                       ),
-                      onPressed: () {
-                        _editEmployee(index);
-                      },
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(4)),
+                          color: Theme.of(context).accentColor),
                     ),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                        color: Colors.green),
-                  ),
-                ))
-          ],
-        ));
+                  ))
+            ],
+          )),
+    );
   }
 }

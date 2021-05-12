@@ -34,15 +34,22 @@ void main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    // Color.fromRGBO(18, 18, 18,1.0),
     return MaterialApp(
       theme: ThemeData(
         brightness: Brightness.light,
-        primarySwatch: Colors.indigo,
+        primaryColor: Color.fromRGBO(69, 54, 88, 1),
+        accentColor: Colors.teal[200],
+        scaffoldBackgroundColor: Colors.white,
+        cardColor: Colors.grey[200],
       ),
       darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        primarySwatch: Colors.indigo,
-      ),
+          brightness: Brightness.dark,
+          primaryColor: Color.fromRGBO(69, 54, 88, 1),
+          accentColor: Colors.teal[200],
+          errorColor: Color.fromRGBO(207, 102, 121, 1),
+          scaffoldBackgroundColor: Colors.black,
+          cardColor: Color.fromRGBO(30, 30, 30, 1)),
       debugShowCheckedModeBanner: false,
       home: HomePage(),
       routes: <String, WidgetBuilder>{

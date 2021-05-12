@@ -94,70 +94,44 @@ class _EditEmployeeState extends State<EditEmployee> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GestureDetector(
-        onTap: () {
-          FocusScopeNode currentFocus = FocusScope.of(context);
-          if (!currentFocus.hasPrimaryFocus) {
-            currentFocus.unfocus();
-          }
-        },
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              CustomAppBar(
-                  title: 'Edit User',
-                  subtitle: 'Update/Remove the user chosen'),
-              Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(10),
-                  margin: EdgeInsets.only(top: 15),
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Employee Details',
-                    style: GoogleFonts.openSans(
-                      textStyle:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                  )),
-              ...employeeDetails.map((element) {
-                return Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(10),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              element.title,
-                              style: GoogleFonts.openSans(
-                                textStyle: TextStyle(
-                                    fontSize: 15, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            Text(element.value),
-                          ],
-                        ),
-                        Divider(
-                          color: Colors.black,
-                        )
-                      ],
-                    ));
-              }),
-              ...editable.map((element) {
-                return Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(10),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  margin: EdgeInsets.only(right: 15),
-                                  child: Text(
+      body: Column(
+        children: [
+          CustomAppBar(
+              title: 'Edit User', subtitle: 'Update/Remove the user chosen'),
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                FocusScopeNode currentFocus = FocusScope.of(context);
+                if (!currentFocus.hasPrimaryFocus) {
+                  currentFocus.unfocus();
+                }
+              },
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(10),
+                        margin: EdgeInsets.only(top: 15),
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Employee Details',
+                          style: GoogleFonts.openSans(
+                            textStyle: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                        )),
+                    ...employeeDetails.map((element) {
+                      return Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.all(10),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
                                     element.title,
                                     style: GoogleFonts.openSans(
                                       textStyle: TextStyle(
@@ -165,38 +139,74 @@ class _EditEmployeeState extends State<EditEmployee> {
                                           fontWeight: FontWeight.bold),
                                     ),
                                   ),
-                                ),
-                                InkWell(
-                                    onTap: () => _editAttribute(element.title),
-                                    child: Icon(Icons.edit)),
-                              ],
-                            ),
-                            Text(element.value),
-                          ],
-                        ),
-                        Divider(
-                          color: Colors.black,
-                        )
-                      ],
-                    ));
-              }),
-              Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  child: CustomButton(
-                    buttonFunction: () {},
-                    buttonText: 'Apply Changes',
-                  )),
-              Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: CustomButton(
-                    buttonFunction: () {},
-                    buttonText: 'Delete User',
-                  ))
-            ],
+                                  Text(element.value),
+                                ],
+                              ),
+                              Divider(
+                                color: Theme.of(context).primaryColor,
+                              )
+                            ],
+                          ));
+                    }),
+                    ...editable.map((element) {
+                      return Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.all(10),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        margin: EdgeInsets.only(right: 15),
+                                        child: Text(
+                                          element.title,
+                                          style: GoogleFonts.openSans(
+                                            textStyle: TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                      ),
+                                      InkWell(
+                                          onTap: () =>
+                                              _editAttribute(element.title),
+                                          child: Icon(Icons.edit)),
+                                    ],
+                                  ),
+                                  Text(element.value),
+                                ],
+                              ),
+                              Divider(
+                                color: Theme.of(context).primaryColor,
+                              )
+                            ],
+                          ));
+                    }),
+                    Container(
+                        width: double.infinity,
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        child: CustomButton(
+                          buttonFunction: () {},
+                          buttonText: 'Apply Changes',
+                        )),
+                    Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: CustomButton(
+                          buttonFunction: () {},
+                          buttonText: 'Delete User',
+                        ))
+                  ],
+                ),
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

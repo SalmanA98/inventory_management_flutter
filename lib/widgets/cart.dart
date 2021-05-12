@@ -58,8 +58,8 @@ class _CartState extends State<Cart> {
   Widget build(BuildContext context) {
     var screenMaxHeight = MediaQuery.of(context).size.height;
     return Container(
-      child: Card(
-          child: Column(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: Column(
         children: <Widget>[
           Container(
             width: double.infinity,
@@ -109,14 +109,15 @@ class _CartState extends State<Cart> {
             ),
           if (widget.cartItems.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5),
               child: CustomButton(
                 buttonFunction: _getCustomerInfo,
                 buttonText: 'Proceed To Checkout',
               ),
             )
         ],
-      )),
+      ),
     );
   }
 
@@ -124,7 +125,7 @@ class _CartState extends State<Cart> {
     return Stack(
       children: <Widget>[
         Container(
-            margin: EdgeInsets.only(left: 16, right: 16, top: 16),
+            margin: EdgeInsets.symmetric(vertical: 3, horizontal: 10),
             decoration: BoxDecoration(
                 // color: Colors.white,
                 borderRadius: BorderRadius.all(Radius.circular(16))),
@@ -139,7 +140,7 @@ class _CartState extends State<Cart> {
                     height: 80,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.all(Radius.circular(14)),
-                        color: Colors.blue.shade200,
+                        //   color: Colors.blue.shade200,
                         image: DecorationImage(
                             image: AssetImage("assets/images/logo.png"))),
                   ),
@@ -229,8 +230,8 @@ class _CartState extends State<Cart> {
                 alignment: Alignment.center,
                 child: IconButton(
                   icon: Icon(
-                    Icons.close,
-                    color: Colors.white,
+                    Icons.close_outlined,
+                    color: Colors.black,
                     size: 15,
                   ),
                   onPressed: () {

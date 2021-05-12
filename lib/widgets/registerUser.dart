@@ -136,6 +136,7 @@ class _RegisterUserState extends State<RegisterUser> {
       },
       child: SingleChildScrollView(
         child: Card(
+          color: Theme.of(context).scaffoldBackgroundColor,
           child: _employeeID == null
               ? Column(children: [
                   Container(

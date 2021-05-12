@@ -13,6 +13,12 @@ Future<void> getSaleFromDB(
 // Accessing worksheet via index.
   final Worksheet sheet = workbook.worksheets[0];
 
+  //Adding style to heading
+  Style headingStyle = workbook.styles.add('headingStyle');
+  headingStyle.bold = true;
+  headingStyle.fontSize = 14;
+  headingStyle.backColor = '#00FFFF';
+
 // Set the text value.
   // Setting value in the cell.
   sheet.getRangeByName('A1').setText('Date');
@@ -31,6 +37,22 @@ Future<void> getSaleFromDB(
   sheet.getRangeByName('N1').setText('Refunded Qty');
   sheet.getRangeByName('O1').setText('Refunded Amount');
   sheet.getRangeByName('P1').setText('Final Amount');
+  sheet.getRangeByName('A1').cellStyle = headingStyle;
+  sheet.getRangeByName('B1').cellStyle = headingStyle;
+  sheet.getRangeByName('C1').cellStyle = headingStyle;
+  sheet.getRangeByName('D1').cellStyle = headingStyle;
+  sheet.getRangeByName('E1').cellStyle = headingStyle;
+  sheet.getRangeByName('F1').cellStyle = headingStyle;
+  sheet.getRangeByName('G1').cellStyle = headingStyle;
+  sheet.getRangeByName('H1').cellStyle = headingStyle;
+  sheet.getRangeByName('I1').cellStyle = headingStyle;
+  sheet.getRangeByName('J1').cellStyle = headingStyle;
+  sheet.getRangeByName('K1').cellStyle = headingStyle;
+  sheet.getRangeByName('L1').cellStyle = headingStyle;
+  sheet.getRangeByName('M1').cellStyle = headingStyle;
+  sheet.getRangeByName('N1').cellStyle = headingStyle;
+  sheet.getRangeByName('O1').cellStyle = headingStyle;
+  sheet.getRangeByName('P1').cellStyle = headingStyle;
 
   int dateRow = 2;
   int detailsRow = 2;

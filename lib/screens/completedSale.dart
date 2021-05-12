@@ -38,71 +38,80 @@ class CompletedSale extends StatelessWidget {
     return Scaffold(
       body: WillPopScope(
         onWillPop: () => _onBackPressed(context),
-        child: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              CustomAppBar(
-                title: 'Sale Details',
-                subtitle: 'View your save details!',
-                needBackButton: false,
-              ),
-              Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(10),
-                  margin: EdgeInsets.only(top: 15),
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Payment Details',
-                    style: GoogleFonts.openSans(
-                      textStyle:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                  )),
-              ...paymentDetails.map((element) {
-                return Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(10),
-                    child: Column(children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            element.title,
-                            style: GoogleFonts.openSans(
-                              textStyle: TextStyle(
-                                  fontSize: 15, fontWeight: FontWeight.bold),
-                            ),
+        child: Column(
+          children: [
+            CustomAppBar(
+              title: 'Sale Details',
+              subtitle: 'View your save details!',
+              needBackButton: false,
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(10),
+                        margin: EdgeInsets.only(top: 15),
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Payment Details',
+                          style: GoogleFonts.openSans(
+                            textStyle: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
                           ),
-                          Text(element.value),
-                        ],
+                        )),
+                    ...paymentDetails.map((element) {
+                      return Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.all(10),
+                          child: Column(children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  element.title,
+                                  style: GoogleFonts.openSans(
+                                    textStyle: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                Text(element.value),
+                              ],
+                            ),
+                            Divider(
+                              color: Colors.black,
+                            )
+                          ]));
+                    }).toList(),
+                    Container(
+                      width: double.infinity,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      child: CustomButton(
+                        buttonFunction: () {
+                          _createPDF();
+                        },
+                        buttonText: 'Invoice PDF',
                       ),
-                      Divider(
-                        color: Colors.black,
-                      )
-                    ]));
-              }).toList(),
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                child: CustomButton(
-                  buttonFunction: () {
-                    _createPDF();
-                  },
-                  buttonText: 'Invoice PDF',
+                    ),
+                    Container(
+                      width: double.infinity,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      child: CustomButton(
+                        buttonFunction: () {
+                          Navigator.pushReplacementNamed(context, '/');
+                        },
+                        buttonText: 'Go Back',
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                child: CustomButton(
-                  buttonFunction: () {
-                    Navigator.pushReplacementNamed(context, '/');
-                  },
-                  buttonText: 'Go Back',
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
