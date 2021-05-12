@@ -16,6 +16,7 @@ class _ManageProductsState extends State<ManageProducts> {
   final List<Products> availableProducts = [];
   final List<Products> finishedProducts = [];
   bool _showFinishedProduct = false;
+  bool _fetchedData = false;
 
   Future<void> getAllProducts(BuildContext context) async {
     await databaseReference
@@ -39,6 +40,9 @@ class _ManageProductsState extends State<ManageProducts> {
           }
         });
       });
+      setState(() {
+        _fetchedData = true;
+      });
     }).onError((error, stackTrace) {
       print(error);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -52,7 +56,6 @@ class _ManageProductsState extends State<ManageProducts> {
   @override
   void initState() {
     getAllProducts(context);
-
     super.initState();
   }
 
@@ -94,132 +97,119 @@ class _ManageProductsState extends State<ManageProducts> {
           ],
         ),
       ),
-      body: Column(children: [
-        CustomAppBar(
-            title: 'Manage Products', subtitle: 'Manage your products!'),
-        Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
-                Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(10),
-                    margin: EdgeInsets.only(top: 15),
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Available Products',
-                      style: GoogleFonts.openSans(
-                        textStyle: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                    )),
-                if (availableProducts.isNotEmpty)
-                  Container(
-                    height: screenMaxHeight * .483,
-                    child: ListView.builder(
-                      itemCount: availableProducts.length,
-                      itemBuilder: (context, index) {
-                        return createCartListItem(index, availableProducts);
-                      },
-                    ),
+      body: !_fetchedData
+          ? Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Center(
+                  child: CircularProgressIndicator.adaptive(
+                    backgroundColor: Theme.of(context).primaryColor,
                   ),
-                if (availableProducts.isEmpty)
-                  Container(
-                      height: screenMaxHeight * 0.20,
-                      width: double.infinity,
-                      alignment: Alignment.center,
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: Image.asset(
-                        'assets/images/empty_cart.png',
-                      )),
-                if (availableProducts.isEmpty)
-                  Container(
-                    width: double.infinity,
-                    alignment: Alignment.center,
+                ),
+                Container(
                     margin: EdgeInsets.symmetric(vertical: 10),
-                    child: Text(
-                      'No Products',
-                      style: GoogleFonts.openSans(
-                        textStyle: TextStyle(
-                            fontSize: 15, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(10),
-                  margin: EdgeInsets.only(top: 15),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Finished Products',
-                        style: GoogleFonts.openSans(
-                          textStyle: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
+                    child: Text('Please Wait..'))
+              ],
+            )
+          : Column(children: [
+              CustomAppBar(
+                  title: 'Manage Products', subtitle: 'Manage your products!'),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.all(10),
+                          margin: EdgeInsets.only(top: 15),
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Available Products',
+                            style: GoogleFonts.openSans(
+                              textStyle: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                          )),
+                      if (availableProducts.isNotEmpty)
+                        Container(
+                          height: screenMaxHeight * .483,
+                          child: ListView.builder(
+                            itemCount: availableProducts.length,
+                            itemBuilder: (context, index) {
+                              return createCartListItem(
+                                  index, availableProducts);
+                            },
+                          ),
+                        ),
+                      if (availableProducts.isEmpty)
+                        Container(
+                            height: screenMaxHeight * 0.20,
+                            width: double.infinity,
+                            alignment: Alignment.center,
+                            padding: EdgeInsets.symmetric(horizontal: 20),
+                            child: Image.asset(
+                              'assets/images/empty_products.png',
+                            )),
+                      Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(10),
+                        margin: EdgeInsets.only(top: 15),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Finished Products',
+                              style: GoogleFonts.openSans(
+                                textStyle: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Switch.adaptive(
+                                value: _showFinishedProduct,
+                                onChanged: (val) {
+                                  setState(() {
+                                    _showFinishedProduct = val;
+                                  });
+                                }),
+                          ],
                         ),
                       ),
-                      Switch.adaptive(
-                          value: _showFinishedProduct,
-                          onChanged: (val) {
-                            setState(() {
-                              _showFinishedProduct = val;
-                            });
-                          }),
+                      if (_showFinishedProduct && finishedProducts.isNotEmpty)
+                        Container(
+                          height: screenMaxHeight * .483,
+                          child: ListView.builder(
+                            itemCount: finishedProducts.length,
+                            itemBuilder: (context, index) {
+                              return createCartListItem(
+                                  index, finishedProducts);
+                            },
+                          ),
+                        ),
+                      if (_showFinishedProduct && finishedProducts.isEmpty)
+                        FittedBox(
+                            alignment: Alignment.center,
+                            child: Image.asset(
+                              'assets/images/empty_products.png',
+                            )),
+                      if (!_showFinishedProduct)
+                        Container(
+                          margin: EdgeInsets.symmetric(horizontal: 10),
+                          width: double.infinity,
+                          child: Card(
+                              elevation: 3,
+                              child: Container(
+                                padding: EdgeInsets.all(10),
+                                child: ListTile(
+                                    leading: Icon(Icons.info_outline),
+                                    title: Text(
+                                        'Please Delete/Update Finished Products')),
+                              )),
+                        ),
                     ],
                   ),
                 ),
-                if (_showFinishedProduct && finishedProducts.isNotEmpty)
-                  Container(
-                    height: screenMaxHeight * .483,
-                    child: ListView.builder(
-                      itemCount: finishedProducts.length,
-                      itemBuilder: (context, index) {
-                        return createCartListItem(index, finishedProducts);
-                      },
-                    ),
-                  ),
-                if (_showFinishedProduct && finishedProducts.isEmpty)
-                  Container(
-                      height: screenMaxHeight * 0.20,
-                      width: double.infinity,
-                      alignment: Alignment.center,
-                      padding: EdgeInsets.all(10),
-                      child: Image.asset(
-                        'assets/images/empty_cart.png',
-                      )),
-                if (_showFinishedProduct && finishedProducts.isEmpty)
-                  Container(
-                    width: double.infinity,
-                    alignment: Alignment.center,
-                    margin: EdgeInsets.symmetric(vertical: 10),
-                    child: Text(
-                      'No Products',
-                      style: GoogleFonts.openSans(
-                        textStyle: TextStyle(
-                            fontSize: 15, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                if (!_showFinishedProduct)
-                  Container(
-                    margin: EdgeInsets.symmetric(horizontal: 10),
-                    width: double.infinity,
-                    child: Card(
-                        elevation: 3,
-                        child: Container(
-                          padding: EdgeInsets.all(10),
-                          child: ListTile(
-                              leading: Icon(Icons.info_outline),
-                              title: Text(
-                                  'Please Delete/Update Finished Products')),
-                        )),
-                  ),
-              ],
-            ),
-          ),
-        ),
-      ]),
+              ),
+            ]),
     );
   }
 

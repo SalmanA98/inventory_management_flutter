@@ -12,7 +12,13 @@ class RegisterUser extends StatefulWidget {
   final String userAge;
   final String userNumber;
   final String adminPriv;
-  RegisterUser({this.userAge, this.adminPriv, this.userName, this.userNumber});
+  final String userLocation;
+  RegisterUser(
+      {this.userAge,
+      this.adminPriv,
+      this.userName,
+      this.userNumber,
+      this.userLocation});
 
   @override
   _RegisterUserState createState() => _RegisterUserState();
@@ -25,15 +31,13 @@ class _RegisterUserState extends State<RegisterUser> {
 
   String _employeeID;
 
-  final String shopLocation = 'D';
-
   Future<void> _createUsername() async {
     String _userID;
     var rnd = new Random();
     var code = rnd.nextInt(9999) + 1000;
-    _userID = ('EM' + shopLocation + code.toString()).toUpperCase();
+    _userID = ('EM' + widget.userLocation + code.toString()).toUpperCase();
     await databaseReference
-        .child('D')
+        .child(widget.userLocation)
         .child('Employees')
         .once()
         .then((snapshot) {
@@ -42,7 +46,7 @@ class _RegisterUserState extends State<RegisterUser> {
       users.forEach((key, value) {
         if (key.toString().toUpperCase() == _userID) {
           code = rnd.nextInt(9999) + 1000;
-          _userID = 'EM' + shopLocation + code.toString();
+          _userID = 'EM' + widget.userLocation + code.toString();
         }
       });
       setState(() {
@@ -61,7 +65,7 @@ class _RegisterUserState extends State<RegisterUser> {
                 email: _employeeID + '@hekayet3tr.com', password: pwd)
             .then((_) {
           databaseReference
-              .child('D')
+              .child(widget.userLocation)
               .child('Employees')
               .child(_employeeID)
               .update({

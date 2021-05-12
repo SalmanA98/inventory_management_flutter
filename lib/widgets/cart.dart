@@ -76,27 +76,12 @@ class _CartState extends State<Cart> {
             ),
           ),
           if (widget.cartItems.isEmpty)
-            Container(
-                height: screenMaxHeight * 0.20,
-                width: double.infinity,
+            FittedBox(
+                fit: BoxFit.fill,
                 alignment: Alignment.center,
-                padding: EdgeInsets.all(10),
                 child: Image.asset(
-                  'assets/images/empty_cart.png',
+                  'assets/images/empty_products.png',
                 )),
-          if (widget.cartItems.isEmpty)
-            Container(
-              width: double.infinity,
-              alignment: Alignment.center,
-              margin: EdgeInsets.symmetric(vertical: 10),
-              child: Text(
-                'Your Cart Is Empty',
-                style: GoogleFonts.openSans(
-                  textStyle:
-                      TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
           if (widget.cartItems.isNotEmpty)
             Container(
               height: screenMaxHeight * .35,

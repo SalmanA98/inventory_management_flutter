@@ -15,6 +15,7 @@ class _LoginPageState extends State<LoginPage> {
   final _pwdInput = TextEditingController();
   String username;
   String pwd;
+  bool _progressBar = false;
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -54,21 +55,39 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   _authenticateUser() async {
+    setState(() {
+      _progressBar = true;
+    });
     username = _usernameInput.text;
     pwd = _pwdInput.text;
     if (username.isEmpty || pwd.isEmpty) {
       return;
     }
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: username + '@hekayet3tr.com', password: pwd);
+      await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+              email: username + '@hekayet3tr.com', password: pwd.toLowerCase())
+          .then((value) {
+        setState(() {
+          _progressBar = false;
+        });
+      });
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         showError('No user found for that email!');
+        setState(() {
+          _progressBar = false;
+        });
       } else if (e.code == 'wrong-password') {
         showError('Wrong password provided for that user.');
+        setState(() {
+          _progressBar = false;
+        });
       } else {
         showError(e.message);
+        setState(() {
+          _progressBar = false;
+        });
       }
     }
   }
@@ -121,10 +140,12 @@ class _LoginPageState extends State<LoginPage> {
                         SizedBox(
                           height: 20,
                         ),
-                        CustomButton(
-                          buttonFunction: _authenticateUser,
-                          buttonText: 'Login',
-                        )
+                        if (!_progressBar)
+                          CustomButton(
+                            buttonFunction: _authenticateUser,
+                            buttonText: 'Login',
+                          ),
+                        if (_progressBar) LinearProgressIndicator(),
                       ],
                     ),
                   )

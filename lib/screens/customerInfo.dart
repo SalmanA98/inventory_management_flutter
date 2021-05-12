@@ -24,40 +24,44 @@ class _CustomerInfoState extends State<CustomerInfo> {
   final TextEditingController discInput = TextEditingController();
 
   final TextEditingController employeeIdInput = TextEditingController();
-  int _radioVat = -1;
-  int _radioPayment = -1;
+
   bool _isCurrentEmployee = false;
   String vat;
   String paymentMethod;
   String currentEmployeeID;
-  final List<String> vatList = const ['VAT', 'No VAT'];
 
-  void _onVatRadioChanged(int value) {
-    setState(() {
-      _radioVat = value;
-      switch (_radioVat) {
-        case 0:
-          vat = '5%';
-          break;
-        case 1:
-          vat = '0%';
-          break;
-      }
-    });
+  int _valueVat = -1;
+  int _valuePM = -1;
+
+  final List<String> vatList = const ['VAT', 'No VAT'];
+  final List<String> paymentList = const ['Cash', 'Card'];
+
+  void _onVatChoice(int value) {
+    switch (value) {
+      case 0:
+        print('VAT');
+        vat = '5%';
+        break;
+      case 1:
+        print('No VAT');
+        vat = '0%';
+        break;
+    }
   }
 
-  void _onPaymentRadioChanged(int value) {
-    setState(() {
-      _radioPayment = value;
-      switch (_radioPayment) {
-        case 0:
-          paymentMethod = 'Cash';
-          break;
-        case 1:
-          paymentMethod = 'Card';
-          break;
-      }
-    });
+  void _onPaymentChoice(int value) {
+    switch (value) {
+      case 0:
+        print('CASH');
+
+        paymentMethod = 'Cash';
+        break;
+      case 1:
+        print('Card');
+
+        paymentMethod = 'Card';
+        break;
+    }
   }
 
   showError(String errormessage) {
@@ -229,39 +233,71 @@ class _CustomerInfoState extends State<CustomerInfo> {
                         keyboardType: TextInputType.number,
                         textIcon: Icon(Icons.monetization_on_rounded)),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Radio(
-                        value: 0,
-                        groupValue: _radioVat,
-                        onChanged: _onVatRadioChanged,
+                  Container(
+                    margin: EdgeInsets.only(top: 10),
+                    width: double.infinity,
+                    padding: EdgeInsets.all(5),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Choose VAT:',
+                      style: GoogleFonts.openSans(
+                        textStyle: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.bold),
                       ),
-                      Text('VAT'),
-                      Radio(
-                        value: 1,
-                        groupValue: _radioVat,
-                        onChanged: _onVatRadioChanged,
-                      ),
-                      Text('No VAT')
-                    ],
+                    ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Radio(
-                        value: 0,
-                        groupValue: _radioPayment,
-                        onChanged: _onPaymentRadioChanged,
+                  Wrap(
+                    children: List<Widget>.generate(
+                      2,
+                      (int index) {
+                        return Container(
+                          margin: EdgeInsets.all(5),
+                          child: ChoiceChip(
+                            label: Text(vatList[index]),
+                            selected: _valueVat == index,
+                            onSelected: (bool selected) {
+                              setState(() {
+                                _valueVat = selected ? index : null;
+                              });
+                              _onVatChoice(index);
+                            },
+                          ),
+                        );
+                      },
+                    ).toList(),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 10),
+                    width: double.infinity,
+                    padding: EdgeInsets.all(5),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Payment Method:',
+                      style: GoogleFonts.openSans(
+                        textStyle: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.bold),
                       ),
-                      Text('Cash'),
-                      Radio(
-                        value: 1,
-                        groupValue: _radioPayment,
-                        onChanged: _onPaymentRadioChanged,
-                      ),
-                      Text('Card')
-                    ],
+                    ),
+                  ),
+                  Wrap(
+                    children: List<Widget>.generate(
+                      2,
+                      (int index) {
+                        return Container(
+                          margin: EdgeInsets.all(5),
+                          child: ChoiceChip(
+                            label: Text(paymentList[index]),
+                            selected: _valuePM == index,
+                            onSelected: (bool selected) {
+                              setState(() {
+                                _valuePM = selected ? index : null;
+                              });
+                              _onPaymentChoice(index);
+                            },
+                          ),
+                        );
+                      },
+                    ).toList(),
                   ),
                   Container(
                     margin: EdgeInsets.all(10),

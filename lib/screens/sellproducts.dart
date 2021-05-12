@@ -16,6 +16,8 @@ class _SellProductsState extends State<SellProducts> {
   final List<Products> products = [];
   final List<Products> toCart = [];
   int availableQty;
+  bool _productsEmpty = true;
+  bool _fetchedData = false;
 
   Future<void> getAllProducts(BuildContext context) async {
     await databaseReference
@@ -34,6 +36,16 @@ class _SellProductsState extends State<SellProducts> {
           }
         });
       });
+      setState(() {
+        _fetchedData = true;
+      });
+      if (_fetchedData) {
+        if (products.isNotEmpty) {
+          setState(() {
+            _productsEmpty = false;
+          });
+        }
+      }
     }).onError((error, stackTrace) {
       print(error);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -89,7 +101,6 @@ class _SellProductsState extends State<SellProducts> {
   @override
   void initState() {
     getAllProducts(context);
-
     super.initState();
   }
 
@@ -118,31 +129,56 @@ class _SellProductsState extends State<SellProducts> {
           ],
         ),
       ),
-      body: Column(
-        children: [
-          CustomAppBar(
-            title: 'Sell Products',
-            subtitle: 'Add Products to cart!',
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Container(
-                    height: screenMaxHeight * .80,
-                    child: ListView.builder(
-                      itemCount: products.length == null ? 0 : products.length,
-                      itemBuilder: (context, index) {
-                        return createCartListItem(index);
-                      },
-                    ),
+      body: !_fetchedData
+          ? Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Center(
+                  child: CircularProgressIndicator.adaptive(
+                    backgroundColor: Theme.of(context).primaryColor,
                   ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+                ),
+                Container(
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    child: Text('Please Wait..'))
+              ],
+            )
+          : _productsEmpty
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Center(
+                      child: Image.asset('assets/images/empty_products.png'),
+                    ),
+                  ],
+                )
+              : Column(
+                  children: [
+                    CustomAppBar(
+                      title: 'Sell Products',
+                      subtitle: 'Add Products to cart!',
+                    ),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            Container(
+                              height: screenMaxHeight * .80,
+                              child: ListView.builder(
+                                itemCount: products.length == null
+                                    ? 0
+                                    : products.length,
+                                itemBuilder: (context, index) {
+                                  return createCartListItem(index);
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
     );
   }
 

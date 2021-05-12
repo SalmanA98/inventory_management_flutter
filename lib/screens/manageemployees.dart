@@ -14,6 +14,7 @@ class ManageEmployees extends StatefulWidget {
 
 class _ManageEmployeesState extends State<ManageEmployees> {
   List<Employee> employeesList = [];
+  bool _fetchedData = false;
 
   Future<void> getAllEmployees(BuildContext context) async {
     await databaseReference
@@ -32,6 +33,9 @@ class _ManageEmployeesState extends State<ManageEmployees> {
               age: details['Age'].toString(),
               lastActivity: details['Last Activity'].toString()));
         });
+      });
+      setState(() {
+        _fetchedData = true;
       });
     }).onError((error, stackTrace) {
       Fluttertoast.showToast(
@@ -84,32 +88,46 @@ class _ManageEmployeesState extends State<ManageEmployees> {
           ],
         ),
       ),
-      body: Column(
-        children: [
-          CustomAppBar(
-              title: 'Manage Employees',
-              subtitle: 'Edit, Add or Remove Employees!'),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Container(
-                    height: screenMaxHeight * .80,
-                    child: ListView.builder(
-                      itemCount: employeesList.length == null
-                          ? 0
-                          : employeesList.length,
-                      itemBuilder: (context, index) {
-                        return createCartListItem(index);
-                      },
+      body: !_fetchedData
+          ? Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Center(
+                  child: CircularProgressIndicator.adaptive(
+                    backgroundColor: Theme.of(context).primaryColor,
+                  ),
+                ),
+                Container(
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    child: Text('Please Wait..'))
+              ],
+            )
+          : Column(
+              children: [
+                CustomAppBar(
+                    title: 'Manage Employees',
+                    subtitle: 'Edit, Add or Remove Employees!'),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Container(
+                          height: screenMaxHeight * .80,
+                          child: ListView.builder(
+                            itemCount: employeesList.length == null
+                                ? 0
+                                : employeesList.length,
+                            itemBuilder: (context, index) {
+                              return createCartListItem(index);
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 

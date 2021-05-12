@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:inventory_management/screens/homepage.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
@@ -160,5 +161,5 @@ Future<void> getSaleFromDB(
 // Open the Excel document in mobile
   OpenFile.open('$path/$filename.xlsx');
 
-  Navigator.pushReplacementNamed(context, '/');
+  Navigator.push(context, MaterialPageRoute(builder: (_) => HomePage()));
 }
