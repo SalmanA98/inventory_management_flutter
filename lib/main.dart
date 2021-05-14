@@ -15,6 +15,7 @@ void main() async {
   runApp(MaterialApp(
     //Splash screen animation
     home: AnimatedSplashScreen(
+        duration: 1000,
         splash: Image.asset(
           'assets/images/logo.png',
         ),

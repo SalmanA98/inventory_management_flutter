@@ -165,6 +165,7 @@ class _ManageEmployeesState extends State<ManageEmployees> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Container(
+                              margin: EdgeInsets.only(bottom: 10),
                               padding: EdgeInsets.only(right: 8, top: 4),
                               child: Text(
                                 employeesList[index].name,
@@ -184,16 +185,6 @@ class _ManageEmployeesState extends State<ManageEmployees> {
                                   Text(
                                     "ID: ${employeesList[index].id}",
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: Container(
-                                      child: FittedBox(
-                                        child: Text(
-                                          employeesList[index].number,
-                                        ),
-                                      ),
-                                    ),
-                                  )
                                 ],
                               ),
                             ),

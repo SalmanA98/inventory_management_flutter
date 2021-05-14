@@ -35,7 +35,7 @@ class _HomePageState extends State<HomePage> {
 
   getUser() async {
     User firebaseUser = _auth.currentUser;
-    await firebaseUser?.reload();
+    firebaseUser?.reload();
     firebaseUser = _auth.currentUser;
 
     if (firebaseUser != null) {
