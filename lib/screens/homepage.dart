@@ -1,13 +1,8 @@
-import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import '../widgets/griddashboard.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../screens/userprofile.dart';
-import '../screens/login.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../widgets/griddashboard.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -16,10 +11,10 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  User user;
-  var username;
-  bool isloggedin = false;
-  var isAdmin;
+  User _user;
+  var _username;
+  bool _isloggedin = false;
+  var _isAdmin;
   bool _checkComplete = false;
 
   checkAuthentification() async {
@@ -41,14 +36,14 @@ class _HomePageState extends State<HomePage> {
     if (firebaseUser != null) {
       setState(() {
         if (firebaseUser.email.startsWith('e')) {
-          this.username = firebaseUser.email.substring(0, 7).toUpperCase();
+          this._username = firebaseUser.email.substring(0, 7).toUpperCase();
         } else {
-          this.username = firebaseUser.email.substring(0, 6).toUpperCase();
+          this._username = firebaseUser.email.substring(0, 6).toUpperCase();
         }
-        this.user = firebaseUser;
+        this._user = firebaseUser;
 
-        this.isloggedin = true;
-        this.isAdmin = firebaseUser.email.substring(0, 1);
+        this._isloggedin = true;
+        this._isAdmin = firebaseUser.email.substring(0, 1);
       });
     }
   }
@@ -60,9 +55,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    super.initState();
     this.checkAuthentification();
     this.getUser();
+    super.initState();
   }
 
   @override
@@ -105,7 +100,7 @@ class _HomePageState extends State<HomePage> {
                             height: screenMaxHeight * 0.01,
                           ),
                           Text(
-                            'Welcome $username!',
+                            'Welcome $_username!',
                             style: GoogleFonts.openSans(
                                 textStyle: TextStyle(
                                     color: Color(0xffa29aac),
@@ -129,7 +124,7 @@ class _HomePageState extends State<HomePage> {
                 SizedBox(
                   height: screenMaxHeight * 0.05,
                 ),
-                GridDashboard(isAdmin)
+                GridDashboard(_isAdmin)
               ],
             ),
     );

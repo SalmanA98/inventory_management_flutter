@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:inventory_management/widgets/customAppBar.dart';
-import 'package:inventory_management/widgets/customButton.dart';
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../widgets/customAppBar.dart';
+import '../widgets/customButton.dart';
 import '../models/paymentdetails.dart';
 import '../models/products.dart';
-import 'package:syncfusion_flutter_pdf/pdf.dart';
 import '../models/invoice.dart';
-import 'package:intl/intl.dart';
 
+// ignore: must_be_immutable
 class CompletedSale extends StatelessWidget {
   final List<Map<String, Object>> details;
-  final List<PaymentDetails> paymentDetails = [];
-  List<Products> productsSold;
+  final List<PaymentDetails> _paymentDetails = [];
+  List<Products> _productsSold;
 
   CompletedSale({@required this.details});
 
   void _getStuff() {
-    productsSold = details[4]['Items Purchased'];
+    _productsSold = details[4]['Items Purchased'];
     for (int i = 0; i < details.length; i++) {
       details[i].forEach((key, value) {
         if (key.toString() != 'Items Purchased') {
-          paymentDetails.add(
+          _paymentDetails.add(
               PaymentDetails(title: key.toString(), value: value.toString()));
         }
       });
@@ -61,7 +61,7 @@ class CompletedSale extends StatelessWidget {
                                 fontSize: 20, fontWeight: FontWeight.bold),
                           ),
                         )),
-                    ...paymentDetails.map((element) {
+                    ..._paymentDetails.map((element) {
                       return Container(
                           width: double.infinity,
                           padding: EdgeInsets.all(10),
@@ -299,14 +299,14 @@ class CompletedSale extends StatelessWidget {
     headerRow.cells[4].value = 'Total';
 
 //Add rows
-    for (int i = 0; i < productsSold.length; i++) {
-      double totOfProd = double.tryParse(productsSold[i].price) *
-          int.tryParse(productsSold[i].qty);
+    for (int i = 0; i < _productsSold.length; i++) {
+      double totOfProd = double.tryParse(_productsSold[i].price) *
+          int.tryParse(_productsSold[i].qty);
       addProducts(
           (i + 1).toString(),
-          productsSold[i].name,
-          double.tryParse(productsSold[i].price),
-          int.tryParse(productsSold[i].qty),
+          _productsSold[i].name,
+          double.tryParse(_productsSold[i].price),
+          int.tryParse(_productsSold[i].qty),
           totOfProd,
           grid);
     }

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_database/firebase_database.dart';
 import '../widgets/customAppBar.dart';
 import '../models/database.dart';
 import '../widgets/customButton.dart';
 import '../widgets/customTextField.dart';
 import '../screens/refundproducts.dart';
-import 'package:firebase_database/firebase_database.dart';
 
 class RefundSaleID extends StatefulWidget {
   @override
@@ -15,7 +15,7 @@ class _RefundSaleIDState extends State<RefundSaleID> {
   final _saleIdInput = TextEditingController();
 
   bool _startedCheck = false;
-  Future<void> authenticateSale(BuildContext context, String saleID) async {
+  Future<void> _authenticateSale(BuildContext context, String saleID) async {
     String year = saleID.substring(0, 4);
     String month = saleID.substring(4, 6);
     String day = saleID.substring(6, 8);
@@ -85,7 +85,7 @@ class _RefundSaleIDState extends State<RefundSaleID> {
             title: Text('ERROR'),
             content: Text(errormessage),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
@@ -105,7 +105,7 @@ class _RefundSaleIDState extends State<RefundSaleID> {
       setState(() {
         _startedCheck = true;
       });
-      authenticateSale(context, saleID);
+      _authenticateSale(context, saleID);
     }
   }
 

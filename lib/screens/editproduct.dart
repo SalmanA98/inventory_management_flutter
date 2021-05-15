@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:inventory_management/models/database.dart';
-import 'package:inventory_management/models/paymentdetails.dart';
-import 'package:inventory_management/screens/homepage.dart';
-import 'package:inventory_management/widgets/customAppBar.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../models/database.dart';
+import '../models/paymentdetails.dart';
+import './homepage.dart';
+import '../widgets/customAppBar.dart';
 import '../widgets/customTextField.dart';
 import '../widgets/customButton.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class EditProduct extends StatefulWidget {
   final String currentPrice;
   final String currentQty;
   final String productName;
-  EditProduct(
+  const EditProduct(
       {@required this.currentPrice,
       @required this.currentQty,
       @required this.productName});
@@ -25,7 +25,7 @@ class _EditProductState extends State<EditProduct> {
 
   final _priceInput = TextEditingController();
 
-  final List<PaymentDetails> productDetails = [];
+  final List<PaymentDetails> _productDetails = [];
 
   bool _updateSuccess = false;
 
@@ -116,19 +116,24 @@ class _EditProductState extends State<EditProduct> {
 
   @override
   void initState() {
-    // TODO: implement initState
-    super.initState();
-    productDetails
+    _productDetails
         .add(PaymentDetails(title: 'Name', value: widget.productName));
-    productDetails.add(
+    _productDetails.add(
         PaymentDetails(title: 'Current Price', value: widget.currentPrice));
-    productDetails
+    _productDetails
         .add(PaymentDetails(title: 'Current Qty', value: widget.currentQty));
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _qtyInput.dispose();
+    _priceInput.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    var screenMaxHeight = MediaQuery.of(context).size.height;
     return Scaffold(
         body: Column(
       children: [
@@ -158,7 +163,7 @@ class _EditProductState extends State<EditProduct> {
                               fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       )),
-                  ...productDetails.map((element) {
+                  ..._productDetails.map((element) {
                     return Container(
                         width: double.infinity,
                         padding: EdgeInsets.all(10),

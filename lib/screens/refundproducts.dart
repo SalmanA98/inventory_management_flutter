@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:inventory_management/models/paymentdetails.dart';
-import 'package:inventory_management/widgets/customButton.dart';
-import 'package:inventory_management/widgets/customTextField.dart';
-import '../widgets/customAppBar.dart';
-import '../models/database.dart';
 import 'package:firebase_database/firebase_database.dart';
-import '../models/products.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import '../models/paymentdetails.dart';
+import '../widgets/customButton.dart';
+import '../widgets/customTextField.dart';
+import '../widgets/customAppBar.dart';
+import '../models/database.dart';
+import '../models/products.dart';
 
 class RefundProducts extends StatefulWidget {
   final String date;
   final String time;
   final String saleID;
 
-  RefundProducts(
+  const RefundProducts(
       {@required this.date, @required this.time, @required this.saleID});
 
   @override
@@ -22,20 +22,19 @@ class RefundProducts extends StatefulWidget {
 }
 
 class _RefundProductsState extends State<RefundProducts> {
-  final List<Products> products = [];
-  final List<PaymentDetails> paymentDetails = [];
-  String discount;
-  String vat;
-  String totalPrice;
-  String refundedPrice;
+  List<Products> _products = [];
+  List<PaymentDetails> _paymentDetails = [];
+  String _discount;
+  String _vat;
+  String _totalPrice;
+  String _refundedPrice;
 
-  Products productToRefund;
+  Products _productToRefund;
   bool _refundEach = false;
-  bool _selectedProduct = false;
   int _selectedIndex = -1;
   final TextEditingController _qtyController = new TextEditingController();
 
-  Future<void> getSaleInfo(
+  Future<void> _getSaleInfo(
       BuildContext context, String date, String time) async {
     await databaseReference
         .child('D')
@@ -50,19 +49,19 @@ class _RefundProductsState extends State<RefundProducts> {
             key.toString() != 'Refund Details') {
           print(key);
           if (key == 'Discount') {
-            discount = value;
+            _discount = value;
           }
           if (key == 'VAT') {
-            vat = value;
+            _vat = value;
           }
           if (key == 'Refunded Amount') {
-            refundedPrice = value.toString();
+            _refundedPrice = value.toString();
           }
           if (key == 'Total After Refund') {
-            totalPrice = value.toString();
+            _totalPrice = value.toString();
           }
           setState(() {
-            paymentDetails.add(
+            _paymentDetails.add(
                 PaymentDetails(title: key.toString(), value: value.toString()));
           });
         }
@@ -70,7 +69,7 @@ class _RefundProductsState extends State<RefundProducts> {
           value.forEach((product, details) {
             if (details['Refunded'].toString() != 'Yes') {
               setState(() {
-                products.add(Products(
+                _products.add(Products(
                     name: product,
                     price: details['Base Price'].toString(),
                     qty: details['Qty'].toString()));
@@ -85,7 +84,7 @@ class _RefundProductsState extends State<RefundProducts> {
   void _onSelectedItem(int index, Products chosenProduct) {
     setState(() {
       _selectedIndex = index;
-      productToRefund = chosenProduct;
+      _productToRefund = chosenProduct;
     });
   }
 
@@ -97,7 +96,7 @@ class _RefundProductsState extends State<RefundProducts> {
             title: Text('ERROR'),
             content: Text(errormessage),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
@@ -150,12 +149,12 @@ class _RefundProductsState extends State<RefundProducts> {
                     .child(widget.date)
                     .child(widget.time)
                     .update({
-                  'Refunded Amount': totalPrice,
+                  'Refunded Amount': _totalPrice,
                   'Total After Refund': 0,
                 });
 
-                products.clear();
-                paymentDetails.clear();
+                _products.clear();
+                _paymentDetails.clear();
                 getSaleInfo(context, widget.date, widget.time);
               });
             }
@@ -181,27 +180,27 @@ class _RefundProductsState extends State<RefundProducts> {
                     int.tryParse(product.qty) - int.tryParse(qtyToRefud);
 
                 //Calculations
-                discount = discount.substring(0, discount.length - 1);
+                _discount = _discount.substring(0, _discount.length - 1);
 
-                vat = vat.substring(0, vat.length - 1);
+                _vat = _vat.substring(0, _vat.length - 1);
                 priceForQty =
                     double.tryParse(product.price) * int.tryParse(product.qty);
                 //If there is discount
-                if (int.tryParse(discount) > 0) {
+                if (int.tryParse(_discount) > 0) {
                   priceAfterDiscount = priceForQty -
-                      ((priceForQty * int.tryParse(discount)) / 100);
+                      ((priceForQty * int.tryParse(_discount)) / 100);
                 } else {
                   priceAfterDiscount = priceForQty;
                 }
                 //If there is vat
-                if (int.tryParse(vat) > 0) {
+                if (int.tryParse(_vat) > 0) {
                   priceAfterVat = priceAfterDiscount +
-                      ((priceForQty * int.tryParse(vat)) / 100);
+                      ((priceForQty * int.tryParse(_vat)) / 100);
                 } else {
                   priceAfterVat = priceAfterDiscount;
                 }
-                totalRefunded = priceAfterVat + double.tryParse(refundedPrice);
-                totalAfterRefund = double.tryParse(totalPrice) - totalRefunded;
+                totalRefunded = priceAfterVat + double.tryParse(_refundedPrice);
+                totalAfterRefund = double.tryParse(_totalPrice) - totalRefunded;
 
                 //Update db
                 setState(() {
@@ -244,8 +243,8 @@ class _RefundProductsState extends State<RefundProducts> {
                                     int.tryParse(qtyToRefud.toString())
                               }))
                           .then((_) {
-                            products.clear();
-                            paymentDetails.clear();
+                            _products.clear();
+                            _paymentDetails.clear();
                             getSaleInfo(context, widget.date, widget.time);
 
                             Fluttertoast.showToast(
@@ -268,7 +267,7 @@ class _RefundProductsState extends State<RefundProducts> {
 
   @override
   void initState() {
-    getSaleInfo(context, widget.date, widget.time);
+    _getSaleInfo(context, widget.date, widget.time);
     super.initState();
   }
 
@@ -319,7 +318,7 @@ class _RefundProductsState extends State<RefundProducts> {
                         ),
                       ),
                     ),
-                    ...paymentDetails.map((element) {
+                    ..._paymentDetails.map((element) {
                       return Container(
                           width: double.infinity,
                           padding: EdgeInsets.all(10),
@@ -354,7 +353,7 @@ class _RefundProductsState extends State<RefundProducts> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            if (products.isNotEmpty)
+                            if (_products.isNotEmpty)
                               Text(
                                 'Choose Products',
                                 style: GoogleFonts.openSans(
@@ -363,7 +362,7 @@ class _RefundProductsState extends State<RefundProducts> {
                                       fontWeight: FontWeight.bold),
                                 ),
                               ),
-                            if (products.isNotEmpty)
+                            if (_products.isNotEmpty)
                               Switch.adaptive(
                                   value: _refundEach,
                                   onChanged: (val) {
@@ -373,8 +372,8 @@ class _RefundProductsState extends State<RefundProducts> {
                                   })
                           ],
                         )),
-                    if (_refundEach && products.isNotEmpty)
-                      ...products.map(
+                    if (_refundEach && _products.isNotEmpty)
+                      ..._products.map(
                         (product) {
                           return Container(
                               padding: EdgeInsets.symmetric(horizontal: 5),
@@ -382,12 +381,12 @@ class _RefundProductsState extends State<RefundProducts> {
                               child: GestureDetector(
                                 onTap: () {
                                   _onSelectedItem(
-                                      products.indexOf(product), product);
+                                      _products.indexOf(product), product);
                                 },
                                 child: Card(
                                   shape: _selectedIndex != null &&
                                           _selectedIndex ==
-                                              products.indexOf(product)
+                                              _products.indexOf(product)
                                       ? new RoundedRectangleBorder(
                                           side: new BorderSide(
                                               color: Colors.blue, width: 2.0),
@@ -431,7 +430,7 @@ class _RefundProductsState extends State<RefundProducts> {
                               ));
                         },
                       ),
-                    if (_refundEach && products.isNotEmpty)
+                    if (_refundEach && _products.isNotEmpty)
                       Container(
                         padding: EdgeInsets.all(10),
                         child: CustomTextField(
@@ -450,7 +449,7 @@ class _RefundProductsState extends State<RefundProducts> {
                               padding: EdgeInsets.all(10),
                               child: ListTile(
                                 leading: Icon(Icons.info_outline),
-                                title: products.isEmpty
+                                title: _products.isEmpty
                                     ? Text('All products have been refunded')
                                     : Text('This will refund all the products'),
                               )),
@@ -460,7 +459,7 @@ class _RefundProductsState extends State<RefundProducts> {
                         padding:
                             EdgeInsets.symmetric(horizontal: 10, vertical: 20),
                         child: Visibility(
-                          visible: products.isEmpty
+                          visible: _products.isEmpty
                               ? false
                               : _refundEach
                                   ? _selectedIndex >= 0
@@ -469,8 +468,8 @@ class _RefundProductsState extends State<RefundProducts> {
                                   : true,
                           child: CustomButton(
                             buttonFunction: () => _refundEach
-                                ? _refundToDb(context, productToRefund, false)
-                                : _refundToDb(context, productToRefund, true),
+                                ? _refundToDb(context, _productToRefund, false)
+                                : _refundToDb(context, _productToRefund, true),
                             buttonText: 'Confirm Refund',
                           ),
                         )),

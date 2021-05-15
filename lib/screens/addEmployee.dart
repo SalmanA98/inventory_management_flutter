@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:inventory_management/models/database.dart';
-import 'package:inventory_management/models/employee.dart';
-import 'package:inventory_management/widgets/customAppBar.dart';
-import 'package:inventory_management/widgets/customButton.dart';
-import 'package:inventory_management/widgets/customTextField.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'dart:math';
-
-import 'package:inventory_management/widgets/registerUser.dart';
+import '../models/database.dart';
+import '../widgets/customAppBar.dart';
+import '../widgets/customButton.dart';
+import '../widgets/customTextField.dart';
+import '../widgets/registerUser.dart';
 
 class AddEmployee extends StatefulWidget {
   @override
@@ -17,21 +14,21 @@ class AddEmployee extends StatefulWidget {
 
 class _AddEmployeeState extends State<AddEmployee> {
   final _nameInput = TextEditingController();
-  List<String> locations = [];
 
   final _ageInput = TextEditingController();
 
   final _numberInput = TextEditingController();
 
-  final List<String> adminLabelList = const ['Admin', 'Not Admin'];
+  List<String> _locations = [];
+
+  final List<String> _adminLabelList = const ['Admin', 'Not Admin'];
 
   int _adminChipChoice = -1;
   int _locationChipChoice = -1;
-  String _employeeID;
 
   String _shopLocation;
 
-  String adminPriv;
+  String _adminPriv;
   bool _fetchedLocations = false;
 
   void _registerUser(
@@ -47,13 +44,13 @@ class _AddEmployeeState extends State<AddEmployee> {
     if (name.isNotEmpty &&
         age.isNotEmpty &&
         number.isNotEmpty &&
-        adminPriv.isNotEmpty &&
+        _adminPriv.isNotEmpty &&
         shop.isNotEmpty) {
       if (number.length >= 10) {
         showModalBottomSheet(
             context: context,
             builder: (_) => RegisterUser(
-                  adminPriv: adminPriv,
+                  adminPriv: _adminPriv,
                   userAge: age,
                   userName: name,
                   userNumber: number,
@@ -68,7 +65,7 @@ class _AddEmployeeState extends State<AddEmployee> {
       }
     } else {
       Fluttertoast.showToast(
-          msg: 'Fields cannot be empty!',
+          msg: 'Fields/Choices cannot be empty!',
           gravity: ToastGravity.CENTER,
           toastLength: Toast.LENGTH_SHORT,
           timeInSecForIosWeb: 1);
@@ -77,17 +74,34 @@ class _AddEmployeeState extends State<AddEmployee> {
 
   void _onAdminChanged(int value) {
     switch (value) {
+      case -1:
+        Fluttertoast.showToast(
+            msg: 'Choose Admin privilege',
+            gravity: ToastGravity.CENTER,
+            toastLength: Toast.LENGTH_SHORT,
+            timeInSecForIosWeb: 1);
+        break;
+
       case 0:
-        adminPriv = 'Yes';
+        _adminPriv = 'Yes';
         break;
       case 1:
-        adminPriv = 'No';
+        _adminPriv = 'No';
         break;
     }
   }
 
-  void _onLocationChanged(String locationChosen) {
-    _shopLocation = locationChosen.substring(0, 1).toUpperCase();
+  void _onLocationChanged(String locationChosen, int choice) {
+    if (choice != -1) {
+      _shopLocation = locationChosen.substring(0, 1).toUpperCase();
+      print(_shopLocation);
+    } else {
+      Fluttertoast.showToast(
+          msg: 'Location cannot be empty!',
+          gravity: ToastGravity.CENTER,
+          toastLength: Toast.LENGTH_SHORT,
+          timeInSecForIosWeb: 1);
+    }
   }
 
   Future<void> getAllLocations() async {
@@ -96,7 +110,7 @@ class _AddEmployeeState extends State<AddEmployee> {
         List<dynamic> values = datasnapshot.value;
         values.forEach((element) {
           if (element != null) {
-            locations.add(element.toString());
+            _locations.add(element.toString());
           }
         });
       }
@@ -115,9 +129,16 @@ class _AddEmployeeState extends State<AddEmployee> {
 
   @override
   void initState() {
-    // TODO: implement initState
-    super.initState();
     getAllLocations();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _ageInput.dispose();
+    _numberInput.dispose();
+    _nameInput.dispose();
+    super.dispose();
   }
 
   @override
@@ -134,7 +155,7 @@ class _AddEmployeeState extends State<AddEmployee> {
                   ),
                   Container(
                       margin: EdgeInsets.symmetric(vertical: 10),
-                      child: Text('Please Wait..'))
+                      child: const Text('Please Wait..'))
                 ],
               )
             : Column(
@@ -200,14 +221,14 @@ class _AddEmployeeState extends State<AddEmployee> {
                                   return Container(
                                     margin: EdgeInsets.all(5),
                                     child: ChoiceChip(
-                                      label: Text(adminLabelList[index]),
+                                      label: Text(_adminLabelList[index]),
                                       selected: _adminChipChoice == index,
                                       onSelected: (bool selected) {
                                         setState(() {
                                           _adminChipChoice =
-                                              selected ? index : null;
+                                              selected ? index : -1;
                                         });
-                                        _onAdminChanged(index);
+                                        _onAdminChanged(_adminChipChoice);
                                       },
                                     ),
                                   );
@@ -230,19 +251,20 @@ class _AddEmployeeState extends State<AddEmployee> {
                             ),
                             Wrap(
                               children: List<Widget>.generate(
-                                locations.isNotEmpty ? locations.length : 0,
+                                _locations.isNotEmpty ? _locations.length : 0,
                                 (int index) {
                                   return Container(
                                     margin: EdgeInsets.all(5),
                                     child: ChoiceChip(
-                                      label: Text(locations[index]),
+                                      label: Text(_locations[index]),
                                       selected: _locationChipChoice == index,
                                       onSelected: (bool selected) {
                                         setState(() {
                                           _locationChipChoice =
-                                              selected ? index : null;
+                                              selected ? index : -1;
                                         });
-                                        _onLocationChanged(locations[index]);
+                                        _onLocationChanged(_locations[index],
+                                            _locationChipChoice);
                                       },
                                     ),
                                   );

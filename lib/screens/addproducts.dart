@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:inventory_management/widgets/customButton.dart';
-import 'package:inventory_management/widgets/customTextField.dart';
+import '../widgets/customButton.dart';
+import '../widgets/customTextField.dart';
 import '../widgets/customAppBar.dart';
 import '../models/database.dart';
 import '../models/products.dart';
@@ -34,6 +34,14 @@ class _AddProductsState extends State<AddProducts> {
       _qtyInput.clear();
     });
     WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+  }
+
+  @override
+  void dispose() {
+    _nameInput.dispose();
+    _priceInput.dispose();
+    _qtyInput.dispose();
+    super.dispose();
   }
 
   @override

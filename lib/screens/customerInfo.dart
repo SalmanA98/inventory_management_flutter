@@ -1,65 +1,73 @@
 import 'package:flutter/material.dart';
-import 'package:inventory_management/widgets/customButton.dart';
-import 'package:inventory_management/widgets/customTextField.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import '../widgets/customButton.dart';
+import '../widgets/customTextField.dart';
 import '../widgets/customAppBar.dart';
 import '../models/database.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../models/sellToDb.dart';
 import '../models/products.dart';
-import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 class CustomerInfo extends StatefulWidget {
   final List<Products> cartProducts;
-  CustomerInfo(this.cartProducts);
+  const CustomerInfo(this.cartProducts);
 
   @override
   _CustomerInfoState createState() => _CustomerInfoState();
 }
 
 class _CustomerInfoState extends State<CustomerInfo> {
-  final TextEditingController customerNameInput = TextEditingController();
+  final TextEditingController _customerNameInput = TextEditingController();
 
-  final TextEditingController customerNumInput = TextEditingController();
+  final TextEditingController _customerNumInput = TextEditingController();
 
-  final TextEditingController discInput = TextEditingController();
+  final TextEditingController _discInput = TextEditingController();
 
-  final TextEditingController employeeIdInput = TextEditingController();
+  final TextEditingController _employeeIdInput = TextEditingController();
 
   bool _isCurrentEmployee = false;
-  String vat;
-  String paymentMethod;
-  String currentEmployeeID;
+  String _vat;
+  String _paymentMethod;
+  String _currentEmployeeID;
 
   int _valueVat = -1;
   int _valuePM = -1;
 
-  final List<String> vatList = const ['VAT', 'No VAT'];
-  final List<String> paymentList = const ['Cash', 'Card'];
+  final List<String> _vatList = const ['VAT', 'No VAT'];
+  final List<String> _paymentList = const ['Cash', 'Card'];
 
   void _onVatChoice(int value) {
     switch (value) {
+      case -1:
+        Fluttertoast.showToast(
+            msg: 'Choose VAT/No Vat!',
+            gravity: ToastGravity.CENTER,
+            toastLength: Toast.LENGTH_SHORT,
+            timeInSecForIosWeb: 1);
+        break;
       case 0:
-        print('VAT');
-        vat = '5%';
+        _vat = '5%';
         break;
       case 1:
-        print('No VAT');
-        vat = '0%';
+        _vat = '0%';
         break;
     }
   }
 
   void _onPaymentChoice(int value) {
     switch (value) {
+      case -1:
+        Fluttertoast.showToast(
+            msg: 'Choose Payment Method!',
+            gravity: ToastGravity.CENTER,
+            toastLength: Toast.LENGTH_SHORT,
+            timeInSecForIosWeb: 1);
+        break;
       case 0:
-        print('CASH');
-
-        paymentMethod = 'Cash';
+        _paymentMethod = 'Cash';
         break;
       case 1:
-        print('Card');
-
-        paymentMethod = 'Card';
+        _paymentMethod = 'Card';
         break;
     }
   }
@@ -72,7 +80,7 @@ class _CustomerInfoState extends State<CustomerInfo> {
             title: Text('ERROR'),
             content: Text(errormessage),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
@@ -84,37 +92,45 @@ class _CustomerInfoState extends State<CustomerInfo> {
 
   void _completeSale() {
     if (!_isCurrentEmployee) {
-      employeeIdInput.text = currentEmployeeID.toString().toUpperCase();
-      print(employeeIdInput.text);
+      _employeeIdInput.text = _currentEmployeeID.toString().toUpperCase();
+      print(_employeeIdInput.text);
     }
-    if (customerNameInput.text.isEmpty ||
-        customerNumInput.text.isEmpty ||
-        vat.isEmpty ||
-        paymentMethod.isEmpty ||
-        employeeIdInput.text.isEmpty ||
-        discInput.text.isEmpty) {
-      showError('Fields cannot be empty');
-    } else if (customerNumInput.text.length < 10) {
+    if (_customerNameInput.text.isEmpty ||
+        _customerNumInput.text.isEmpty ||
+        _vat.isEmpty ||
+        _paymentMethod.isEmpty ||
+        _employeeIdInput.text.isEmpty ||
+        _discInput.text.isEmpty) {
+      showError('Fields/Choices cannot be empty');
+    } else if (_customerNumInput.text.length < 10) {
       showError('Number should be of 10-digits! (0501234567)');
     } else {
       var sell = WriteSaleToDb(
-          customerName: customerNameInput.text,
-          customerNum: customerNumInput.text,
-          discount: discInput.text,
-          employeeID: employeeIdInput.text,
+          customerName: _customerNameInput.text,
+          customerNum: _customerNumInput.text,
+          discount: _discInput.text,
+          employeeID: _employeeIdInput.text,
           finalItems: widget.cartProducts,
-          paymentMethod: paymentMethod,
-          vat: vat);
+          paymentMethod: _paymentMethod,
+          vat: _vat);
       sell.processSale(context);
     }
   }
 
   @override
   void initState() {
-    // TODO: implement initState
-    super.initState();
     getUser();
-    currentEmployeeID = username;
+    _currentEmployeeID = username;
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _customerNameInput.dispose();
+    _customerNumInput.dispose();
+    _discInput.dispose();
+    _employeeIdInput.dispose();
+    super.dispose();
   }
 
   @override
@@ -153,14 +169,14 @@ class _CustomerInfoState extends State<CustomerInfo> {
                   Container(
                     margin: EdgeInsets.all(10),
                     child: CustomTextField(
-                        textController: customerNameInput,
+                        textController: _customerNameInput,
                         textHint: 'Customer Name',
                         textIcon: Icon(Icons.person)),
                   ),
                   Container(
                     margin: EdgeInsets.all(10),
                     child: CustomTextField(
-                        textController: customerNumInput,
+                        textController: _customerNumInput,
                         textHint: 'Customer Number',
                         keyboardType: TextInputType.phone,
                         maximumLength: 10,
@@ -192,7 +208,7 @@ class _CustomerInfoState extends State<CustomerInfo> {
                     Container(
                         margin: EdgeInsets.all(10),
                         child: CustomTextField(
-                            textController: employeeIdInput,
+                            textController: _employeeIdInput,
                             textHint: 'Employee ID',
                             maximumLength: 7,
                             textIcon: Icon(Icons.person_outline_rounded))),
@@ -227,7 +243,7 @@ class _CustomerInfoState extends State<CustomerInfo> {
                   Container(
                     margin: EdgeInsets.all(10),
                     child: CustomTextField(
-                        textController: discInput,
+                        textController: _discInput,
                         textHint: 'Discount',
                         maximumLength: 2,
                         keyboardType: TextInputType.number,
@@ -253,13 +269,13 @@ class _CustomerInfoState extends State<CustomerInfo> {
                         return Container(
                           margin: EdgeInsets.all(5),
                           child: ChoiceChip(
-                            label: Text(vatList[index]),
+                            label: Text(_vatList[index]),
                             selected: _valueVat == index,
                             onSelected: (bool selected) {
                               setState(() {
-                                _valueVat = selected ? index : null;
+                                _valueVat = selected ? index : -1;
                               });
-                              _onVatChoice(index);
+                              _onVatChoice(_valueVat);
                             },
                           ),
                         );
@@ -286,13 +302,13 @@ class _CustomerInfoState extends State<CustomerInfo> {
                         return Container(
                           margin: EdgeInsets.all(5),
                           child: ChoiceChip(
-                            label: Text(paymentList[index]),
+                            label: Text(_paymentList[index]),
                             selected: _valuePM == index,
                             onSelected: (bool selected) {
                               setState(() {
-                                _valuePM = selected ? index : null;
+                                _valuePM = selected ? index : -1;
                               });
-                              _onPaymentChoice(index);
+                              _onPaymentChoice(_valuePM);
                             },
                           ),
                         );

@@ -117,16 +117,14 @@ class _RegisterUserState extends State<RegisterUser> {
   @override
   void initState() {
     _createUsername();
-    // TODO: implement initState
     super.initState();
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
-    super.dispose();
     _pwdInput.dispose();
     _confirmPwdInput.dispose();
+    super.dispose();
   }
 
   @override

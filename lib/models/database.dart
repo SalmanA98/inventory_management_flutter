@@ -2,8 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:inventory_management/screens/refundproducts.dart';
-import 'package:inventory_management/widgets/customTextField.dart';
+import '../screens/refundproducts.dart';
 import './products.dart';
 
 final databaseReference = FirebaseDatabase.instance.reference();

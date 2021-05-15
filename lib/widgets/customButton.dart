@@ -15,7 +15,7 @@ class CustomButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           elevation: 5,
           primary: Theme.of(context).primaryColor,
-          onPrimary: Colors.white,
+          onPrimary: Colors.black,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(
               Radius.circular(18),

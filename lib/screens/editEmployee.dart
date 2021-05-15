@@ -1,53 +1,54 @@
 import 'package:flutter/material.dart';
-import 'package:inventory_management/models/employee.dart';
-import 'package:inventory_management/widgets/customButton.dart';
-import 'package:inventory_management/widgets/customTextField.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import '../models/employee.dart';
+import '../widgets/customButton.dart';
+import '../widgets/customTextField.dart';
 import '../models/paymentdetails.dart';
 import '../widgets/customAppBar.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../models/database.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class EditEmployee extends StatefulWidget {
   final Employee _employee;
-  EditEmployee(this._employee);
+  const EditEmployee(this._employee);
 
   @override
   _EditEmployeeState createState() => _EditEmployeeState();
 }
 
 class _EditEmployeeState extends State<EditEmployee> {
-  final List<PaymentDetails> employeeDetails = [];
-  final List<PaymentDetails> editable = [];
+  final List<PaymentDetails> _employeeDetails = [];
+  final List<PaymentDetails> _editable = [];
   final _ageController = TextEditingController();
   final _numberController = TextEditingController();
-  final List<String> adminLabelList = const ['Admin', 'Not Admin'];
+  final List<String> _adminLabelList = const ['Admin', 'Not Admin'];
   int _adminChipChoice = -1;
   bool _editAdmin = false;
-  String adminPriv;
+  // ignore: unused_field
+  String _adminPriv;
   bool _hasUpdated = false;
   bool _hasDeletedUser = false;
-  bool startProgress = false;
+  bool _startProgress = false;
 
   void _loadDetails() {
-    employeeDetails
+    _employeeDetails
         .add(PaymentDetails(title: 'ID', value: widget._employee.id));
-    employeeDetails.add(
+    _employeeDetails.add(
       PaymentDetails(title: 'Name', value: widget._employee.name),
     );
-    employeeDetails.add(
+    _employeeDetails.add(
       PaymentDetails(
           title: 'Location',
           value: widget._employee.id.toString().substring(2, 3)),
     );
-    editable.add(
+    _editable.add(
       PaymentDetails(title: 'Age', value: widget._employee.age),
     );
 
-    editable.add(
+    _editable.add(
       PaymentDetails(title: 'Number', value: widget._employee.number),
     );
-    editable.add(
+    _editable.add(
       PaymentDetails(
           title: 'Admin Privilege', value: widget._employee.adminPriv),
     );
@@ -73,9 +74,9 @@ class _EditEmployeeState extends State<EditEmployee> {
                     setState(() {
                       if (controller.text.isNotEmpty) {
                         if (isAge) {
-                          editable[0].value = controller.text;
+                          _editable[0].value = controller.text;
                         } else {
-                          editable[1].value = controller.text;
+                          _editable[1].value = controller.text;
                         }
                         _hasUpdated = true;
                       } else {
@@ -96,17 +97,17 @@ class _EditEmployeeState extends State<EditEmployee> {
   void _onAdminChanged(int value) {
     switch (value) {
       case 0:
-        adminPriv = 'Yes';
+        _adminPriv = 'Yes';
         setState(() {
-          editable[2].value = 'Yes';
+          _editable[2].value = 'Yes';
           _hasUpdated = true;
         });
 
         break;
       case 1:
-        adminPriv = 'No';
+        _adminPriv = 'No';
         setState(() {
-          editable[2].value = 'No';
+          _editable[2].value = 'No';
           _hasUpdated = true;
         });
         break;
@@ -129,13 +130,13 @@ class _EditEmployeeState extends State<EditEmployee> {
 
   Future<void> _deleteUser() async {
     setState(() {
-      startProgress = true;
+      _startProgress = true;
     });
 
     databaseReference
-        .child(employeeDetails[2].value)
+        .child(_employeeDetails[2].value)
         .child('Employees')
-        .child(employeeDetails[0].value)
+        .child(_employeeDetails[0].value)
         .remove()
         .then((_) {
       Fluttertoast.showToast(
@@ -144,7 +145,7 @@ class _EditEmployeeState extends State<EditEmployee> {
           toastLength: Toast.LENGTH_SHORT,
           timeInSecForIosWeb: 1);
       setState(() {
-        startProgress = false;
+        _startProgress = false;
         _hasDeletedUser = true;
       });
     }).catchError((onError) {
@@ -154,7 +155,7 @@ class _EditEmployeeState extends State<EditEmployee> {
           toastLength: Toast.LENGTH_SHORT,
           timeInSecForIosWeb: 1);
       setState(() {
-        startProgress = false;
+        _startProgress = false;
       });
     });
   }
@@ -162,17 +163,17 @@ class _EditEmployeeState extends State<EditEmployee> {
   Future<void> _applyChanges() async {
     if (_hasUpdated) {
       setState(() {
-        startProgress = true;
+        _startProgress = true;
       });
 
       databaseReference
-          .child(employeeDetails[2].value)
+          .child(_employeeDetails[2].value)
           .child('Employees')
-          .child(employeeDetails[0].value)
+          .child(_employeeDetails[0].value)
           .update({
-        'Admin Privilege': editable[2].value,
-        'Age': editable[0].value,
-        'Number': editable[1].value,
+        'Admin Privilege': _editable[2].value,
+        'Age': _editable[0].value,
+        'Number': _editable[1].value,
       }).then((_) {
         Fluttertoast.showToast(
             msg: 'Updated successfully!',
@@ -181,7 +182,7 @@ class _EditEmployeeState extends State<EditEmployee> {
             timeInSecForIosWeb: 1);
         setState(() {
           _hasUpdated = false;
-          startProgress = false;
+          _startProgress = false;
         });
       }).catchError((error) {
         Fluttertoast.showToast(
@@ -190,7 +191,7 @@ class _EditEmployeeState extends State<EditEmployee> {
             toastLength: Toast.LENGTH_SHORT,
             timeInSecForIosWeb: 1);
         setState(() {
-          startProgress = false;
+          _startProgress = false;
         });
       });
     } else {
@@ -204,17 +205,15 @@ class _EditEmployeeState extends State<EditEmployee> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
-    super.dispose();
     _ageController.dispose();
     _numberController.dispose();
+    super.dispose();
   }
 
   @override
   void initState() {
-    // TODO: implement initState
-    super.initState();
     _loadDetails();
+    super.initState();
   }
 
   @override
@@ -233,7 +232,7 @@ class _EditEmployeeState extends State<EditEmployee> {
                 }
               },
               child: SingleChildScrollView(
-                child: startProgress
+                child: _startProgress
                     ? Padding(
                         padding: const EdgeInsets.all(50.0),
                         child: Column(
@@ -280,7 +279,7 @@ class _EditEmployeeState extends State<EditEmployee> {
                                       fontWeight: FontWeight.bold),
                                 ),
                               )),
-                          ...employeeDetails.map((element) {
+                          ..._employeeDetails.map((element) {
                             return Container(
                                 width: double.infinity,
                                 padding: EdgeInsets.all(10),
@@ -307,7 +306,7 @@ class _EditEmployeeState extends State<EditEmployee> {
                                   ],
                                 ));
                           }),
-                          ...editable.map((element) {
+                          ..._editable.map((element) {
                             return Container(
                                 width: double.infinity,
                                 padding: EdgeInsets.all(10),
@@ -370,7 +369,7 @@ class _EditEmployeeState extends State<EditEmployee> {
                                   return Container(
                                     margin: EdgeInsets.all(5),
                                     child: ChoiceChip(
-                                      label: Text(adminLabelList[index]),
+                                      label: Text(_adminLabelList[index]),
                                       selected: _adminChipChoice == index,
                                       onSelected: (bool selected) {
                                         setState(() {

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:inventory_management/models/database.dart';
-import 'package:inventory_management/models/employee.dart';
-import 'package:inventory_management/screens/addEmployee.dart';
-import 'package:inventory_management/screens/editEmployee.dart';
-import 'package:inventory_management/widgets/customAppBar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import '../models/database.dart';
+import '../models/employee.dart';
+import './addEmployee.dart';
+import './editEmployee.dart';
+import '../widgets/customAppBar.dart';
 
 class ManageEmployees extends StatefulWidget {
   @override
@@ -13,10 +13,10 @@ class ManageEmployees extends StatefulWidget {
 }
 
 class _ManageEmployeesState extends State<ManageEmployees> {
-  List<Employee> employeesList = [];
+  List<Employee> _employeesList = [];
   bool _fetchedData = false;
 
-  Future<void> getAllEmployees(BuildContext context) async {
+  Future<void> _getAllEmployees(BuildContext context) async {
     await databaseReference
         .child('D')
         .child('Employees')
@@ -25,7 +25,7 @@ class _ManageEmployeesState extends State<ManageEmployees> {
       Map<dynamic, dynamic> results = snapshot.value;
       results.forEach((id, details) {
         setState(() {
-          employeesList.add(Employee(
+          _employeesList.add(Employee(
               id: id,
               name: details['Name'],
               number: details['Number'].toString(),
@@ -52,14 +52,12 @@ class _ManageEmployeesState extends State<ManageEmployees> {
 
   void _editEmployee(int index) {
     Navigator.push(context,
-        MaterialPageRoute(builder: (_) => EditEmployee(employeesList[index])));
+        MaterialPageRoute(builder: (_) => EditEmployee(_employeesList[index])));
   }
 
   @override
   void initState() {
-    // TODO: implement initState
-    getAllEmployees(context);
-
+    _getAllEmployees(context);
     super.initState();
   }
 
@@ -114,9 +112,9 @@ class _ManageEmployeesState extends State<ManageEmployees> {
                         Container(
                           height: screenMaxHeight * .80,
                           child: ListView.builder(
-                            itemCount: employeesList.length == null
+                            itemCount: _employeesList.length == null
                                 ? 0
-                                : employeesList.length,
+                                : _employeesList.length,
                             itemBuilder: (context, index) {
                               return createCartListItem(index);
                             },
@@ -168,7 +166,7 @@ class _ManageEmployeesState extends State<ManageEmployees> {
                               margin: EdgeInsets.only(bottom: 10),
                               padding: EdgeInsets.only(right: 8, top: 4),
                               child: Text(
-                                employeesList[index].name,
+                                _employeesList[index].name,
                                 style: GoogleFonts.openSans(
                                     textStyle: TextStyle(
                                         fontSize: 17,
@@ -183,7 +181,7 @@ class _ManageEmployeesState extends State<ManageEmployees> {
                                     MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
                                   Text(
-                                    "ID: ${employeesList[index].id}",
+                                    "ID: ${_employeesList[index].id}",
                                   ),
                                 ],
                               ),

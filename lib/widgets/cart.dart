@@ -47,7 +47,6 @@ class _CartState extends State<Cart> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     for (int i = 0; i < widget.cartItems.length; i++) {
       qtyInCart.add('1');

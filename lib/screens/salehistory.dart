@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:inventory_management/widgets/customAppBar.dart';
-import 'package:inventory_management/widgets/customButton.dart';
-import '../widgets/textfieldDatePicker.dart';
 import 'package:intl/intl.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import '../widgets/customAppBar.dart';
+import '../widgets/customButton.dart';
+import '../widgets/textfieldDatePicker.dart';
 import '../models/excelSheet.dart';
 
 class SalesHistory extends StatefulWidget {
@@ -18,9 +18,9 @@ class _SalesHistoryState extends State<SalesHistory> {
 
   DateTime _today = DateTime.now();
 
-  bool isStart = false;
+  bool _isStart = false;
 
-  void getSaleData() {
+  void _getSaleData() {
     List<String> datesList = [];
     String filename = DateFormat('yyyy-MM-dd').format(_fromDate) +
         '__' +
@@ -37,7 +37,7 @@ class _SalesHistoryState extends State<SalesHistory> {
           }
           getSaleFromDB(datesList, filename, context);
           setState(() {
-            isStart = true;
+            _isStart = true;
           });
         } else {
           Fluttertoast.showToast(
@@ -94,12 +94,12 @@ class _SalesHistoryState extends State<SalesHistory> {
                               padding: EdgeInsets.all(10),
                               child: ListTile(
                                 leading: Icon(Icons.info_outline),
-                                title:
-                                    Text('This requires internet connection'),
+                                title: const Text(
+                                    'This requires internet connection'),
                               )),
                         ),
                       ),
-                      if (!isStart)
+                      if (!_isStart)
                         Container(
                           width: double.infinity,
                           padding: EdgeInsets.symmetric(
@@ -119,7 +119,7 @@ class _SalesHistoryState extends State<SalesHistory> {
                             },
                           ),
                         ),
-                      if (!isStart)
+                      if (!_isStart)
                         Container(
                           width: double.infinity,
                           padding: EdgeInsets.symmetric(
@@ -139,16 +139,16 @@ class _SalesHistoryState extends State<SalesHistory> {
                             },
                           ),
                         ),
-                      if (!isStart)
+                      if (!_isStart)
                         Container(
                           width: double.infinity,
                           padding:
                               EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                           child: CustomButton(
-                              buttonFunction: getSaleData,
+                              buttonFunction: _getSaleData,
                               buttonText: 'Show Data'),
                         ),
-                      if (isStart)
+                      if (_isStart)
                         Column(
                           children: [
                             Container(
@@ -161,7 +161,7 @@ class _SalesHistoryState extends State<SalesHistory> {
                               padding: EdgeInsets.all(10),
                               alignment: Alignment.center,
                               width: double.infinity,
-                              child: Text('Please Wait...'),
+                              child: const Text('Please Wait...'),
                             )
                           ],
                         ),

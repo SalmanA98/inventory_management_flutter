@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../widgets/customButton.dart';
-import '../widgets/customTextField.dart';
-import '../widgets/customAppBar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:progress_state_button/iconed_button.dart';
 import 'package:progress_state_button/progress_button.dart';
+import '../widgets/customTextField.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -36,8 +34,9 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void initState() {
-    super.initState();
     this.isUserSignedIn();
+
+    super.initState();
   }
 
   showError(String errormessage) {
@@ -48,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
             title: Text('ERROR'),
             content: Text(errormessage),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
@@ -147,8 +146,14 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
+  void dispose() {
+    _usernameInput.dispose();
+    _pwdInput.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    var screenMaxHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       body: Column(
         children: [
@@ -211,11 +216,19 @@ class _LoginPageState extends State<LoginPage> {
                             child: ProgressButton.icon(
                                 radius: 16.0,
                                 height: 50.0,
+                                textStyle: TextStyle(
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor),
+                                // progressIndicator:
+                                //     CircularProgressIndicator.adaptive(
+                                //         backgroundColor:
+                                //             Theme.of(context).accentColor),
                                 iconedButtons: {
                                   ButtonState.idle: IconedButton(
-                                      text: "Login",
+                                      text: 'login',
                                       icon: Icon(Icons.login_rounded,
-                                          color: Colors.white),
+                                          color: Theme.of(context)
+                                              .scaffoldBackgroundColor),
                                       color: Theme.of(context).primaryColor),
                                   ButtonState.loading: IconedButton(
                                       text: "Loading",

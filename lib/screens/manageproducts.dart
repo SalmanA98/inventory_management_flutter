@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:inventory_management/screens/addproducts.dart';
-import 'package:inventory_management/screens/editproduct.dart';
-import 'package:inventory_management/widgets/customAppBar.dart';
-import 'package:google_fonts/google_fonts.dart';
-import '../models/database.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:google_fonts/google_fonts.dart';
+import './addproducts.dart';
+import './editproduct.dart';
+import '../widgets/customAppBar.dart';
+import '../models/database.dart';
 import '../models/products.dart';
 
 class ManageProducts extends StatefulWidget {
@@ -13,12 +13,12 @@ class ManageProducts extends StatefulWidget {
 }
 
 class _ManageProductsState extends State<ManageProducts> {
-  final List<Products> availableProducts = [];
-  final List<Products> finishedProducts = [];
+  final List<Products> _availableProducts = [];
+  final List<Products> _finishedProducts = [];
   bool _showFinishedProduct = false;
   bool _fetchedData = false;
 
-  Future<void> getAllProducts(BuildContext context) async {
+  Future<void> _getAllProducts(BuildContext context) async {
     await databaseReference
         .child('D')
         .child('Products')
@@ -28,12 +28,12 @@ class _ManageProductsState extends State<ManageProducts> {
       values.forEach((key, value) {
         setState(() {
           if (int.tryParse(value['Qty'].toString()) > 0) {
-            availableProducts.add(Products(
+            _availableProducts.add(Products(
                 name: key,
                 price: value['Price'].toString(),
                 qty: value['Qty'].toString()));
           } else {
-            finishedProducts.add(Products(
+            _finishedProducts.add(Products(
                 name: key,
                 price: value['Price'].toString(),
                 qty: value['Qty'].toString()));
@@ -55,7 +55,7 @@ class _ManageProductsState extends State<ManageProducts> {
 
   @override
   void initState() {
-    getAllProducts(context);
+    _getAllProducts(context);
     super.initState();
   }
 
@@ -130,18 +130,18 @@ class _ManageProductsState extends State<ManageProducts> {
                                   fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                           )),
-                      if (availableProducts.isNotEmpty)
+                      if (_availableProducts.isNotEmpty)
                         Container(
                           height: screenMaxHeight * .483,
                           child: ListView.builder(
-                            itemCount: availableProducts.length,
+                            itemCount: _availableProducts.length,
                             itemBuilder: (context, index) {
                               return createCartListItem(
-                                  index, availableProducts);
+                                  index, _availableProducts);
                             },
                           ),
                         ),
-                      if (availableProducts.isEmpty)
+                      if (_availableProducts.isEmpty)
                         Container(
                             height: screenMaxHeight * 0.20,
                             width: double.infinity,
@@ -174,18 +174,18 @@ class _ManageProductsState extends State<ManageProducts> {
                           ],
                         ),
                       ),
-                      if (_showFinishedProduct && finishedProducts.isNotEmpty)
+                      if (_showFinishedProduct && _finishedProducts.isNotEmpty)
                         Container(
                           height: screenMaxHeight * .483,
                           child: ListView.builder(
-                            itemCount: finishedProducts.length,
+                            itemCount: _finishedProducts.length,
                             itemBuilder: (context, index) {
                               return createCartListItem(
-                                  index, finishedProducts);
+                                  index, _finishedProducts);
                             },
                           ),
                         ),
-                      if (_showFinishedProduct && finishedProducts.isEmpty)
+                      if (_showFinishedProduct && _finishedProducts.isEmpty)
                         FittedBox(
                             alignment: Alignment.center,
                             child: Image.asset(

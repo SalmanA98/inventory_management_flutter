@@ -13,13 +13,12 @@ class SellProducts extends StatefulWidget {
 }
 
 class _SellProductsState extends State<SellProducts> {
-  final List<Products> products = [];
-  final List<Products> toCart = [];
-  int availableQty;
+  List<Products> _products = [];
+  List<Products> _toCart = [];
   bool _productsEmpty = true;
   bool _fetchedData = false;
 
-  Future<void> getAllProducts(BuildContext context) async {
+  Future<void> _getAllProducts(BuildContext context) async {
     await databaseReference
         .child('D')
         .child('Products')
@@ -29,7 +28,7 @@ class _SellProductsState extends State<SellProducts> {
       values.forEach((key, value) {
         setState(() {
           if (int.tryParse(value['Qty'].toString()) > 0) {
-            products.add(Products(
+            _products.add(Products(
                 name: key,
                 price: value['Price'].toString(),
                 qty: value['Qty'].toString()));
@@ -40,7 +39,7 @@ class _SellProductsState extends State<SellProducts> {
         _fetchedData = true;
       });
       if (_fetchedData) {
-        if (products.isNotEmpty) {
+        if (_products.isNotEmpty) {
           setState(() {
             _productsEmpty = false;
           });
@@ -57,8 +56,8 @@ class _SellProductsState extends State<SellProducts> {
   }
 
   void _addItemToCart(Products product) {
-    if (!toCart.contains(product)) {
-      toCart.add(product);
+    if (!_toCart.contains(product)) {
+      _toCart.add(product);
       Fluttertoast.showToast(
           msg: 'Added ${product.name} to cart!',
           gravity: ToastGravity.CENTER,
@@ -76,7 +75,7 @@ class _SellProductsState extends State<SellProducts> {
             title: Text('SORRY!'),
             content: Text(errormessage),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
@@ -100,7 +99,7 @@ class _SellProductsState extends State<SellProducts> {
 
   @override
   void initState() {
-    getAllProducts(context);
+    _getAllProducts(context);
     super.initState();
   }
 
@@ -113,7 +112,7 @@ class _SellProductsState extends State<SellProducts> {
         elevation: 10,
         child: const Icon(Icons.shopping_bag_outlined),
         onPressed: () {
-          _showCart(toCart);
+          _showCart(_toCart);
         },
       ),
       bottomNavigationBar: BottomAppBar(
@@ -140,7 +139,7 @@ class _SellProductsState extends State<SellProducts> {
                 ),
                 Container(
                     margin: EdgeInsets.symmetric(vertical: 10),
-                    child: Text('Please Wait..'))
+                    child: const Text('Please Wait..'))
               ],
             )
           : _productsEmpty
@@ -165,9 +164,9 @@ class _SellProductsState extends State<SellProducts> {
                             Container(
                               height: screenMaxHeight * .80,
                               child: ListView.builder(
-                                itemCount: products.length == null
+                                itemCount: _products.length == null
                                     ? 0
-                                    : products.length,
+                                    : _products.length,
                                 itemBuilder: (context, index) {
                                   return createCartListItem(index);
                                 },
@@ -219,7 +218,7 @@ class _SellProductsState extends State<SellProducts> {
                               padding:
                                   EdgeInsets.only(right: 8, top: 4, bottom: 15),
                               child: Text(
-                                products[index].name,
+                                _products[index].name,
                                 style: GoogleFonts.openSans(
                                     textStyle: TextStyle(
                                         fontSize: 17,
@@ -234,20 +233,8 @@ class _SellProductsState extends State<SellProducts> {
                                     MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
                                   Text(
-                                    "AED: ${products[index].price}",
+                                    "AED: ${_products[index].price}",
                                   ),
-
-                                  // Padding(
-                                  //   padding: const EdgeInsets.all(8.0),
-                                  //   child: Container(
-                                  //     // color: Theme.of(context).primaryColor,
-                                  //     padding: const EdgeInsets.only(
-                                  //         bottom: 2, right: 12, left: 12),
-                                  //     child: Text(
-                                  //       'Qty: ${products[index].qty}',
-                                  //     ),
-                                  //   ),
-                                  // )
                                 ],
                               ),
                             ),
@@ -275,7 +262,7 @@ class _SellProductsState extends State<SellProducts> {
                             size: 15,
                           ),
                           onPressed: () {
-                            _addItemToCart(products[index]);
+                            _addItemToCart(_products[index]);
                           },
                         ),
                         decoration: BoxDecoration(
