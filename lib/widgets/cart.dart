@@ -231,26 +231,3 @@ class _CartState extends State<Cart> {
     );
   }
 }
-
-// Card(
-//                       elevation: 5,
-//                       child: Container(
-//                         margin: EdgeInsets.all(10),
-//                         child: ListTile(
-//                           leading: CircleAvatar(
-//                               child: FittedBox(child: Text('${(index + 1)}'))),
-//                           title: Text(widget.cartItems[index].name),
-//                           subtitle: Text(
-//                               'Price: ${widget.cartItems[index].price}\nQty: 1'),
-//                           trailing: IconButton(
-//                             icon: Icon(
-//                               Icons.delete_forever_outlined,
-//                               color: Theme.of(context).errorColor,
-//                             ),
-//                             onPressed: () {
-//                               _removeFromCart(index);
-//                             },
-//                           ),
-//                         ),
-//                       ),
-//                     );

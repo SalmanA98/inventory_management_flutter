@@ -14,7 +14,11 @@ class ManageEmployees extends StatefulWidget {
 
 class _ManageEmployeesState extends State<ManageEmployees> {
   List<Employee> _employeesList = [];
+  List<Employee> _employeesCopy = [];
   bool _fetchedData = false;
+  bool _showSearchBar = false;
+  String _searchText = 'Show';
+  TextEditingController _searchController = TextEditingController();
 
   Future<void> _getAllEmployees(BuildContext context) async {
     await databaseReference
@@ -34,6 +38,7 @@ class _ManageEmployeesState extends State<ManageEmployees> {
               lastActivity: details['Last Activity'].toString()));
         });
       });
+      _employeesCopy.addAll(_employeesList);
       setState(() {
         _fetchedData = true;
       });
@@ -55,10 +60,39 @@ class _ManageEmployeesState extends State<ManageEmployees> {
         MaterialPageRoute(builder: (_) => EditEmployee(_employeesList[index])));
   }
 
+  void _searchInEmployees(String searchedEmployee) {
+    List<Employee> dummySearchList = [];
+    dummySearchList.addAll(_employeesCopy);
+    if (searchedEmployee.isNotEmpty) {
+      List<Employee> dummyListData = [];
+      dummySearchList.forEach((item) {
+        if (item.name.toLowerCase().contains(searchedEmployee.toLowerCase())) {
+          dummyListData.add(item);
+        }
+      });
+      setState(() {
+        _employeesList.clear();
+        _employeesList.addAll(dummyListData);
+      });
+      return;
+    } else {
+      setState(() {
+        _employeesList.clear();
+        _employeesList.addAll(_employeesCopy);
+      });
+    }
+  }
+
   @override
   void initState() {
     _getAllEmployees(context);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -80,8 +114,28 @@ class _ManageEmployeesState extends State<ManageEmployees> {
         elevation: 5,
         child: new Row(
           children: <Widget>[
-            SizedBox(
-              height: screenMaxHeight * 0.060,
+            Container(
+              child: TextButton.icon(
+                style: TextButton.styleFrom(
+                    primary: Theme.of(context).scaffoldBackgroundColor),
+                label: Text(_searchText),
+                icon: Icon(
+                  Icons.search_outlined,
+                ),
+                onPressed: () {
+                  if (_showSearchBar) {
+                    setState(() {
+                      _showSearchBar = false;
+                      _searchText = 'Show';
+                    });
+                  } else {
+                    setState(() {
+                      _showSearchBar = true;
+                      _searchText = 'Hide';
+                    });
+                  }
+                },
+              ),
             ),
           ],
         ),
@@ -106,21 +160,62 @@ class _ManageEmployeesState extends State<ManageEmployees> {
                     title: 'Manage Employees',
                     subtitle: 'Edit, Add or Remove Employees!'),
                 Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Container(
-                          height: screenMaxHeight * .80,
-                          child: ListView.builder(
-                            itemCount: _employeesList.length == null
-                                ? 0
-                                : _employeesList.length,
-                            itemBuilder: (context, index) {
-                              return createCartListItem(index);
-                            },
+                  child: GestureDetector(
+                    onTap: () {
+                      FocusScopeNode currentFocus = FocusScope.of(context);
+                      if (!currentFocus.hasPrimaryFocus) {
+                        currentFocus.unfocus();
+                      }
+                    },
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          if (_showSearchBar)
+                            Container(
+                                width: double.infinity,
+                                padding: EdgeInsets.only(
+                                    top: 10, right: 10, left: 10, bottom: 5),
+                                child: Card(
+                                  child: new ListTile(
+                                    leading: new Icon(Icons.search),
+                                    title: new TextField(
+                                      controller: _searchController,
+                                      decoration: new InputDecoration(
+                                          hintText: 'Search',
+                                          border: InputBorder.none),
+                                      onChanged: (searchedEmployee) =>
+                                          _searchInEmployees(searchedEmployee),
+                                      // onChanged: onSearchTextChanged,
+                                    ),
+                                    trailing: new IconButton(
+                                      icon: new Icon(Icons.cancel),
+                                      onPressed: () {
+                                        _searchController.clear();
+                                        setState(() {
+                                          _employeesList.clear();
+                                          _employeesList.addAll(_employeesCopy);
+                                        });
+                                        // onSearchTextChanged('');
+                                      },
+                                    ),
+                                  ),
+                                )),
+                          Container(
+                            height: _showSearchBar
+                                ? screenMaxHeight * 0.65
+                                : screenMaxHeight * .75,
+                            child: ListView.builder(
+                              padding: EdgeInsets.all(0.0),
+                              itemCount: _employeesList.length == null
+                                  ? 0
+                                  : _employeesList.length,
+                              itemBuilder: (context, index) {
+                                return createCartListItem(index);
+                              },
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:google_fonts/google_fonts.dart';
+import './finishedProducts.dart';
 import './addproducts.dart';
 import './editproduct.dart';
 import '../widgets/customAppBar.dart';
@@ -15,8 +16,12 @@ class ManageProducts extends StatefulWidget {
 class _ManageProductsState extends State<ManageProducts> {
   final List<Products> _availableProducts = [];
   final List<Products> _finishedProducts = [];
-  bool _showFinishedProduct = false;
   bool _fetchedData = false;
+//For searching
+  List<Products> _productsCopy = [];
+  bool _showSearchBar = false;
+  String _searchText = 'Show';
+  TextEditingController _searchController = TextEditingController();
 
   Future<void> _getAllProducts(BuildContext context) async {
     await databaseReference
@@ -40,6 +45,8 @@ class _ManageProductsState extends State<ManageProducts> {
           }
         });
       });
+      _productsCopy.addAll(_availableProducts);
+
       setState(() {
         _fetchedData = true;
       });
@@ -53,10 +60,27 @@ class _ManageProductsState extends State<ManageProducts> {
     });
   }
 
-  @override
-  void initState() {
-    _getAllProducts(context);
-    super.initState();
+  void _searchInProducts(String searchedProduct) {
+    List<Products> dummySearchList = [];
+    dummySearchList.addAll(_productsCopy);
+    if (searchedProduct.isNotEmpty) {
+      List<Products> dummyListData = [];
+      dummySearchList.forEach((item) {
+        if (item.name.toLowerCase().contains(searchedProduct.toLowerCase())) {
+          dummyListData.add(item);
+        }
+      });
+      setState(() {
+        _availableProducts.clear();
+        _availableProducts.addAll(dummyListData);
+      });
+      return;
+    } else {
+      setState(() {
+        _availableProducts.clear();
+        _availableProducts.addAll(_productsCopy);
+      });
+    }
   }
 
   void _editProduct(Products product) {
@@ -71,6 +95,18 @@ class _ManageProductsState extends State<ManageProducts> {
 
   void _addProduct() {
     Navigator.push(context, MaterialPageRoute(builder: (_) => AddProducts()));
+  }
+
+  @override
+  void initState() {
+    _getAllProducts(context);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -90,9 +126,46 @@ class _ManageProductsState extends State<ManageProducts> {
         notchMargin: 1.0,
         elevation: 5,
         child: new Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            SizedBox(
-              height: screenMaxHeight * 0.060,
+            Container(
+              child: TextButton.icon(
+                style: TextButton.styleFrom(
+                    primary: Theme.of(context).scaffoldBackgroundColor),
+                label: Text(_searchText),
+                icon: Icon(
+                  Icons.search_outlined,
+                ),
+                onPressed: () {
+                  if (_showSearchBar) {
+                    setState(() {
+                      _showSearchBar = false;
+                      _searchText = 'Show';
+                    });
+                  } else {
+                    setState(() {
+                      _showSearchBar = true;
+                      _searchText = 'Hide';
+                    });
+                  }
+                },
+              ),
+            ),
+            Container(
+              child: TextButton.icon(
+                style: TextButton.styleFrom(
+                    primary: Theme.of(context).scaffoldBackgroundColor),
+                label: Text('Finished'),
+                icon: Icon(
+                  Icons.arrow_forward_outlined,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => FinishedProducts(_finishedProducts)));
+                },
+              ),
             ),
           ],
         ),
@@ -130,10 +203,42 @@ class _ManageProductsState extends State<ManageProducts> {
                                   fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                           )),
+                      if (_showSearchBar)
+                        Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.only(
+                                top: 10, right: 10, left: 10, bottom: 5),
+                            child: Card(
+                              child: new ListTile(
+                                leading: new Icon(Icons.search),
+                                title: new TextField(
+                                  controller: _searchController,
+                                  decoration: new InputDecoration(
+                                      hintText: 'Search',
+                                      border: InputBorder.none),
+                                  onChanged: (searchedProduct) =>
+                                      _searchInProducts(searchedProduct),
+                                ),
+                                trailing: new IconButton(
+                                  icon: new Icon(Icons.cancel),
+                                  onPressed: () {
+                                    _searchController.clear();
+                                    setState(() {
+                                      _availableProducts.clear();
+                                      _availableProducts.addAll(_productsCopy);
+                                    });
+                                    // onSearchTextChanged('');
+                                  },
+                                ),
+                              ),
+                            )),
                       if (_availableProducts.isNotEmpty)
                         Container(
-                          height: screenMaxHeight * .483,
+                          height: _showSearchBar
+                              ? screenMaxHeight * 0.58
+                              : screenMaxHeight * .70,
                           child: ListView.builder(
+                            padding: EdgeInsets.all(0.0),
                             itemCount: _availableProducts.length,
                             itemBuilder: (context, index) {
                               return createCartListItem(
@@ -150,61 +255,6 @@ class _ManageProductsState extends State<ManageProducts> {
                             child: Image.asset(
                               'assets/images/empty_products.png',
                             )),
-                      Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.all(10),
-                        margin: EdgeInsets.only(top: 15),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Finished Products',
-                              style: GoogleFonts.openSans(
-                                textStyle: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            Switch.adaptive(
-                                value: _showFinishedProduct,
-                                onChanged: (val) {
-                                  setState(() {
-                                    _showFinishedProduct = val;
-                                  });
-                                }),
-                          ],
-                        ),
-                      ),
-                      if (_showFinishedProduct && _finishedProducts.isNotEmpty)
-                        Container(
-                          height: screenMaxHeight * .483,
-                          child: ListView.builder(
-                            itemCount: _finishedProducts.length,
-                            itemBuilder: (context, index) {
-                              return createCartListItem(
-                                  index, _finishedProducts);
-                            },
-                          ),
-                        ),
-                      if (_showFinishedProduct && _finishedProducts.isEmpty)
-                        FittedBox(
-                            alignment: Alignment.center,
-                            child: Image.asset(
-                              'assets/images/empty_products.png',
-                            )),
-                      if (!_showFinishedProduct)
-                        Container(
-                          margin: EdgeInsets.symmetric(horizontal: 10),
-                          width: double.infinity,
-                          child: Card(
-                              elevation: 3,
-                              child: Container(
-                                padding: EdgeInsets.all(10),
-                                child: ListTile(
-                                    leading: Icon(Icons.info_outline),
-                                    title: Text(
-                                        'Please Delete/Update Finished Products')),
-                              )),
-                        ),
                     ],
                   ),
                 ),

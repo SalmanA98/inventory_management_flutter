@@ -11,7 +11,7 @@ class CreateItemList extends StatelessWidget {
   final Icon trailingIcon;
   final bool updateQty;
   final Function(int index, bool isAdd) updateQtyButton;
-  final Function(int index) trailingButtonFunction;
+  final Function() trailingButtonFunction;
 
   CreateItemList(
       {@required this.index,
@@ -142,7 +142,7 @@ class CreateItemList extends StatelessWidget {
                     size: 15,
                   ),
                   onPressed: () {
-                    trailingButtonFunction(index);
+                    trailingButtonFunction();
                   },
                 ),
                 decoration: BoxDecoration(

@@ -15,11 +15,16 @@ class SellProducts extends StatefulWidget {
 class _SellProductsState extends State<SellProducts> {
   List<Products> _products = [];
   List<Products> _toCart = [];
+  //Copy for searching
+  List<Products> _productsCopy = [];
   bool _productsEmpty = true;
   bool _fetchedData = false;
+  bool _showSearchBar = false;
+  String _searchText = 'Show';
+  TextEditingController _searchController = TextEditingController();
 
   Future<void> _getAllProducts(BuildContext context) async {
-    await databaseReference
+    databaseReference
         .child('D')
         .child('Products')
         .once()
@@ -35,6 +40,8 @@ class _SellProductsState extends State<SellProducts> {
           }
         });
       });
+
+      _productsCopy.addAll(_products);
       setState(() {
         _fetchedData = true;
       });
@@ -97,10 +104,39 @@ class _SellProductsState extends State<SellProducts> {
     }
   }
 
+  void _searchInProducts(String searchedProduct) {
+    List<Products> dummySearchList = [];
+    dummySearchList.addAll(_productsCopy);
+    if (searchedProduct.isNotEmpty) {
+      List<Products> dummyListData = [];
+      dummySearchList.forEach((item) {
+        if (item.name.toLowerCase().contains(searchedProduct.toLowerCase())) {
+          dummyListData.add(item);
+        }
+      });
+      setState(() {
+        _products.clear();
+        _products.addAll(dummyListData);
+      });
+      return;
+    } else {
+      setState(() {
+        _products.clear();
+        _products.addAll(_productsCopy);
+      });
+    }
+  }
+
   @override
   void initState() {
     _getAllProducts(context);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -122,8 +158,28 @@ class _SellProductsState extends State<SellProducts> {
         elevation: 24,
         child: new Row(
           children: <Widget>[
-            SizedBox(
-              height: screenMaxHeight * 0.060,
+            Container(
+              child: TextButton.icon(
+                style: TextButton.styleFrom(
+                    primary: Theme.of(context).scaffoldBackgroundColor),
+                label: Text(_searchText),
+                icon: Icon(
+                  Icons.search_outlined,
+                ),
+                onPressed: () {
+                  if (_showSearchBar) {
+                    setState(() {
+                      _showSearchBar = false;
+                      _searchText = 'Show';
+                    });
+                  } else {
+                    setState(() {
+                      _showSearchBar = true;
+                      _searchText = 'Hide';
+                    });
+                  }
+                },
+              ),
             ),
           ],
         ),
@@ -158,21 +214,65 @@ class _SellProductsState extends State<SellProducts> {
                       subtitle: 'Add Products to cart!',
                     ),
                     Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            Container(
-                              height: screenMaxHeight * .80,
-                              child: ListView.builder(
-                                itemCount: _products.length == null
-                                    ? 0
-                                    : _products.length,
-                                itemBuilder: (context, index) {
-                                  return createCartListItem(index);
-                                },
+                      child: GestureDetector(
+                        onTap: () {
+                          FocusScopeNode currentFocus = FocusScope.of(context);
+                          if (!currentFocus.hasPrimaryFocus) {
+                            currentFocus.unfocus();
+                          }
+                        },
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              if (_showSearchBar)
+                                Container(
+                                    width: double.infinity,
+                                    padding: EdgeInsets.only(
+                                        top: 10,
+                                        right: 10,
+                                        left: 10,
+                                        bottom: 5),
+                                    child: Card(
+                                      child: new ListTile(
+                                        leading: new Icon(Icons.search),
+                                        title: new TextField(
+                                          controller: _searchController,
+                                          decoration: new InputDecoration(
+                                              hintText: 'Search',
+                                              border: InputBorder.none),
+                                          onChanged: (searchedItem) =>
+                                              _searchInProducts(searchedItem),
+                                          // onChanged: onSearchTextChanged,
+                                        ),
+                                        trailing: new IconButton(
+                                          icon: new Icon(Icons.cancel),
+                                          onPressed: () {
+                                            _searchController.clear();
+                                            setState(() {
+                                              _products.clear();
+                                              _products.addAll(_productsCopy);
+                                            });
+                                            // onSearchTextChanged('');
+                                          },
+                                        ),
+                                      ),
+                                    )),
+                              Container(
+                                height: _showSearchBar
+                                    ? screenMaxHeight * 0.65
+                                    : screenMaxHeight * .75,
+                                child: ListView.builder(
+                                  padding: EdgeInsets.all(0.0),
+                                  itemCount: _products.length == null
+                                      ? 0
+                                      : _products.length,
+                                  itemBuilder: (context, index) {
+                                    return createCartListItem(index);
+                                  },
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
