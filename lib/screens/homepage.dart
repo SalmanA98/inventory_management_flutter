@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../widgets/griddashboard.dart';
 
@@ -55,9 +54,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    super.initState();
     this.checkAuthentification();
     this.getUser();
-    super.initState();
   }
 
   @override
@@ -75,7 +74,9 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Container(
                     margin: EdgeInsets.symmetric(vertical: 10),
-                    child: Text('Please Wait'))
+                    child: FittedBox(
+                        fit: BoxFit.contain,
+                        child: const Text('Please Wait..')))
               ],
             )
           : Column(
@@ -91,21 +92,26 @@ class _HomePageState extends State<HomePage> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text("Hekayet Etr",
-                              style: GoogleFonts.openSans(
-                                textStyle: TextStyle(
-                                    fontSize: 30, fontWeight: FontWeight.bold),
-                              )),
+                          FittedBox(
+                            fit: BoxFit.contain,
+                            child: const Text(
+                              "Hekayet Etr",
+                              style: TextStyle(
+                                  fontSize: 30, fontWeight: FontWeight.bold),
+                            ),
+                          ),
                           SizedBox(
                             height: screenMaxHeight * 0.01,
                           ),
-                          Text(
-                            'Welcome $_username!',
-                            style: GoogleFonts.openSans(
-                                textStyle: TextStyle(
-                                    color: Color(0xffa29aac),
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600)),
+                          FittedBox(
+                            fit: BoxFit.contain,
+                            child: Text(
+                              'Welcome $_username!',
+                              style: TextStyle(
+                                  color: Color(0xffa29aac),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600),
+                            ),
                           ),
                         ],
                       ),

@@ -93,8 +93,8 @@ class _SalesHistoryState extends State<SalesHistory> {
                           child: Container(
                               padding: EdgeInsets.all(10),
                               child: ListTile(
-                                leading: Icon(Icons.info_outline),
-                                title: const Text(
+                                leading: const Icon(Icons.info_outline),
+                                subtitle: const Text(
                                     'This requires internet connection'),
                               )),
                         ),
@@ -161,7 +161,9 @@ class _SalesHistoryState extends State<SalesHistory> {
                               padding: EdgeInsets.all(10),
                               alignment: Alignment.center,
                               width: double.infinity,
-                              child: const Text('Please Wait...'),
+                              child: FittedBox(
+                                  fit: BoxFit.contain,
+                                  child: const Text('Please Wait...')),
                             )
                           ],
                         ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../screens/addproducts.dart';
 import '../screens/manageproducts.dart';
 import '../screens/sellproducts.dart';
@@ -85,13 +84,9 @@ class GridDashboard extends StatelessWidget {
                           margin: EdgeInsets.all(10),
                           child: FittedBox(
                             fit: BoxFit.contain,
-                            child: Text(
-                              data.title,
-                              style: GoogleFonts.openSans(
-                                  textStyle: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600)),
-                            ),
+                            child: Text(data.title,
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold)),
                           ),
                         ),
                       ],

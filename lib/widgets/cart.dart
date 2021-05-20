@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:inventory_management/widgets/customButton.dart';
 import 'package:inventory_management/screens/customerInfo.dart';
 import '../models/products.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class Cart extends StatefulWidget {
   final List<Products> cartItems;
@@ -67,10 +66,7 @@ class _CartState extends State<Cart> {
             child: FittedBox(
               child: Text(
                 'Cart',
-                style: GoogleFonts.openSans(
-                  textStyle:
-                      TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                ),
+                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -137,22 +133,26 @@ class _CartState extends State<Cart> {
                         children: <Widget>[
                           Container(
                             padding: EdgeInsets.only(right: 8, top: 4),
-                            child: Text(
-                              widget.cartItems[index].name,
-                              style: GoogleFonts.openSans(
-                                  textStyle: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold)),
-                              maxLines: 2,
-                              softWrap: true,
+                            child: FittedBox(
+                              fit: BoxFit.contain,
+                              child: Text(
+                                widget.cartItems[index].name,
+                                style: TextStyle(
+                                    fontSize: 15, fontWeight: FontWeight.bold),
+                                maxLines: 2,
+                                softWrap: true,
+                              ),
                             ),
                           ),
                           Container(
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: <Widget>[
-                                Text(
-                                  "AED: ${widget.cartItems[index].price}",
+                                FittedBox(
+                                  fit: BoxFit.contain,
+                                  child: Text(
+                                    "AED: ${widget.cartItems[index].price}",
+                                  ),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),

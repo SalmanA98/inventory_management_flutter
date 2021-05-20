@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class CustomAppBar extends StatelessWidget {
   final String title;
@@ -30,21 +29,19 @@ class CustomAppBar extends StatelessWidget {
           child: Column(
             children: [
               FittedBox(
-                child: Text(title,
-                    style: GoogleFonts.openSans(
-                      textStyle:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                    )),
+                fit: BoxFit.contain,
+                child: Text(
+                  title,
+                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                ),
               ),
               FittedBox(
-                child: Text(
-                  subtitle,
-                  style: GoogleFonts.openSans(
-                      textStyle: TextStyle(
-                          color: Color(0xffa29aac),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600)),
-                ),
+                fit: BoxFit.contain,
+                child: Text(subtitle,
+                    style: TextStyle(
+                        color: Color(0xffa29aac),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600)),
               ),
             ],
           ),

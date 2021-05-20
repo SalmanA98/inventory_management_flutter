@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../models/database.dart';
 import '../models/employee.dart';
@@ -85,8 +84,8 @@ class _ManageEmployeesState extends State<ManageEmployees> {
 
   @override
   void initState() {
-    _getAllEmployees(context);
     super.initState();
+    _getAllEmployees(context);
   }
 
   @override
@@ -99,47 +98,52 @@ class _ManageEmployeesState extends State<ManageEmployees> {
   Widget build(BuildContext context) {
     var screenMaxHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(
-          Icons.add_box_outlined,
-          color: Colors.white,
-        ),
-        onPressed: _addEmployees,
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: Theme.of(context).primaryColor,
-        shape: CircularNotchedRectangle(),
-        notchMargin: 2.0,
-        elevation: 5,
-        child: new Row(
-          children: <Widget>[
-            Container(
-              child: TextButton.icon(
-                style: TextButton.styleFrom(
-                    primary: Theme.of(context).scaffoldBackgroundColor),
-                label: Text(_searchText),
-                icon: Icon(
-                  Icons.search_outlined,
-                ),
-                onPressed: () {
-                  if (_showSearchBar) {
-                    setState(() {
-                      _showSearchBar = false;
-                      _searchText = 'Show';
-                    });
-                  } else {
-                    setState(() {
-                      _showSearchBar = true;
-                      _searchText = 'Hide';
-                    });
-                  }
-                },
+      floatingActionButtonLocation:
+          !_fetchedData ? null : FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: !_fetchedData
+          ? null
+          : FloatingActionButton(
+              child: const Icon(
+                Icons.add_box_outlined,
+                color: Colors.white,
+              ),
+              onPressed: _addEmployees,
+            ),
+      bottomNavigationBar: !_fetchedData
+          ? null
+          : BottomAppBar(
+              color: Theme.of(context).primaryColor,
+              shape: CircularNotchedRectangle(),
+              notchMargin: 2.0,
+              elevation: 5,
+              child: new Row(
+                children: <Widget>[
+                  Container(
+                    child: TextButton.icon(
+                      style: TextButton.styleFrom(
+                          primary: Theme.of(context).scaffoldBackgroundColor),
+                      label: Text(_searchText),
+                      icon: Icon(
+                        Icons.search_outlined,
+                      ),
+                      onPressed: () {
+                        if (_showSearchBar) {
+                          setState(() {
+                            _showSearchBar = false;
+                            _searchText = 'Show';
+                          });
+                        } else {
+                          setState(() {
+                            _showSearchBar = true;
+                            _searchText = 'Hide';
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
       body: !_fetchedData
           ? Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -151,7 +155,9 @@ class _ManageEmployeesState extends State<ManageEmployees> {
                 ),
                 Container(
                     margin: EdgeInsets.symmetric(vertical: 10),
-                    child: Text('Please Wait..'))
+                    child: FittedBox(
+                        fit: BoxFit.contain,
+                        child: const Text('Please Wait..')))
               ],
             )
           : Column(
@@ -210,7 +216,10 @@ class _ManageEmployeesState extends State<ManageEmployees> {
                                   ? 0
                                   : _employeesList.length,
                               itemBuilder: (context, index) {
-                                return createCartListItem(index);
+                                return CartItem(
+                                    editEmployee: _editEmployee,
+                                    employeesList: _employeesList,
+                                    index: index);
                               },
                             ),
                           ),
@@ -223,8 +232,22 @@ class _ManageEmployeesState extends State<ManageEmployees> {
             ),
     );
   }
+}
 
-  createCartListItem(int index) {
+class CartItem extends StatelessWidget {
+  const CartItem({
+    Key key,
+    @required this.employeesList,
+    @required this.index,
+    @required this.editEmployee,
+  }) : super(key: key);
+
+  final List<Employee> employeesList;
+  final int index;
+  final Function(int index) editEmployee;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 3, horizontal: 10),
       child: Card(
@@ -260,14 +283,16 @@ class _ManageEmployeesState extends State<ManageEmployees> {
                             Container(
                               margin: EdgeInsets.only(bottom: 10),
                               padding: EdgeInsets.only(right: 8, top: 4),
-                              child: Text(
-                                _employeesList[index].name,
-                                style: GoogleFonts.openSans(
-                                    textStyle: TextStyle(
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.bold)),
-                                maxLines: 2,
-                                softWrap: true,
+                              child: FittedBox(
+                                fit: BoxFit.contain,
+                                child: Text(
+                                  employeesList[index].name,
+                                  style: TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold),
+                                  maxLines: 2,
+                                  softWrap: true,
+                                ),
                               ),
                             ),
                             Container(
@@ -275,8 +300,11 @@ class _ManageEmployeesState extends State<ManageEmployees> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
-                                  Text(
-                                    "ID: ${_employeesList[index].id}",
+                                  FittedBox(
+                                    fit: BoxFit.contain,
+                                    child: Text(
+                                      "ID: ${employeesList[index].id}",
+                                    ),
                                   ),
                                 ],
                               ),
@@ -305,7 +333,7 @@ class _ManageEmployeesState extends State<ManageEmployees> {
                           size: 15,
                         ),
                         onPressed: () {
-                          _editEmployee(index);
+                          editEmployee(index);
                         },
                       ),
                       decoration: BoxDecoration(

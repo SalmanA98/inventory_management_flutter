@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import './finishedProducts.dart';
 import './addproducts.dart';
 import './editproduct.dart';
@@ -51,12 +51,11 @@ class _ManageProductsState extends State<ManageProducts> {
         _fetchedData = true;
       });
     }).onError((error, stackTrace) {
-      print(error);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error.toString()),
-        ),
-      );
+      Fluttertoast.showToast(
+          msg: error.toString(),
+          toastLength: Toast.LENGTH_SHORT,
+          timeInSecForIosWeb: 1,
+          fontSize: 16.0);
     });
   }
 
@@ -99,8 +98,8 @@ class _ManageProductsState extends State<ManageProducts> {
 
   @override
   void initState() {
-    _getAllProducts(context);
     super.initState();
+    _getAllProducts(context);
   }
 
   @override
@@ -113,63 +112,69 @@ class _ManageProductsState extends State<ManageProducts> {
   Widget build(BuildContext context) {
     var screenMaxHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(
-          Icons.add_box_outlined,
-        ),
-        onPressed: _addProduct,
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: Theme.of(context).primaryColor,
-        shape: CircularNotchedRectangle(),
-        notchMargin: 1.0,
-        elevation: 5,
-        child: new Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Container(
-              child: TextButton.icon(
-                style: TextButton.styleFrom(
-                    primary: Theme.of(context).scaffoldBackgroundColor),
-                label: Text(_searchText),
-                icon: Icon(
-                  Icons.search_outlined,
-                ),
-                onPressed: () {
-                  if (_showSearchBar) {
-                    setState(() {
-                      _showSearchBar = false;
-                      _searchText = 'Show';
-                    });
-                  } else {
-                    setState(() {
-                      _showSearchBar = true;
-                      _searchText = 'Hide';
-                    });
-                  }
-                },
+      floatingActionButtonLocation:
+          !_fetchedData ? null : FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: !_fetchedData
+          ? null
+          : FloatingActionButton(
+              child: const Icon(
+                Icons.add_box_outlined,
+              ),
+              onPressed: _addProduct,
+            ),
+      bottomNavigationBar: !_fetchedData
+          ? null
+          : BottomAppBar(
+              color: Theme.of(context).primaryColor,
+              shape: CircularNotchedRectangle(),
+              notchMargin: 1.0,
+              elevation: 5,
+              child: new Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Container(
+                    child: TextButton.icon(
+                      style: TextButton.styleFrom(
+                          primary: Theme.of(context).scaffoldBackgroundColor),
+                      label: FittedBox(child: Text(_searchText)),
+                      icon: Icon(
+                        Icons.search_outlined,
+                      ),
+                      onPressed: () {
+                        if (_showSearchBar) {
+                          setState(() {
+                            _showSearchBar = false;
+                            _searchText = 'Show';
+                          });
+                        } else {
+                          setState(() {
+                            _showSearchBar = true;
+                            _searchText = 'Hide';
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                  Container(
+                    child: TextButton.icon(
+                      style: TextButton.styleFrom(
+                          primary: Theme.of(context).scaffoldBackgroundColor),
+                      label: FittedBox(child: Text('Finished')),
+                      icon: Icon(
+                        Icons.arrow_forward_outlined,
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) =>
+                                    FinishedProducts(_finishedProducts)));
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
-            Container(
-              child: TextButton.icon(
-                style: TextButton.styleFrom(
-                    primary: Theme.of(context).scaffoldBackgroundColor),
-                label: Text('Finished'),
-                icon: Icon(
-                  Icons.arrow_forward_outlined,
-                ),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => FinishedProducts(_finishedProducts)));
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
       body: !_fetchedData
           ? Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -181,7 +186,7 @@ class _ManageProductsState extends State<ManageProducts> {
                 ),
                 Container(
                     margin: EdgeInsets.symmetric(vertical: 10),
-                    child: Text('Please Wait..'))
+                    child: FittedBox(child: Text('Please Wait..')))
               ],
             )
           : Column(children: [
@@ -192,17 +197,18 @@ class _ManageProductsState extends State<ManageProducts> {
                   child: Column(
                     children: <Widget>[
                       Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.all(10),
-                          margin: EdgeInsets.only(top: 15),
-                          alignment: Alignment.centerLeft,
+                        width: double.infinity,
+                        padding: EdgeInsets.all(10),
+                        margin: EdgeInsets.only(top: 15),
+                        alignment: Alignment.centerLeft,
+                        child: FittedBox(
                           child: Text(
                             'Available Products',
-                            style: GoogleFonts.openSans(
-                              textStyle: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                          )),
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
                       if (_showSearchBar)
                         Container(
                             width: double.infinity,
@@ -241,14 +247,17 @@ class _ManageProductsState extends State<ManageProducts> {
                             padding: EdgeInsets.all(0.0),
                             itemCount: _availableProducts.length,
                             itemBuilder: (context, index) {
-                              return createCartListItem(
-                                  index, _availableProducts);
+                              return CartItem(
+                                editProduct: _editProduct,
+                                index: index,
+                                list: _availableProducts,
+                              );
                             },
                           ),
                         ),
                       if (_availableProducts.isEmpty)
                         Container(
-                            height: screenMaxHeight * 0.20,
+                            height: screenMaxHeight * 0.60,
                             width: double.infinity,
                             alignment: Alignment.center,
                             padding: EdgeInsets.symmetric(horizontal: 20),
@@ -262,8 +271,22 @@ class _ManageProductsState extends State<ManageProducts> {
             ]),
     );
   }
+}
 
-  createCartListItem(int index, List<Products> list) {
+class CartItem extends StatelessWidget {
+  const CartItem({
+    @required this.editProduct,
+    @required this.index,
+    @required this.list,
+    Key key,
+  }) : super(key: key);
+
+  final int index;
+  final List<Products> list;
+  final Function(Products product) editProduct;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 3, horizontal: 10),
       child: Card(
@@ -298,14 +321,15 @@ class _ManageProductsState extends State<ManageProducts> {
                           children: <Widget>[
                             Container(
                               padding: EdgeInsets.only(right: 8, top: 4),
-                              child: Text(
-                                list[index].name,
-                                style: GoogleFonts.openSans(
-                                    textStyle: TextStyle(
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.bold)),
-                                maxLines: 2,
-                                softWrap: true,
+                              child: FittedBox(
+                                child: Text(
+                                  list[index].name,
+                                  style: TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold),
+                                  maxLines: 2,
+                                  softWrap: true,
+                                ),
                               ),
                             ),
                             Container(
@@ -313,8 +337,10 @@ class _ManageProductsState extends State<ManageProducts> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
-                                  Text(
-                                    "AED: ${list[index].price}",
+                                  FittedBox(
+                                    child: Text(
+                                      "AED: ${list[index].price}",
+                                    ),
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
@@ -322,8 +348,10 @@ class _ManageProductsState extends State<ManageProducts> {
                                       color: Colors.grey,
                                       padding: const EdgeInsets.only(
                                           bottom: 2, right: 12, left: 12),
-                                      child: Text(
-                                        list[index].qty,
+                                      child: FittedBox(
+                                        child: Text(
+                                          list[index].qty,
+                                        ),
                                       ),
                                     ),
                                   )
@@ -354,7 +382,7 @@ class _ManageProductsState extends State<ManageProducts> {
                           size: 15,
                         ),
                         onPressed: () {
-                          _editProduct(list[index]);
+                          editProduct(list[index]);
                         },
                       ),
                       decoration: BoxDecoration(

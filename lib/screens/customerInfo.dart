@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../widgets/customButton.dart';
 import '../widgets/customTextField.dart';
@@ -72,28 +71,9 @@ class _CustomerInfoState extends State<CustomerInfo> {
     }
   }
 
-  showError(String errormessage) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('ERROR'),
-            content: Text(errormessage),
-            actions: <Widget>[
-              TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('OK'))
-            ],
-          );
-        });
-  }
-
   void _completeSale() {
     if (!_isCurrentEmployee) {
       _employeeIdInput.text = _currentEmployeeID.toString().toUpperCase();
-      print(_employeeIdInput.text);
     }
     if (_customerNameInput.text.isEmpty ||
         _customerNumInput.text.isEmpty ||
@@ -101,9 +81,17 @@ class _CustomerInfoState extends State<CustomerInfo> {
         _paymentMethod.isEmpty ||
         _employeeIdInput.text.isEmpty ||
         _discInput.text.isEmpty) {
-      showError('Fields/Choices cannot be empty');
+      Fluttertoast.showToast(
+          msg: 'Fields/Choices cannot be empty!',
+          gravity: ToastGravity.CENTER,
+          toastLength: Toast.LENGTH_SHORT,
+          timeInSecForIosWeb: 1);
     } else if (_customerNumInput.text.length < 10) {
-      showError('Number should be of 10-digits! (0501234567)');
+      Fluttertoast.showToast(
+          msg: 'Number should have 10-digits only! (0501234567)',
+          gravity: ToastGravity.CENTER,
+          toastLength: Toast.LENGTH_LONG,
+          timeInSecForIosWeb: 1);
     } else {
       var sell = WriteSaleToDb(
           customerName: _customerNameInput.text,
@@ -119,9 +107,9 @@ class _CustomerInfoState extends State<CustomerInfo> {
 
   @override
   void initState() {
+    super.initState();
     getUser();
     _currentEmployeeID = username;
-    super.initState();
   }
 
   @override
@@ -158,10 +146,10 @@ class _CustomerInfoState extends State<CustomerInfo> {
                     width: double.infinity,
                     padding: EdgeInsets.all(10),
                     alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Customer Details',
-                      style: GoogleFonts.openSans(
-                        textStyle: TextStyle(
+                    child: FittedBox(
+                      child: const Text(
+                        'Customer Details',
+                        style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -187,10 +175,11 @@ class _CustomerInfoState extends State<CustomerInfo> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'Employee Details',
-                          style: GoogleFonts.openSans(
-                            textStyle: TextStyle(
+                        FittedBox(
+                          fit: BoxFit.contain,
+                          child: const Text(
+                            'Employee Details',
+                            style: TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -221,8 +210,8 @@ class _CustomerInfoState extends State<CustomerInfo> {
                         child: Container(
                             padding: EdgeInsets.all(10),
                             child: ListTile(
-                              leading: Icon(Icons.info_outline),
-                              title: Text(
+                              leading: const Icon(Icons.info_outline),
+                              subtitle: const Text(
                                   'Current employee is assumed to be the merchant'),
                             )),
                       ),
@@ -232,10 +221,11 @@ class _CustomerInfoState extends State<CustomerInfo> {
                     width: double.infinity,
                     padding: EdgeInsets.all(10),
                     alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Payment Details',
-                      style: GoogleFonts.openSans(
-                        textStyle: TextStyle(
+                    child: FittedBox(
+                      fit: BoxFit.contain,
+                      child: const Text(
+                        'Payment Details',
+                        style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -254,10 +244,11 @@ class _CustomerInfoState extends State<CustomerInfo> {
                     width: double.infinity,
                     padding: EdgeInsets.all(5),
                     alignment: Alignment.center,
-                    child: Text(
-                      'Choose VAT:',
-                      style: GoogleFonts.openSans(
-                        textStyle: TextStyle(
+                    child: FittedBox(
+                      fit: BoxFit.contain,
+                      child: const Text(
+                        'Choose VAT:',
+                        style: TextStyle(
                             fontSize: 15, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -287,10 +278,11 @@ class _CustomerInfoState extends State<CustomerInfo> {
                     width: double.infinity,
                     padding: EdgeInsets.all(5),
                     alignment: Alignment.center,
-                    child: Text(
-                      'Payment Method:',
-                      style: GoogleFonts.openSans(
-                        textStyle: TextStyle(
+                    child: FittedBox(
+                      fit: BoxFit.contain,
+                      child: const Text(
+                        'Payment Method:',
+                        style: TextStyle(
                             fontSize: 15, fontWeight: FontWeight.bold),
                       ),
                     ),

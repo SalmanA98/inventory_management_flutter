@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../models/products.dart';
 import '../widgets/customAppBar.dart';
-import 'package:firebase_database/firebase_database.dart';
 import '../models/database.dart';
 import '../widgets/cart.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class SellProducts extends StatefulWidget {
   @override
@@ -53,12 +52,12 @@ class _SellProductsState extends State<SellProducts> {
         }
       }
     }).onError((error, stackTrace) {
-      print(error);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error.toString()),
-        ),
-      );
+      Fluttertoast.showToast(
+          msg: error.toString(),
+          gravity: ToastGravity.CENTER,
+          toastLength: Toast.LENGTH_SHORT,
+          timeInSecForIosWeb: 1,
+          fontSize: 16.0);
     });
   }
 
@@ -129,8 +128,8 @@ class _SellProductsState extends State<SellProducts> {
 
   @override
   void initState() {
-    _getAllProducts(context);
     super.initState();
+    _getAllProducts(context);
   }
 
   @override
@@ -143,47 +142,52 @@ class _SellProductsState extends State<SellProducts> {
   Widget build(BuildContext context) {
     var screenMaxHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton(
-        elevation: 10,
-        child: const Icon(Icons.shopping_bag_outlined),
-        onPressed: () {
-          _showCart(_toCart);
-        },
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: Theme.of(context).primaryColor,
-        shape: CircularNotchedRectangle(),
-        notchMargin: 1.0,
-        elevation: 24,
-        child: new Row(
-          children: <Widget>[
-            Container(
-              child: TextButton.icon(
-                style: TextButton.styleFrom(
-                    primary: Theme.of(context).scaffoldBackgroundColor),
-                label: Text(_searchText),
-                icon: Icon(
-                  Icons.search_outlined,
-                ),
-                onPressed: () {
-                  if (_showSearchBar) {
-                    setState(() {
-                      _showSearchBar = false;
-                      _searchText = 'Show';
-                    });
-                  } else {
-                    setState(() {
-                      _showSearchBar = true;
-                      _searchText = 'Hide';
-                    });
-                  }
-                },
+      floatingActionButtonLocation:
+          !_fetchedData ? null : FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: !_fetchedData
+          ? null
+          : FloatingActionButton(
+              elevation: 10,
+              child: const Icon(Icons.shopping_bag_outlined),
+              onPressed: () {
+                _showCart(_toCart);
+              },
+            ),
+      bottomNavigationBar: !_fetchedData
+          ? null
+          : BottomAppBar(
+              color: Theme.of(context).primaryColor,
+              shape: CircularNotchedRectangle(),
+              notchMargin: 1.0,
+              elevation: 24,
+              child: new Row(
+                children: <Widget>[
+                  Container(
+                    child: TextButton.icon(
+                      style: TextButton.styleFrom(
+                          primary: Theme.of(context).scaffoldBackgroundColor),
+                      label: Text(_searchText),
+                      icon: Icon(
+                        Icons.search_outlined,
+                      ),
+                      onPressed: () {
+                        if (_showSearchBar) {
+                          setState(() {
+                            _showSearchBar = false;
+                            _searchText = 'Show';
+                          });
+                        } else {
+                          setState(() {
+                            _showSearchBar = true;
+                            _searchText = 'Hide';
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
       body: !_fetchedData
           ? Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -195,7 +199,9 @@ class _SellProductsState extends State<SellProducts> {
                 ),
                 Container(
                     margin: EdgeInsets.symmetric(vertical: 10),
-                    child: const Text('Please Wait..'))
+                    child: FittedBox(
+                        fit: BoxFit.contain,
+                        child: const Text('Please Wait..')))
               ],
             )
           : _productsEmpty
@@ -233,19 +239,19 @@ class _SellProductsState extends State<SellProducts> {
                                         left: 10,
                                         bottom: 5),
                                     child: Card(
-                                      child: new ListTile(
-                                        leading: new Icon(Icons.search),
-                                        title: new TextField(
+                                      child: ListTile(
+                                        leading: Icon(Icons.search),
+                                        title: TextField(
                                           controller: _searchController,
-                                          decoration: new InputDecoration(
+                                          decoration: InputDecoration(
                                               hintText: 'Search',
                                               border: InputBorder.none),
                                           onChanged: (searchedItem) =>
                                               _searchInProducts(searchedItem),
                                           // onChanged: onSearchTextChanged,
                                         ),
-                                        trailing: new IconButton(
-                                          icon: new Icon(Icons.cancel),
+                                        trailing: IconButton(
+                                          icon: Icon(Icons.cancel),
                                           onPressed: () {
                                             _searchController.clear();
                                             setState(() {
@@ -267,7 +273,11 @@ class _SellProductsState extends State<SellProducts> {
                                       ? 0
                                       : _products.length,
                                   itemBuilder: (context, index) {
-                                    return createCartListItem(index);
+                                    return CartItem(
+                                      addItemToCart: _addItemToCart,
+                                      index: index,
+                                      products: _products,
+                                    );
                                   },
                                 ),
                               ),
@@ -280,8 +290,22 @@ class _SellProductsState extends State<SellProducts> {
                 ),
     );
   }
+}
 
-  createCartListItem(int index) {
+class CartItem extends StatelessWidget {
+  const CartItem({
+    Key key,
+    @required this.products,
+    @required this.addItemToCart,
+    @required this.index,
+  }) : super(key: key);
+
+  final List<Products> products;
+  final int index;
+  final Function(Products product) addItemToCart;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
       child: Card(
@@ -317,14 +341,16 @@ class _SellProductsState extends State<SellProducts> {
                             Container(
                               padding:
                                   EdgeInsets.only(right: 8, top: 4, bottom: 15),
-                              child: Text(
-                                _products[index].name,
-                                style: GoogleFonts.openSans(
-                                    textStyle: TextStyle(
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.bold)),
-                                maxLines: 2,
-                                softWrap: true,
+                              child: FittedBox(
+                                fit: BoxFit.contain,
+                                child: Text(
+                                  products[index].name,
+                                  style: TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold),
+                                  maxLines: 2,
+                                  softWrap: true,
+                                ),
                               ),
                             ),
                             Container(
@@ -332,8 +358,11 @@ class _SellProductsState extends State<SellProducts> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
-                                  Text(
-                                    "AED: ${_products[index].price}",
+                                  FittedBox(
+                                    fit: BoxFit.contain,
+                                    child: Text(
+                                      "AED: ${products[index].price}",
+                                    ),
                                   ),
                                 ],
                               ),
@@ -362,7 +391,7 @@ class _SellProductsState extends State<SellProducts> {
                             size: 15,
                           ),
                           onPressed: () {
-                            _addItemToCart(_products[index]);
+                            addItemToCart(products[index]);
                           },
                         ),
                         decoration: BoxDecoration(

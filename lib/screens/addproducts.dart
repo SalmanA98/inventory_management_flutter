@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../widgets/customButton.dart';
 import '../widgets/customTextField.dart';
 import '../widgets/customAppBar.dart';
@@ -19,21 +20,31 @@ class _AddProductsState extends State<AddProducts> {
     if (_nameInput.text.isEmpty ||
         _priceInput.text.isEmpty ||
         _qtyInput.text.isEmpty) {
-      return;
+      Fluttertoast.showToast(
+          msg: 'Fields cannot be empty',
+          gravity: ToastGravity.CENTER,
+          toastLength: Toast.LENGTH_SHORT,
+          timeInSecForIosWeb: 1);
+    } else {
+      //Fix username for last changed by
+      uploadProduct(
+          context,
+          Products(
+              name: _nameInput.text,
+              price: _priceInput.text,
+              qty: _qtyInput.text));
+      setState(() {
+        _nameInput.clear();
+        _priceInput.clear();
+        _qtyInput.clear();
+      });
+      WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+      Fluttertoast.showToast(
+          msg: 'Added product successfully!',
+          gravity: ToastGravity.CENTER,
+          toastLength: Toast.LENGTH_SHORT,
+          timeInSecForIosWeb: 1);
     }
-    //Fix username for last changed by
-    uploadProduct(
-        context,
-        Products(
-            name: _nameInput.text,
-            price: _priceInput.text,
-            qty: _qtyInput.text));
-    setState(() {
-      _nameInput.clear();
-      _priceInput.clear();
-      _qtyInput.clear();
-    });
-    WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
   }
 
   @override

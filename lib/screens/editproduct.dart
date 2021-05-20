@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../models/database.dart';
 import '../models/paymentdetails.dart';
 import './homepage.dart';
@@ -48,17 +48,17 @@ class _EditProductState extends State<EditProduct> {
           setState(() {
             _updateSuccess = true;
           });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Updated Price Successfully!'),
-            ),
-          );
+          Fluttertoast.showToast(
+              msg: 'Updated Price Successfully',
+              gravity: ToastGravity.CENTER,
+              toastLength: Toast.LENGTH_SHORT,
+              timeInSecForIosWeb: 1);
         }).onError((error, stacktrace) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(error.toString()),
-            ),
-          );
+          Fluttertoast.showToast(
+              msg: error.toString(),
+              gravity: ToastGravity.CENTER,
+              toastLength: Toast.LENGTH_SHORT,
+              timeInSecForIosWeb: 1);
         });
       } else if (_qtyToUpdate != null) {
         databaseReference
@@ -74,17 +74,17 @@ class _EditProductState extends State<EditProduct> {
           setState(() {
             _updateSuccess = true;
           });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Updated Qty Successfully!'),
-            ),
-          );
+          Fluttertoast.showToast(
+              msg: 'Updated Qty Successfully',
+              gravity: ToastGravity.CENTER,
+              toastLength: Toast.LENGTH_SHORT,
+              timeInSecForIosWeb: 1);
         }).onError((error, stacktrace) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(error.toString()),
-            ),
-          );
+          Fluttertoast.showToast(
+              msg: error.toString(),
+              gravity: ToastGravity.CENTER,
+              toastLength: Toast.LENGTH_SHORT,
+              timeInSecForIosWeb: 1);
         });
       }
     }
@@ -100,29 +100,29 @@ class _EditProductState extends State<EditProduct> {
       setState(() {
         _updateSuccess = true;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Removed Product Successfully!'),
-        ),
-      );
+      Fluttertoast.showToast(
+          msg: 'Removed product -> $productName!',
+          gravity: ToastGravity.CENTER,
+          toastLength: Toast.LENGTH_SHORT,
+          timeInSecForIosWeb: 1);
     }).onError((error, stacktrace) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error.toString()),
-        ),
-      );
+      Fluttertoast.showToast(
+          msg: error.toString(),
+          gravity: ToastGravity.CENTER,
+          toastLength: Toast.LENGTH_SHORT,
+          timeInSecForIosWeb: 1);
     });
   }
 
   @override
   void initState() {
+    super.initState();
     _productDetails
         .add(PaymentDetails(title: 'Name', value: widget.productName));
     _productDetails.add(
         PaymentDetails(title: 'Current Price', value: widget.currentPrice));
     _productDetails
         .add(PaymentDetails(title: 'Current Qty', value: widget.currentQty));
-    super.initState();
   }
 
   @override
@@ -156,10 +156,11 @@ class _EditProductState extends State<EditProduct> {
                       padding: EdgeInsets.all(10),
                       margin: EdgeInsets.only(top: 15),
                       alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Product Details',
-                        style: GoogleFonts.openSans(
-                          textStyle: TextStyle(
+                      child: FittedBox(
+                        fit: BoxFit.contain,
+                        child: const Text(
+                          'Product Details',
+                          style: TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       )),
@@ -171,15 +172,18 @@ class _EditProductState extends State<EditProduct> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                element.title,
-                                style: GoogleFonts.openSans(
-                                  textStyle: TextStyle(
+                              FittedBox(
+                                fit: BoxFit.contain,
+                                child: Text(
+                                  element.title,
+                                  style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold),
                                 ),
                               ),
-                              Text(element.value),
+                              FittedBox(
+                                  fit: BoxFit.contain,
+                                  child: Text(element.value)),
                             ],
                           ),
                           Divider(
@@ -192,26 +196,26 @@ class _EditProductState extends State<EditProduct> {
                       padding: EdgeInsets.all(10),
                       margin: EdgeInsets.only(top: 15),
                       alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Update Product',
-                        style: GoogleFonts.openSans(
-                          textStyle: TextStyle(
+                      child: FittedBox(
+                        fit: BoxFit.contain,
+                        child: const Text(
+                          'Update Product',
+                          style: TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       )),
                   Container(
-                    margin: EdgeInsets.symmetric(horizontal: 10),
-                    width: double.infinity,
-                    child: Card(
+                      margin: EdgeInsets.symmetric(horizontal: 10),
+                      width: double.infinity,
+                      child: Card(
                         elevation: 3,
                         child: Container(
-                          padding: EdgeInsets.all(10),
-                          child: ListTile(
-                              leading: Icon(Icons.info_outline),
-                              title:
-                                  Text('Leave the unchanged data field blank')),
-                        )),
-                  ),
+                            padding: EdgeInsets.all(10),
+                            child: ListTile(
+                                leading: const Icon(Icons.info_outline),
+                                subtitle: const Text(
+                                    'Leave the unchanged data field blank'))),
+                      )),
                   Container(
                     margin: EdgeInsets.all(10),
                     child: CustomTextField(

@@ -1,11 +1,10 @@
+import 'dart:math';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:inventory_management/widgets/customButton.dart';
-import 'package:inventory_management/widgets/customTextField.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'dart:math';
+import './customButton.dart';
+import './customTextField.dart';
 import '../models/database.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class RegisterUser extends StatefulWidget {
   final String userName;
@@ -149,12 +148,11 @@ class _RegisterUserState extends State<RegisterUser> {
                   Container(
                     padding: EdgeInsets.only(top: 10, left: 10, bottom: 10),
                     child: FittedBox(
-                      child: Text(
+                      fit: BoxFit.contain,
+                      child: const Text(
                         'Please Wait',
-                        style: GoogleFonts.openSans(
-                          textStyle: TextStyle(
-                              fontSize: 15, fontWeight: FontWeight.bold),
-                        ),
+                        style: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
@@ -166,12 +164,11 @@ class _RegisterUserState extends State<RegisterUser> {
                       alignment: Alignment.centerLeft,
                       padding: EdgeInsets.only(top: 10, left: 10),
                       child: FittedBox(
-                        child: Text(
+                        fit: BoxFit.contain,
+                        child: const Text(
                           'User Credentials',
-                          style: GoogleFonts.openSans(
-                            textStyle: TextStyle(
-                                fontSize: 25, fontWeight: FontWeight.bold),
-                          ),
+                          style: TextStyle(
+                              fontSize: 25, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
@@ -182,12 +179,11 @@ class _RegisterUserState extends State<RegisterUser> {
                           padding:
                               EdgeInsets.only(top: 10, left: 10, bottom: 10),
                           child: FittedBox(
+                            fit: BoxFit.contain,
                             child: Text(
                               'User ID: $_employeeID',
-                              style: GoogleFonts.openSans(
-                                textStyle: TextStyle(
-                                    fontSize: 15, fontWeight: FontWeight.bold),
-                              ),
+                              style: TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ),

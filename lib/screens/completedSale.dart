@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../widgets/customAppBar.dart';
 import '../widgets/customButton.dart';
 import '../models/paymentdetails.dart';
@@ -28,7 +27,6 @@ class CompletedSale extends StatelessWidget {
   }
 
   Future<void> _onBackPressed(BuildContext context) async {
-    // Your back press code here...
     Navigator.pushReplacementNamed(context, '/');
   }
 
@@ -54,10 +52,11 @@ class CompletedSale extends StatelessWidget {
                         padding: EdgeInsets.all(10),
                         margin: EdgeInsets.only(top: 15),
                         alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Payment Details',
-                          style: GoogleFonts.openSans(
-                            textStyle: TextStyle(
+                        child: FittedBox(
+                          fit: BoxFit.contain,
+                          child: const Text(
+                            'Payment Details',
+                            style: TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.bold),
                           ),
                         )),
@@ -69,15 +68,18 @@ class CompletedSale extends StatelessWidget {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  element.title,
-                                  style: GoogleFonts.openSans(
-                                    textStyle: TextStyle(
+                                FittedBox(
+                                  fit: BoxFit.contain,
+                                  child: Text(
+                                    element.title,
+                                    style: TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.bold),
                                   ),
                                 ),
-                                Text(element.value),
+                                FittedBox(
+                                    fit: BoxFit.contain,
+                                    child: Text(element.value)),
                               ],
                             ),
                             Divider(

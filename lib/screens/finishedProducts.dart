@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../models/products.dart';
 import '../widgets/customAppBar.dart';
-import 'package:firebase_database/firebase_database.dart';
 import '../models/database.dart';
-import '../widgets/cart.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class FinishedProducts extends StatefulWidget {
   final List<Products> finishedProductsList;
@@ -17,32 +14,35 @@ class FinishedProducts extends StatefulWidget {
 class _FinishedProductsState extends State<FinishedProducts> {
   List<Products> productsCopy = [];
 
-  void _deleteProduct(String productName) {
+  void _deleteProduct(Products product) {
     databaseReference
         .child('D')
         .child('Products')
-        .child(productName)
+        .child(product.name)
         .remove()
         .then((_) {
-      setState(() {});
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Removed Product Successfully!'),
-        ),
-      );
+      setState(() {
+        widget.finishedProductsList.remove(product);
+      });
+      Fluttertoast.showToast(
+          msg: 'Removed Product Successfully',
+          gravity: ToastGravity.CENTER,
+          toastLength: Toast.LENGTH_SHORT,
+          timeInSecForIosWeb: 1);
     }).onError((error, stacktrace) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error.toString()),
-        ),
-      );
+      print('ERROR: ${error.toString()}\nSTACK: $stacktrace');
+      Fluttertoast.showToast(
+          msg: error.toString(),
+          gravity: ToastGravity.CENTER,
+          toastLength: Toast.LENGTH_SHORT,
+          timeInSecForIosWeb: 1);
     });
   }
 
   @override
   void initState() {
-    productsCopy.addAll(widget.finishedProductsList);
     super.initState();
+    productsCopy.addAll(widget.finishedProductsList);
   }
 
   @override
@@ -61,28 +61,46 @@ class _FinishedProductsState extends State<FinishedProducts> {
                     padding: EdgeInsets.all(10),
                     margin: EdgeInsets.only(top: 15),
                     alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Finished Products',
-                      style: GoogleFonts.openSans(
-                        textStyle: TextStyle(
+                    child: FittedBox(
+                      fit: BoxFit.contain,
+                      child: const Text(
+                        'Finished Products',
+                        style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                     )),
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: 10),
+                  width: double.infinity,
+                  child: Card(
+                    elevation: 3,
+                    child: Container(
+                        padding: EdgeInsets.all(10),
+                        child: ListTile(
+                          leading: const Icon(Icons.info_outline),
+                          subtitle: const Text(
+                              'Please remove or update the empty (qty -> 0) products'),
+                        )),
+                  ),
+                ),
                 if (widget.finishedProductsList.isNotEmpty)
                   Container(
-                    height: screenMaxHeight * .70,
+                    height: screenMaxHeight * .60,
                     child: ListView.builder(
                       padding: EdgeInsets.all(0.0),
                       itemCount: widget.finishedProductsList.length,
                       itemBuilder: (context, index) {
-                        return createCartListItem(
-                            index, widget.finishedProductsList);
+                        return CartItem(
+                          index: index,
+                          list: widget.finishedProductsList,
+                          deleteProduct: _deleteProduct,
+                        );
                       },
                     ),
                   ),
                 if (widget.finishedProductsList.isEmpty)
                   Container(
-                      height: screenMaxHeight * 0.20,
+                      height: screenMaxHeight * 0.60,
                       width: double.infinity,
                       alignment: Alignment.center,
                       padding: EdgeInsets.symmetric(horizontal: 20),
@@ -96,8 +114,22 @@ class _FinishedProductsState extends State<FinishedProducts> {
       ]),
     );
   }
+}
 
-  createCartListItem(int index, List<Products> list) {
+class CartItem extends StatelessWidget {
+  const CartItem(
+      {Key key,
+      @required this.index,
+      @required this.list,
+      @required this.deleteProduct})
+      : super(key: key);
+
+  final int index;
+  final List<Products> list;
+  final Function(Products product) deleteProduct;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 3, horizontal: 10),
       child: Card(
@@ -132,14 +164,16 @@ class _FinishedProductsState extends State<FinishedProducts> {
                           children: <Widget>[
                             Container(
                               padding: EdgeInsets.only(right: 8, top: 4),
-                              child: Text(
-                                list[index].name,
-                                style: GoogleFonts.openSans(
-                                    textStyle: TextStyle(
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.bold)),
-                                maxLines: 2,
-                                softWrap: true,
+                              child: FittedBox(
+                                fit: BoxFit.contain,
+                                child: Text(
+                                  list[index].name,
+                                  style: TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold),
+                                  maxLines: 2,
+                                  softWrap: true,
+                                ),
                               ),
                             ),
                             Container(
@@ -147,8 +181,11 @@ class _FinishedProductsState extends State<FinishedProducts> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
-                                  Text(
-                                    "AED: ${list[index].price}",
+                                  FittedBox(
+                                    fit: BoxFit.contain,
+                                    child: Text(
+                                      "AED: ${list[index].price}",
+                                    ),
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
@@ -156,8 +193,11 @@ class _FinishedProductsState extends State<FinishedProducts> {
                                       color: Colors.grey,
                                       padding: const EdgeInsets.only(
                                           bottom: 2, right: 12, left: 12),
-                                      child: Text(
-                                        list[index].qty,
+                                      child: FittedBox(
+                                        fit: BoxFit.contain,
+                                        child: Text(
+                                          list[index].qty,
+                                        ),
                                       ),
                                     ),
                                   )
@@ -188,8 +228,7 @@ class _FinishedProductsState extends State<FinishedProducts> {
                           size: 15,
                         ),
                         onPressed: () {
-                          _deleteProduct(
-                              widget.finishedProductsList[index].name);
+                          deleteProduct(list[index]);
                         },
                       ),
                       decoration: BoxDecoration(

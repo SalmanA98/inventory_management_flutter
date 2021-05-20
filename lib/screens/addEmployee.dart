@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../models/database.dart';
 import '../widgets/customAppBar.dart';
 import '../widgets/customButton.dart';
@@ -104,7 +103,7 @@ class _AddEmployeeState extends State<AddEmployee> {
     }
   }
 
-  Future<void> getAllLocations() async {
+  Future<void> _getAllLocations() async {
     await databaseReference.child('Locations').once().then((datasnapshot) {
       if (datasnapshot.value != null) {
         List<dynamic> values = datasnapshot.value;
@@ -129,8 +128,8 @@ class _AddEmployeeState extends State<AddEmployee> {
 
   @override
   void initState() {
-    getAllLocations();
     super.initState();
+    _getAllLocations();
   }
 
   @override
@@ -155,7 +154,9 @@ class _AddEmployeeState extends State<AddEmployee> {
                   ),
                   Container(
                       margin: EdgeInsets.symmetric(vertical: 10),
-                      child: const Text('Please Wait..'))
+                      child: FittedBox(
+                          fit: BoxFit.contain,
+                          child: const Text('Please Wait..')))
                 ],
               )
             : Column(
@@ -205,10 +206,11 @@ class _AddEmployeeState extends State<AddEmployee> {
                               width: double.infinity,
                               padding: EdgeInsets.all(5),
                               alignment: Alignment.center,
-                              child: Text(
-                                'Admin Privilege:',
-                                style: GoogleFonts.openSans(
-                                  textStyle: TextStyle(
+                              child: FittedBox(
+                                fit: BoxFit.contain,
+                                child: const Text(
+                                  'Admin Privilege:',
+                                  style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -221,7 +223,9 @@ class _AddEmployeeState extends State<AddEmployee> {
                                   return Container(
                                     margin: EdgeInsets.all(5),
                                     child: ChoiceChip(
-                                      label: Text(_adminLabelList[index]),
+                                      label: FittedBox(
+                                          fit: BoxFit.contain,
+                                          child: Text(_adminLabelList[index])),
                                       selected: _adminChipChoice == index,
                                       onSelected: (bool selected) {
                                         setState(() {
@@ -240,10 +244,11 @@ class _AddEmployeeState extends State<AddEmployee> {
                               width: double.infinity,
                               padding: EdgeInsets.all(5),
                               alignment: Alignment.center,
-                              child: Text(
-                                'Location:',
-                                style: GoogleFonts.openSans(
-                                  textStyle: TextStyle(
+                              child: FittedBox(
+                                fit: BoxFit.contain,
+                                child: const Text(
+                                  'Location:',
+                                  style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -256,7 +261,9 @@ class _AddEmployeeState extends State<AddEmployee> {
                                   return Container(
                                     margin: EdgeInsets.all(5),
                                     child: ChoiceChip(
-                                      label: Text(_locations[index]),
+                                      label: FittedBox(
+                                          fit: BoxFit.contain,
+                                          child: Text(_locations[index])),
                                       selected: _locationChipChoice == index,
                                       onSelected: (bool selected) {
                                         setState(() {

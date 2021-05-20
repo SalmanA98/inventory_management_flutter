@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../models/employee.dart';
 import '../widgets/customButton.dart';
@@ -60,7 +59,8 @@ class _EditEmployeeState extends State<EditEmployee> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Enter Details'),
+            title: FittedBox(
+                fit: BoxFit.contain, child: const Text('Enter Details')),
             content: CustomTextField(
                 textController: controller,
                 textHint: hint,
@@ -88,7 +88,8 @@ class _EditEmployeeState extends State<EditEmployee> {
                       }
                     });
                   },
-                  child: Text('Save Changes'))
+                  child: FittedBox(
+                      fit: BoxFit.contain, child: const Text('Save Changes')))
             ],
           );
         });
@@ -118,7 +119,6 @@ class _EditEmployeeState extends State<EditEmployee> {
     if (attribute?.toLowerCase() == 'age') {
       enterDetailsBox('Enter the Age', _ageController, 'Updated Age', true);
     } else if (attribute?.toLowerCase() == 'admin privilege') {
-      print('Admin');
       setState(() {
         _editAdmin = true;
       });
@@ -212,8 +212,8 @@ class _EditEmployeeState extends State<EditEmployee> {
 
   @override
   void initState() {
-    _loadDetails();
     super.initState();
+    _loadDetails();
   }
 
   @override
@@ -245,7 +245,9 @@ class _EditEmployeeState extends State<EditEmployee> {
                             ),
                             Container(
                                 margin: EdgeInsets.symmetric(vertical: 10),
-                                child: Text('Please Wait..'))
+                                child: FittedBox(
+                                    fit: BoxFit.contain,
+                                    child: const Text('Please Wait..')))
                           ],
                         ),
                       )
@@ -261,7 +263,7 @@ class _EditEmployeeState extends State<EditEmployee> {
                                   padding: EdgeInsets.all(10),
                                   child: ListTile(
                                     leading: Icon(Icons.info_outline),
-                                    title: Text(
+                                    subtitle: const Text(
                                         'To change the Location, Name or ID, delete the user and create a new one'),
                                   )),
                             ),
@@ -271,10 +273,11 @@ class _EditEmployeeState extends State<EditEmployee> {
                               padding: EdgeInsets.all(10),
                               margin: EdgeInsets.only(top: 15),
                               alignment: Alignment.centerLeft,
-                              child: Text(
-                                'Employee Details',
-                                style: GoogleFonts.openSans(
-                                  textStyle: TextStyle(
+                              child: FittedBox(
+                                fit: BoxFit.contain,
+                                child: const Text(
+                                  'Employee Details',
+                                  style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -289,15 +292,18 @@ class _EditEmployeeState extends State<EditEmployee> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text(
-                                          element.title,
-                                          style: GoogleFonts.openSans(
-                                            textStyle: TextStyle(
+                                        FittedBox(
+                                          fit: BoxFit.contain,
+                                          child: Text(
+                                            element.title,
+                                            style: TextStyle(
                                                 fontSize: 15,
                                                 fontWeight: FontWeight.bold),
                                           ),
                                         ),
-                                        Text(element.value),
+                                        FittedBox(
+                                            fit: BoxFit.contain,
+                                            child: Text(element.value)),
                                       ],
                                     ),
                                     Divider(
@@ -321,10 +327,11 @@ class _EditEmployeeState extends State<EditEmployee> {
                                             Container(
                                               margin:
                                                   EdgeInsets.only(right: 15),
-                                              child: Text(
-                                                element.title,
-                                                style: GoogleFonts.openSans(
-                                                  textStyle: TextStyle(
+                                              child: FittedBox(
+                                                fit: BoxFit.contain,
+                                                child: Text(
+                                                  element.title,
+                                                  style: TextStyle(
                                                       fontSize: 15,
                                                       fontWeight:
                                                           FontWeight.bold),
@@ -337,7 +344,9 @@ class _EditEmployeeState extends State<EditEmployee> {
                                                 child: Icon(Icons.edit)),
                                           ],
                                         ),
-                                        Text(element.value),
+                                        FittedBox(
+                                            fit: BoxFit.contain,
+                                            child: Text(element.value)),
                                       ],
                                     ),
                                     Divider(
@@ -352,10 +361,11 @@ class _EditEmployeeState extends State<EditEmployee> {
                               width: double.infinity,
                               padding: EdgeInsets.all(5),
                               alignment: Alignment.center,
-                              child: Text(
-                                'Admin Privilege:',
-                                style: GoogleFonts.openSans(
-                                  textStyle: TextStyle(
+                              child: FittedBox(
+                                fit: BoxFit.contain,
+                                child: const Text(
+                                  'Admin Privilege:',
+                                  style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -369,7 +379,9 @@ class _EditEmployeeState extends State<EditEmployee> {
                                   return Container(
                                     margin: EdgeInsets.all(5),
                                     child: ChoiceChip(
-                                      label: Text(_adminLabelList[index]),
+                                      label: FittedBox(
+                                          fit: BoxFit.contain,
+                                          child: Text(_adminLabelList[index])),
                                       selected: _adminChipChoice == index,
                                       onSelected: (bool selected) {
                                         setState(() {

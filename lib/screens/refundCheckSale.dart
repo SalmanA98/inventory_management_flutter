@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../widgets/customAppBar.dart';
 import '../models/database.dart';
 import '../widgets/customButton.dart';
@@ -43,11 +44,12 @@ class _RefundSaleIDState extends State<RefundSaleID> {
             .once()
             .then((paymentMethod) {
           if (paymentMethod.value.toString() == 'Cash') {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Sale ID matched successfully!'),
-              ),
-            );
+            Fluttertoast.showToast(
+                msg: 'Sale ID matched!',
+                toastLength: Toast.LENGTH_SHORT,
+                timeInSecForIosWeb: 1,
+                fontSize: 16.0);
+
             Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -57,50 +59,44 @@ class _RefundSaleIDState extends State<RefundSaleID> {
                           saleID: saleID,
                         )));
           }
-        }).onError((error, stackTrace) => null);
+        }).onError((error, stackTrace) => Fluttertoast.showToast(
+                msg: error.toString(),
+                toastLength: Toast.LENGTH_SHORT,
+                timeInSecForIosWeb: 1,
+                fontSize: 16.0));
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Sale ID does not exist!'),
-          ),
-        );
+        Fluttertoast.showToast(
+            msg: 'Sale ID does not exist!',
+            toastLength: Toast.LENGTH_SHORT,
+            timeInSecForIosWeb: 1,
+            fontSize: 16.0);
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Sale does not exist!'),
-        ),
-      );
+      Fluttertoast.showToast(
+          msg: 'Sale does not exist!',
+          toastLength: Toast.LENGTH_SHORT,
+          timeInSecForIosWeb: 1,
+          fontSize: 16.0);
     }
     setState(() {
       _startedCheck = false;
     });
   }
 
-  showError(String errormessage, BuildContext context) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('ERROR'),
-            content: Text(errormessage),
-            actions: <Widget>[
-              TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('OK'))
-            ],
-          );
-        });
-  }
-
   void _checkSaleID(BuildContext context) {
     String saleID = _saleIdInput.text;
     if (saleID.isEmpty) {
-      showError('The Sale ID Cannot Be Empty!', context);
+      Fluttertoast.showToast(
+          msg: 'Sale ID cannot be empty!',
+          toastLength: Toast.LENGTH_SHORT,
+          timeInSecForIosWeb: 1,
+          fontSize: 16.0);
     } else if (saleID.length < 15) {
-      showError('The Sale ID is of 15 Characters!', context);
+      Fluttertoast.showToast(
+          msg: 'Sale ID should be 15 characters!',
+          toastLength: Toast.LENGTH_LONG,
+          timeInSecForIosWeb: 1,
+          fontSize: 16.0);
     } else {
       setState(() {
         _startedCheck = true;

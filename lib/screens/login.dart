@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:progress_state_button/iconed_button.dart';
@@ -34,9 +33,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void initState() {
-    this.isUserSignedIn();
-
     super.initState();
+    this.isUserSignedIn();
   }
 
   showError(String errormessage) {
@@ -44,14 +42,14 @@ class _LoginPageState extends State<LoginPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('ERROR'),
+            title: const Text('ERROR'),
             content: Text(errormessage),
             actions: <Widget>[
               TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: Text('OK'))
+                  child: const Text('OK'))
             ],
           );
         });
@@ -161,18 +159,16 @@ class _LoginPageState extends State<LoginPage> {
             width: double.infinity,
             alignment: Alignment.centerLeft,
             padding: EdgeInsets.only(top: 100, left: 30),
-            child: RichText(
-              text: TextSpan(
-                  children: [
-                    TextSpan(text: 'Welcome\n'),
-                    TextSpan(text: 'Back'),
-                    TextSpan(
-                        children: [TextSpan(text: '!')],
-                        style: TextStyle(color: Theme.of(context).primaryColor))
-                  ],
-                  style: GoogleFonts.openSans(
-                      textStyle: TextStyle(
-                          fontSize: 50, fontWeight: FontWeight.bold))),
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: RichText(
+                  text: TextSpan(children: [
+                TextSpan(text: 'Welcome\n'),
+                TextSpan(text: 'Back'),
+                TextSpan(
+                    children: [TextSpan(text: '!')],
+                    style: TextStyle(color: Theme.of(context).primaryColor))
+              ], style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold))),
             ),
           ),
           Expanded(
@@ -219,10 +215,6 @@ class _LoginPageState extends State<LoginPage> {
                                 textStyle: TextStyle(
                                     color: Theme.of(context)
                                         .scaffoldBackgroundColor),
-                                // progressIndicator:
-                                //     CircularProgressIndicator.adaptive(
-                                //         backgroundColor:
-                                //             Theme.of(context).accentColor),
                                 iconedButtons: {
                                   ButtonState.idle: IconedButton(
                                       text: 'login',

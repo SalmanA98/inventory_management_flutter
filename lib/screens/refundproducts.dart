@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../models/paymentdetails.dart';
 import '../widgets/customButton.dart';
@@ -88,24 +87,6 @@ class _RefundProductsState extends State<RefundProducts> {
     });
   }
 
-  showError(String errormessage) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('ERROR'),
-            content: Text(errormessage),
-            actions: <Widget>[
-              TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('OK'))
-            ],
-          );
-        });
-  }
-
   Future<void> _refundToDb(
       BuildContext context, Products product, bool refundedAll) async {
     String qtyToRefud = _qtyController.text;
@@ -163,7 +144,11 @@ class _RefundProductsState extends State<RefundProducts> {
       }).onError((error, stackTrace) => null);
     } else {
       if (qtyToRefud.isEmpty || int.tryParse(qtyToRefud) < 1) {
-        showError('Refund Qty Should Be More Than 0!');
+        Fluttertoast.showToast(
+            msg: 'Refund qty should be more than 0!',
+            toastLength: Toast.LENGTH_SHORT,
+            timeInSecForIosWeb: 1,
+            fontSize: 16.0);
       } else {
         databaseReference
             .child('D')
@@ -260,15 +245,19 @@ class _RefundProductsState extends State<RefundProducts> {
               }
             }
           });
-        }).onError((error, stackTrace) => null);
+        }).onError((error, stackTrace) => Fluttertoast.showToast(
+                msg: error.toString(),
+                toastLength: Toast.LENGTH_SHORT,
+                timeInSecForIosWeb: 1,
+                fontSize: 16.0));
       }
     }
   }
 
   @override
   void initState() {
-    _getSaleInfo(context, widget.date, widget.time);
     super.initState();
+    _getSaleInfo(context, widget.date, widget.time);
   }
 
   @override
@@ -300,7 +289,7 @@ class _RefundProductsState extends State<RefundProducts> {
                             padding: EdgeInsets.all(10),
                             child: ListTile(
                               leading: Icon(Icons.info_outline),
-                              title: Text(
+                              subtitle: const Text(
                                   'Refund should be completed by admins only'),
                             )),
                       ),
@@ -310,10 +299,11 @@ class _RefundProductsState extends State<RefundProducts> {
                       width: double.infinity,
                       padding: EdgeInsets.all(10),
                       alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Payment Details',
-                        style: GoogleFonts.openSans(
-                          textStyle: TextStyle(
+                      child: FittedBox(
+                        fit: BoxFit.contain,
+                        child: const Text(
+                          'Payment Details',
+                          style: TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -328,15 +318,18 @@ class _RefundProductsState extends State<RefundProducts> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    element.title,
-                                    style: GoogleFonts.openSans(
-                                      textStyle: TextStyle(
+                                  FittedBox(
+                                    fit: BoxFit.contain,
+                                    child: Text(
+                                      element.title,
+                                      style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.bold),
                                     ),
                                   ),
-                                  Text(element.value),
+                                  FittedBox(
+                                      fit: BoxFit.contain,
+                                      child: Text(element.value)),
                                 ],
                               ),
                               Divider(
@@ -354,10 +347,11 @@ class _RefundProductsState extends State<RefundProducts> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             if (_products.isNotEmpty)
-                              Text(
-                                'Choose Products',
-                                style: GoogleFonts.openSans(
-                                  textStyle: TextStyle(
+                              FittedBox(
+                                fit: BoxFit.contain,
+                                child: const Text(
+                                  'Choose Products',
+                                  style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -409,17 +403,24 @@ class _RefundProductsState extends State<RefundProducts> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Text(
-                                                product.name,
-                                                style: GoogleFonts.openSans(
-                                                  textStyle: TextStyle(
+                                              FittedBox(
+                                                fit: BoxFit.contain,
+                                                child: Text(
+                                                  product.name,
+                                                  style: TextStyle(
                                                       fontSize: 15,
                                                       fontWeight:
                                                           FontWeight.bold),
                                                 ),
                                               ),
-                                              Text('Price: ${product.price}'),
-                                              Text('Qty: ${product.qty}'),
+                                              FittedBox(
+                                                  fit: BoxFit.contain,
+                                                  child: Text(
+                                                      'Price: ${product.price}')),
+                                              FittedBox(
+                                                  fit: BoxFit.contain,
+                                                  child: Text(
+                                                      'Qty: ${product.qty}')),
                                             ],
                                           ),
                                         ),
@@ -448,10 +449,12 @@ class _RefundProductsState extends State<RefundProducts> {
                           child: Container(
                               padding: EdgeInsets.all(10),
                               child: ListTile(
-                                leading: Icon(Icons.info_outline),
-                                title: _products.isEmpty
-                                    ? Text('All products have been refunded')
-                                    : Text('This will refund all the products'),
+                                leading: const Icon(Icons.info_outline),
+                                subtitle: _products.isEmpty
+                                    ? const Text(
+                                        'All products have been refunded')
+                                    : const Text(
+                                        'This will refund all the products'),
                               )),
                         ),
                       ),
