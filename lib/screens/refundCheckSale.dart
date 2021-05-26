@@ -8,6 +8,8 @@ import '../widgets/customTextField.dart';
 import '../screens/refundproducts.dart';
 
 class RefundSaleID extends StatefulWidget {
+  final String _username;
+  const RefundSaleID(this._username);
   @override
   _RefundSaleIDState createState() => _RefundSaleIDState();
 }
@@ -17,6 +19,14 @@ class _RefundSaleIDState extends State<RefundSaleID> {
 
   bool _startedCheck = false;
   Future<void> _authenticateSale(BuildContext context, String saleID) async {
+    String _shopLocation;
+
+    if (widget._username.toLowerCase().startsWith('a')) {
+      _shopLocation = widget._username.substring(1, 2).toUpperCase();
+    } else {
+      _shopLocation = widget._username.substring(2, 3).toUpperCase();
+    }
+
     String year = saleID.substring(0, 4);
     String month = saleID.substring(4, 6);
     String day = saleID.substring(6, 8);
@@ -27,7 +37,7 @@ class _RefundSaleIDState extends State<RefundSaleID> {
     String time = '$hr:$min:$sec';
 
     DataSnapshot dataSnapshot = await databaseReference
-        .child('D')
+        .child(_shopLocation)
         .child('Sales')
         .child(date)
         .child(time)
@@ -36,7 +46,7 @@ class _RefundSaleIDState extends State<RefundSaleID> {
     if (dataSnapshot.value != null) {
       if (dataSnapshot.value == saleID) {
         databaseReference
-            .child('D')
+            .child(_shopLocation)
             .child('Sales')
             .child(date)
             .child(time)
@@ -54,9 +64,10 @@ class _RefundSaleIDState extends State<RefundSaleID> {
                 context,
                 MaterialPageRoute(
                     builder: (_) => RefundProducts(
-                          date: date,
-                          time: time,
-                          saleID: saleID,
+                          date,
+                          time,
+                          saleID,
+                          widget._username,
                         )));
           }
         }).onError((error, stackTrace) => Fluttertoast.showToast(
@@ -108,45 +119,47 @@ class _RefundSaleIDState extends State<RefundSaleID> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GestureDetector(
-        onTap: () {
-          FocusScopeNode currentFocus = FocusScope.of(context);
-          if (!currentFocus.hasPrimaryFocus) {
-            currentFocus.unfocus();
-          }
-        },
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              CustomAppBar(
-                title: 'Refund Sale',
-                subtitle: 'Enter the sale details!',
-              ),
-              Container(
-                padding: EdgeInsets.all(10),
-                margin: EdgeInsets.only(top: 50),
-                width: double.infinity,
-                child: Column(
-                  children: [
-                    CustomTextField(
-                      textController: _saleIdInput,
-                      textIcon: Icon(Icons.format_list_numbered),
-                      textHint: 'Sale ID',
-                      maximumLength: 15,
-                    ),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * .02,
-                    ),
-                    if (!_startedCheck)
-                      CustomButton(
-                        buttonFunction: () => _checkSaleID(context),
-                        buttonText: 'Authenticate Sale ID',
-                      ),
-                    if (_startedCheck) LinearProgressIndicator(),
-                  ],
+      body: SafeArea(
+        child: GestureDetector(
+          onTap: () {
+            FocusScopeNode currentFocus = FocusScope.of(context);
+            if (!currentFocus.hasPrimaryFocus) {
+              currentFocus.unfocus();
+            }
+          },
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                CustomAppBar(
+                  title: 'Refund Sale',
+                  subtitle: 'Enter the sale details!',
                 ),
-              ),
-            ],
+                Container(
+                  padding: EdgeInsets.all(10),
+                  margin: EdgeInsets.only(top: 50),
+                  width: double.infinity,
+                  child: Column(
+                    children: [
+                      CustomTextField(
+                        textController: _saleIdInput,
+                        textIcon: Icon(Icons.format_list_numbered),
+                        textHint: 'Sale ID',
+                        maximumLength: 15,
+                      ),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * .02,
+                      ),
+                      if (!_startedCheck)
+                        CustomButton(
+                          buttonFunction: () => _checkSaleID(context),
+                          buttonText: 'Authenticate Sale ID',
+                        ),
+                      if (_startedCheck) LinearProgressIndicator(),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

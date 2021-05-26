@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:giffy_dialog/giffy_dialog.dart';
 import '../models/products.dart';
 import '../widgets/customAppBar.dart';
 import '../models/database.dart';
@@ -15,28 +16,48 @@ class _FinishedProductsState extends State<FinishedProducts> {
   List<Products> productsCopy = [];
 
   void _deleteProduct(Products product) {
-    databaseReference
-        .child('D')
-        .child('Products')
-        .child(product.name)
-        .remove()
-        .then((_) {
-      setState(() {
-        widget.finishedProductsList.remove(product);
-      });
-      Fluttertoast.showToast(
-          msg: 'Removed Product Successfully',
-          gravity: ToastGravity.CENTER,
-          toastLength: Toast.LENGTH_SHORT,
-          timeInSecForIosWeb: 1);
-    }).onError((error, stacktrace) {
-      print('ERROR: ${error.toString()}\nSTACK: $stacktrace');
-      Fluttertoast.showToast(
-          msg: error.toString(),
-          gravity: ToastGravity.CENTER,
-          toastLength: Toast.LENGTH_SHORT,
-          timeInSecForIosWeb: 1);
-    });
+    showDialog(
+        context: context,
+        builder: (_) => NetworkGiffyDialog(
+              image: Image.asset('assets/images/logo.png'),
+              title: Text('Confirm Delete?',
+                  textAlign: TextAlign.center,
+                  style:
+                      TextStyle(fontSize: 22.0, fontWeight: FontWeight.w600)),
+              description: Text(
+                'This cannot be undone.\nAre you sure you want to remove ${product.name}?',
+                textAlign: TextAlign.center,
+              ),
+              entryAnimation: EntryAnimation.BOTTOM_LEFT,
+              onOkButtonPressed: () {
+                Navigator.of(context, rootNavigator: true).pop(context);
+                databaseReference
+                    .child('D')
+                    .child('Products')
+                    .child(product.name)
+                    .remove()
+                    .then((_) {
+                  setState(() {
+                    widget.finishedProductsList.remove(product);
+                  });
+                  Fluttertoast.showToast(
+                      msg: 'Removed Product Successfully',
+                      gravity: ToastGravity.CENTER,
+                      toastLength: Toast.LENGTH_SHORT,
+                      timeInSecForIosWeb: 1);
+                }).onError((error, stacktrace) {
+                  print('ERROR: ${error.toString()}\nSTACK: $stacktrace');
+                  Fluttertoast.showToast(
+                      msg: error.toString(),
+                      gravity: ToastGravity.CENTER,
+                      toastLength: Toast.LENGTH_SHORT,
+                      timeInSecForIosWeb: 1);
+                });
+              },
+              onCancelButtonPressed: () {
+                Navigator.of(context, rootNavigator: true).pop(context);
+              },
+            ));
   }
 
   @override
@@ -49,69 +70,71 @@ class _FinishedProductsState extends State<FinishedProducts> {
   Widget build(BuildContext context) {
     var screenMaxHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      body: Column(children: [
-        CustomAppBar(
-            title: 'Manage Products', subtitle: 'Manage your products!'),
-        Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
-                Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(10),
-                    margin: EdgeInsets.only(top: 15),
-                    alignment: Alignment.centerLeft,
-                    child: FittedBox(
-                      fit: BoxFit.contain,
-                      child: const Text(
-                        'Finished Products',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                    )),
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: 10),
-                  width: double.infinity,
-                  child: Card(
-                    elevation: 3,
-                    child: Container(
-                        padding: EdgeInsets.all(10),
-                        child: ListTile(
-                          leading: const Icon(Icons.info_outline),
-                          subtitle: const Text(
-                              'Please remove or update the empty (qty -> 0) products'),
-                        )),
-                  ),
-                ),
-                if (widget.finishedProductsList.isNotEmpty)
+      body: SafeArea(
+        child: Column(children: [
+          CustomAppBar(
+              title: 'Manage Products', subtitle: 'Manage your products!'),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: <Widget>[
                   Container(
-                    height: screenMaxHeight * .60,
-                    child: ListView.builder(
-                      padding: EdgeInsets.all(0.0),
-                      itemCount: widget.finishedProductsList.length,
-                      itemBuilder: (context, index) {
-                        return CartItem(
-                          index: index,
-                          list: widget.finishedProductsList,
-                          deleteProduct: _deleteProduct,
-                        );
-                      },
+                      width: double.infinity,
+                      padding: EdgeInsets.all(10),
+                      margin: EdgeInsets.only(top: 15),
+                      alignment: Alignment.centerLeft,
+                      child: FittedBox(
+                        fit: BoxFit.contain,
+                        child: const Text(
+                          'Finished Products',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                      )),
+                  Container(
+                    margin: EdgeInsets.symmetric(horizontal: 10),
+                    width: double.infinity,
+                    child: Card(
+                      elevation: 3,
+                      child: Container(
+                          padding: EdgeInsets.all(10),
+                          child: ListTile(
+                            leading: const Icon(Icons.info_outline),
+                            subtitle: const Text(
+                                'Please remove or update the empty (qty -> 0) products'),
+                          )),
                     ),
                   ),
-                if (widget.finishedProductsList.isEmpty)
-                  Container(
-                      height: screenMaxHeight * 0.60,
-                      width: double.infinity,
-                      alignment: Alignment.center,
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: Image.asset(
-                        'assets/images/empty_products.png',
-                      )),
-              ],
+                  if (widget.finishedProductsList.isNotEmpty)
+                    Container(
+                      height: screenMaxHeight * .60,
+                      child: ListView.builder(
+                        padding: EdgeInsets.all(0.0),
+                        itemCount: widget.finishedProductsList.length,
+                        itemBuilder: (context, index) {
+                          return CartItem(
+                            index: index,
+                            list: widget.finishedProductsList,
+                            deleteProduct: _deleteProduct,
+                          );
+                        },
+                      ),
+                    ),
+                  if (widget.finishedProductsList.isEmpty)
+                    Container(
+                        height: screenMaxHeight * 0.60,
+                        width: double.infinity,
+                        alignment: Alignment.center,
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        child: Image.asset(
+                          'assets/images/empty_products.png',
+                        )),
+                ],
+              ),
             ),
           ),
-        ),
-      ]),
+        ]),
+      ),
     );
   }
 }

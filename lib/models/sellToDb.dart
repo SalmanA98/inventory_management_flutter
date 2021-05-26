@@ -58,21 +58,33 @@ class WriteSaleToDb {
   Future<void> updateQtyDB() async {}
 
   Future<void> processSale(BuildContext context) async {
+    String shopLocation;
+    String saleID;
+    if (employeeID.toLowerCase().startsWith('a')) {
+      shopLocation = employeeID.substring(1, 2).toUpperCase();
+    } else {
+      shopLocation = employeeID.substring(2, 3).toUpperCase();
+    }
     bool employeeExists = false;
     //check if employee exists
-    databaseReference.child('D').child('Employees').once().then((results) {
+    databaseReference
+        .child(shopLocation)
+        .child('Employees')
+        .once()
+        .then((results) {
       Map<dynamic, dynamic> values = results.value;
 
       values.forEach((key, value) {
-        if (employeeID.toUpperCase() == key.toString().toUpperCase()) {
+        if (employeeID.toUpperCase() == key.toString().toUpperCase() ||
+            employeeID.toLowerCase().startsWith('a')) {
           employeeExists = true;
           int initalQty;
-          String saleID = date.replaceAll('-', '') +
+          saleID = date.replaceAll('-', '') +
               time.replaceAll(':', '') +
               customerName.substring(0, 1);
           double totalPrice = _calculatePrice();
           databaseReference
-              .child('D')
+              .child(shopLocation)
               .child('Sales')
               .child(date)
               .child(time)
@@ -82,7 +94,9 @@ class WriteSaleToDb {
             'Discount': discount + '%',
             'VAT': vat,
             'Payment Method': paymentMethod,
-            'Seller': employeeID.toUpperCase(),
+            'Seller': employeeID.toLowerCase().startsWith('a')
+                ? 'Super Admin(${employeeID.toUpperCase()})'
+                : employeeID.toUpperCase(),
             'Number of products': (finalItems.length + 1),
             'Final Price': totalPrice.toStringAsFixed(2),
             'Refunded Amount': 0,
@@ -91,7 +105,7 @@ class WriteSaleToDb {
           }).then((_) {
             for (int i = 0; i < finalItems.length; i++) {
               databaseReference
-                  .child('D')
+                  .child(shopLocation)
                   .child('Sales')
                   .child(date)
                   .child(time)
@@ -104,7 +118,7 @@ class WriteSaleToDb {
                 'Refunded Qty': 0,
               }).then((_) {
                 databaseReference
-                    .child('D')
+                    .child(shopLocation)
                     .child('Products')
                     .child(finalItems[i].name)
                     .child('Qty')
@@ -112,11 +126,23 @@ class WriteSaleToDb {
                     .then((result) {
                   initalQty = int.tryParse(result.value.toString());
                   databaseReference
-                      .child('D')
+                      .child(shopLocation)
                       .child('Products')
                       .child(finalItems[i].name)
-                      .update(
-                          {'Qty': initalQty - int.tryParse(finalItems[i].qty)});
+                      .update({
+                    'Qty': initalQty - int.tryParse(finalItems[i].qty)
+                  }).then((value) {
+                    if (employeeID.toLowerCase().startsWith('e')) {
+                      databaseReference
+                          .child(shopLocation)
+                          .child('Employees')
+                          .child(employeeID)
+                          .update({
+                        'Last Activity Time': date + ' ' + time,
+                        'Last Activity': 'Sale $saleID'
+                      });
+                    }
+                  });
                 });
               });
             }
@@ -134,7 +160,11 @@ class WriteSaleToDb {
                     {'VAT': vat},
                     {'Discount': discount},
                     {'Payment Method': paymentMethod},
-                    {'Employee ID': employeeID},
+                    {
+                      'Employee ID': employeeID.toLowerCase().startsWith('a')
+                          ? 'Super Admin ($employeeID)'
+                          : employeeID
+                    },
                     {'Sale ID': saleID},
                     {'Total Price': totalPrice.toStringAsFixed(2)}
                   ],
@@ -158,10 +188,10 @@ class WriteSaleToDb {
         ));
       }
     }).catchError((error, stackTrace) => Fluttertoast.showToast(
-        msg: error.toString(),
-        gravity: ToastGravity.CENTER,
-        toastLength: Toast.LENGTH_SHORT,
-        timeInSecForIosWeb: 1,
-        fontSize: 16.0));
+            msg: error.toString(),
+            gravity: ToastGravity.CENTER,
+            toastLength: Toast.LENGTH_SHORT,
+            timeInSecForIosWeb: 1,
+            fontSize: 16.0));
   }
 }

@@ -12,9 +12,8 @@ class CustomAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var screenHeight = MediaQuery.of(context).size.height;
     return Container(
-      margin: EdgeInsets.only(top: screenHeight * 0.07),
+      margin: EdgeInsets.only(bottom: 20),
       child: Column(children: [
         if (needBackButton)
           Container(

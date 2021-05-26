@@ -48,13 +48,20 @@ class _AddEmployeeState extends State<AddEmployee> {
       if (number.length >= 10) {
         showModalBottomSheet(
             context: context,
-            builder: (_) => RegisterUser(
+            isScrollControlled: true,
+            builder: (_) {
+              return Padding(
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom),
+                child: RegisterUser(
                   adminPriv: _adminPriv,
                   userAge: age,
                   userName: name,
                   userNumber: number,
                   userLocation: shop,
-                ));
+                ),
+              );
+            });
       } else {
         Fluttertoast.showToast(
             msg: 'Number should be 10 digits!',
@@ -143,156 +150,163 @@ class _AddEmployeeState extends State<AddEmployee> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        resizeToAvoidBottomInset: true,
+        bottomNavigationBar: !_fetchedLocations
+            ? null
+            : Padding(
+                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                child: CustomButton(
+                  buttonFunction: () => _registerUser(
+                      _ageInput, _nameInput, _numberInput, _shopLocation),
+                  buttonText: 'Register User',
+                ),
+              ),
         body: !_fetchedLocations
-            ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Center(
-                    child: CircularProgressIndicator.adaptive(
-                      backgroundColor: Theme.of(context).primaryColor,
+            ? SafeArea(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Center(
+                      child: CircularProgressIndicator.adaptive(
+                        backgroundColor: Theme.of(context).primaryColor,
+                      ),
                     ),
-                  ),
-                  Container(
-                      margin: EdgeInsets.symmetric(vertical: 10),
-                      child: FittedBox(
-                          fit: BoxFit.contain,
-                          child: const Text('Please Wait..')))
-                ],
+                    Container(
+                        margin: EdgeInsets.symmetric(vertical: 10),
+                        child: FittedBox(
+                            fit: BoxFit.contain,
+                            child: const Text('Please Wait..')))
+                  ],
+                ),
               )
-            : Column(
-                children: [
-                  CustomAppBar(
-                      title: 'Add Employee',
-                      subtitle: 'Add new user and login credentials'),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        FocusScopeNode currentFocus = FocusScope.of(context);
-                        if (!currentFocus.hasPrimaryFocus) {
-                          currentFocus.unfocus();
-                        }
-                      },
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            Container(
-                              margin: EdgeInsets.only(top: 70),
-                              padding: EdgeInsets.all(10),
-                              child: CustomTextField(
-                                  textController: _nameInput,
-                                  textHint: 'Name',
-                                  textIcon: Icon(Icons.person)),
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(10),
-                              child: CustomTextField(
-                                  textController: _ageInput,
-                                  textHint: 'Age',
-                                  keyboardType: TextInputType.number,
-                                  maximumLength: 2,
-                                  textIcon: Icon(Icons.view_agenda)),
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(10),
-                              child: CustomTextField(
-                                  textController: _numberInput,
-                                  textHint: 'Number',
-                                  maximumLength: 10,
-                                  keyboardType: TextInputType.phone,
-                                  textIcon: Icon(Icons.phone)),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(top: 10),
-                              width: double.infinity,
-                              padding: EdgeInsets.all(5),
-                              alignment: Alignment.center,
-                              child: FittedBox(
-                                fit: BoxFit.contain,
-                                child: const Text(
-                                  'Admin Privilege:',
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold),
+            : SafeArea(
+                child: Column(
+                  children: [
+                    CustomAppBar(
+                        title: 'Add Employee',
+                        subtitle: 'Add new user and login credentials'),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          FocusScopeNode currentFocus = FocusScope.of(context);
+                          if (!currentFocus.hasPrimaryFocus) {
+                            currentFocus.unfocus();
+                          }
+                        },
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              Container(
+                                margin: EdgeInsets.only(top: 70),
+                                padding: EdgeInsets.all(10),
+                                child: CustomTextField(
+                                    textController: _nameInput,
+                                    textHint: 'Name',
+                                    textIcon: Icon(Icons.person)),
+                              ),
+                              Container(
+                                padding: EdgeInsets.all(10),
+                                child: CustomTextField(
+                                    textController: _ageInput,
+                                    textHint: 'Age',
+                                    keyboardType: TextInputType.number,
+                                    maximumLength: 2,
+                                    textIcon: Icon(Icons.view_agenda)),
+                              ),
+                              Container(
+                                padding: EdgeInsets.all(10),
+                                child: CustomTextField(
+                                    textController: _numberInput,
+                                    textHint: 'Number',
+                                    maximumLength: 10,
+                                    keyboardType: TextInputType.phone,
+                                    textIcon: Icon(Icons.phone)),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(top: 10),
+                                width: double.infinity,
+                                padding: EdgeInsets.all(5),
+                                alignment: Alignment.center,
+                                child: FittedBox(
+                                  fit: BoxFit.contain,
+                                  child: const Text(
+                                    'Admin Privilege:',
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold),
+                                  ),
                                 ),
                               ),
-                            ),
-                            Wrap(
-                              children: List<Widget>.generate(
-                                2,
-                                (int index) {
-                                  return Container(
-                                    margin: EdgeInsets.all(5),
-                                    child: ChoiceChip(
-                                      label: FittedBox(
-                                          fit: BoxFit.contain,
-                                          child: Text(_adminLabelList[index])),
-                                      selected: _adminChipChoice == index,
-                                      onSelected: (bool selected) {
-                                        setState(() {
-                                          _adminChipChoice =
-                                              selected ? index : -1;
-                                        });
-                                        _onAdminChanged(_adminChipChoice);
-                                      },
-                                    ),
-                                  );
-                                },
-                              ).toList(),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(top: 10),
-                              width: double.infinity,
-                              padding: EdgeInsets.all(5),
-                              alignment: Alignment.center,
-                              child: FittedBox(
-                                fit: BoxFit.contain,
-                                child: const Text(
-                                  'Location:',
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold),
+                              Wrap(
+                                children: List<Widget>.generate(
+                                  2,
+                                  (int index) {
+                                    return Container(
+                                      margin: EdgeInsets.all(5),
+                                      child: ChoiceChip(
+                                        label: FittedBox(
+                                            fit: BoxFit.contain,
+                                            child:
+                                                Text(_adminLabelList[index])),
+                                        selected: _adminChipChoice == index,
+                                        onSelected: (bool selected) {
+                                          setState(() {
+                                            _adminChipChoice =
+                                                selected ? index : -1;
+                                          });
+                                          _onAdminChanged(_adminChipChoice);
+                                        },
+                                      ),
+                                    );
+                                  },
+                                ).toList(),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(top: 10),
+                                width: double.infinity,
+                                padding: EdgeInsets.all(5),
+                                alignment: Alignment.center,
+                                child: FittedBox(
+                                  fit: BoxFit.contain,
+                                  child: const Text(
+                                    'Location:',
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold),
+                                  ),
                                 ),
                               ),
-                            ),
-                            Wrap(
-                              children: List<Widget>.generate(
-                                _locations.isNotEmpty ? _locations.length : 0,
-                                (int index) {
-                                  return Container(
-                                    margin: EdgeInsets.all(5),
-                                    child: ChoiceChip(
-                                      label: FittedBox(
-                                          fit: BoxFit.contain,
-                                          child: Text(_locations[index])),
-                                      selected: _locationChipChoice == index,
-                                      onSelected: (bool selected) {
-                                        setState(() {
-                                          _locationChipChoice =
-                                              selected ? index : -1;
-                                        });
-                                        _onLocationChanged(_locations[index],
-                                            _locationChipChoice);
-                                      },
-                                    ),
-                                  );
-                                },
-                              ).toList(),
-                            ),
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 5),
-                              child: CustomButton(
-                                buttonFunction: () => _registerUser(_ageInput,
-                                    _nameInput, _numberInput, _shopLocation),
-                                buttonText: 'Register User',
+                              Wrap(
+                                children: List<Widget>.generate(
+                                  _locations.isNotEmpty ? _locations.length : 0,
+                                  (int index) {
+                                    return Container(
+                                      margin: EdgeInsets.all(5),
+                                      child: ChoiceChip(
+                                        label: FittedBox(
+                                            fit: BoxFit.contain,
+                                            child: Text(_locations[index])),
+                                        selected: _locationChipChoice == index,
+                                        onSelected: (bool selected) {
+                                          setState(() {
+                                            _locationChipChoice =
+                                                selected ? index : -1;
+                                          });
+                                          _onLocationChanged(_locations[index],
+                                              _locationChipChoice);
+                                        },
+                                      ),
+                                    );
+                                  },
+                                ).toList(),
                               ),
-                            )
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ));
   }
 }

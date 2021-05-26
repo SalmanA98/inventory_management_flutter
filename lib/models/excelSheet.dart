@@ -7,8 +7,8 @@ import '../models/database.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
 
-Future<void> getSaleFromDB(
-    List<String> dateList, String filename, BuildContext context) async {
+Future<void> getSaleFromDB(List<String> dateList, String filename,
+    BuildContext context, String shopLocation) async {
   final Workbook workbook = Workbook();
 
 // Accessing worksheet via index.
@@ -62,7 +62,7 @@ Future<void> getSaleFromDB(
   Map<dynamic, dynamic> testThis;
   for (int i = 0; i < dateList.length; i++) {
     await databaseReference
-        .child('D')
+        .child(shopLocation)
         .child('Sales')
         .child(dateList[i])
         .once()

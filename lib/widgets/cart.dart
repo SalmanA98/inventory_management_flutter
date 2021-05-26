@@ -5,7 +5,8 @@ import '../models/products.dart';
 
 class Cart extends StatefulWidget {
   final List<Products> cartItems;
-  Cart(this.cartItems);
+  final String _username;
+  Cart(this.cartItems, this._username);
 
   @override
   _CartState createState() => _CartState();
@@ -23,8 +24,8 @@ class _CartState extends State<Cart> {
     for (int i = 0; i < widget.cartItems.length; i++) {
       widget.cartItems[i].qty = qtyInCart[i];
     }
-    Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => CustomerInfo(widget.cartItems)));
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => CustomerInfo(widget.cartItems, widget._username)));
   }
 
   void _updateQty(int index, bool isAdd) {

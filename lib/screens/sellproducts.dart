@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:giffy_dialog/giffy_dialog.dart';
 import '../models/products.dart';
 import '../widgets/customAppBar.dart';
 import '../models/database.dart';
 import '../widgets/cart.dart';
 
 class SellProducts extends StatefulWidget {
+  final String _username;
+  const SellProducts(this._username);
   @override
   _SellProductsState createState() => _SellProductsState();
 }
@@ -23,8 +26,16 @@ class _SellProductsState extends State<SellProducts> {
   TextEditingController _searchController = TextEditingController();
 
   Future<void> _getAllProducts(BuildContext context) async {
+    String _shopLocation;
+
+    if (widget._username.toLowerCase().startsWith('a')) {
+      _shopLocation = widget._username.substring(1, 2).toUpperCase();
+    } else {
+      _shopLocation = widget._username.substring(2, 3).toUpperCase();
+    }
+
     databaseReference
-        .child('D')
+        .child(_shopLocation)
         .child('Products')
         .once()
         .then((DataSnapshot dataSnapshot) {
@@ -62,15 +73,35 @@ class _SellProductsState extends State<SellProducts> {
   }
 
   void _addItemToCart(Products product) {
-    if (!_toCart.contains(product)) {
-      _toCart.add(product);
-      Fluttertoast.showToast(
-          msg: 'Added ${product.name} to cart!',
-          gravity: ToastGravity.CENTER,
-          toastLength: Toast.LENGTH_SHORT,
-          timeInSecForIosWeb: 1,
-          fontSize: 16.0);
-    }
+    showDialog(
+        context: context,
+        builder: (_) => NetworkGiffyDialog(
+              image: Image.asset('assets/images/logo.png'),
+              title: Text('Add Product?',
+                  textAlign: TextAlign.center,
+                  style:
+                      TextStyle(fontSize: 22.0, fontWeight: FontWeight.w600)),
+              description: Text(
+                'Adding ${product.name} to cart\nAre you sure?',
+                textAlign: TextAlign.center,
+              ),
+              entryAnimation: EntryAnimation.BOTTOM_LEFT,
+              onOkButtonPressed: () {
+                Navigator.of(context, rootNavigator: true).pop(context);
+                if (!_toCart.contains(product)) {
+                  _toCart.add(product);
+                  Fluttertoast.showToast(
+                      msg: 'Added ${product.name} to cart!',
+                      gravity: ToastGravity.CENTER,
+                      toastLength: Toast.LENGTH_SHORT,
+                      timeInSecForIosWeb: 1,
+                      fontSize: 16.0);
+                }
+              },
+              onCancelButtonPressed: () {
+                Navigator.of(context, rootNavigator: true).pop(context);
+              },
+            ));
   }
 
   showError(String errormessage) {
@@ -96,7 +127,8 @@ class _SellProductsState extends State<SellProducts> {
       showModalBottomSheet(
           context: context,
           builder: (_) {
-            return SingleChildScrollView(child: Cart(itemsInCart));
+            return SingleChildScrollView(
+                child: Cart(itemsInCart, widget._username));
           });
     } else {
       showError('Cart is Empty!');
@@ -189,104 +221,111 @@ class _SellProductsState extends State<SellProducts> {
               ),
             ),
       body: !_fetchedData
-          ? Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Center(
-                  child: CircularProgressIndicator.adaptive(
-                    backgroundColor: Theme.of(context).primaryColor,
+          ? SafeArea(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Center(
+                    child: CircularProgressIndicator.adaptive(
+                      backgroundColor: Theme.of(context).primaryColor,
+                    ),
                   ),
-                ),
-                Container(
-                    margin: EdgeInsets.symmetric(vertical: 10),
-                    child: FittedBox(
-                        fit: BoxFit.contain,
-                        child: const Text('Please Wait..')))
-              ],
+                  Container(
+                      margin: EdgeInsets.symmetric(vertical: 10),
+                      child: FittedBox(
+                          fit: BoxFit.contain,
+                          child: const Text('Please Wait..')))
+                ],
+              ),
             )
           : _productsEmpty
-              ? Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Center(
-                      child: Image.asset('assets/images/empty_products.png'),
-                    ),
-                  ],
+              ? SafeArea(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Center(
+                        child: Image.asset('assets/images/empty_products.png'),
+                      ),
+                    ],
+                  ),
                 )
-              : Column(
-                  children: [
-                    CustomAppBar(
-                      title: 'Sell Products',
-                      subtitle: 'Add Products to cart!',
-                    ),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          FocusScopeNode currentFocus = FocusScope.of(context);
-                          if (!currentFocus.hasPrimaryFocus) {
-                            currentFocus.unfocus();
-                          }
-                        },
-                        child: SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              if (_showSearchBar)
+              : SafeArea(
+                  child: Column(
+                    children: [
+                      CustomAppBar(
+                        title: 'Sell Products',
+                        subtitle: 'Add Products to cart!',
+                      ),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            FocusScopeNode currentFocus =
+                                FocusScope.of(context);
+                            if (!currentFocus.hasPrimaryFocus) {
+                              currentFocus.unfocus();
+                            }
+                          },
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                if (_showSearchBar)
+                                  Container(
+                                      width: double.infinity,
+                                      padding: EdgeInsets.only(
+                                          top: 10,
+                                          right: 10,
+                                          left: 10,
+                                          bottom: 5),
+                                      child: Card(
+                                        child: ListTile(
+                                          leading: Icon(Icons.search),
+                                          title: TextField(
+                                            controller: _searchController,
+                                            decoration: InputDecoration(
+                                                hintText: 'Search',
+                                                border: InputBorder.none),
+                                            onChanged: (searchedItem) =>
+                                                _searchInProducts(searchedItem),
+                                            // onChanged: onSearchTextChanged,
+                                          ),
+                                          trailing: IconButton(
+                                            icon: Icon(Icons.cancel),
+                                            onPressed: () {
+                                              _searchController.clear();
+                                              setState(() {
+                                                _products.clear();
+                                                _products.addAll(_productsCopy);
+                                              });
+                                              // onSearchTextChanged('');
+                                            },
+                                          ),
+                                        ),
+                                      )),
                                 Container(
-                                    width: double.infinity,
-                                    padding: EdgeInsets.only(
-                                        top: 10,
-                                        right: 10,
-                                        left: 10,
-                                        bottom: 5),
-                                    child: Card(
-                                      child: ListTile(
-                                        leading: Icon(Icons.search),
-                                        title: TextField(
-                                          controller: _searchController,
-                                          decoration: InputDecoration(
-                                              hintText: 'Search',
-                                              border: InputBorder.none),
-                                          onChanged: (searchedItem) =>
-                                              _searchInProducts(searchedItem),
-                                          // onChanged: onSearchTextChanged,
-                                        ),
-                                        trailing: IconButton(
-                                          icon: Icon(Icons.cancel),
-                                          onPressed: () {
-                                            _searchController.clear();
-                                            setState(() {
-                                              _products.clear();
-                                              _products.addAll(_productsCopy);
-                                            });
-                                            // onSearchTextChanged('');
-                                          },
-                                        ),
-                                      ),
-                                    )),
-                              Container(
-                                height: _showSearchBar
-                                    ? screenMaxHeight * 0.65
-                                    : screenMaxHeight * .75,
-                                child: ListView.builder(
-                                  padding: EdgeInsets.all(0.0),
-                                  itemCount: _products.length == null
-                                      ? 0
-                                      : _products.length,
-                                  itemBuilder: (context, index) {
-                                    return CartItem(
-                                      addItemToCart: _addItemToCart,
-                                      index: index,
-                                      products: _products,
-                                    );
-                                  },
+                                  height: _showSearchBar
+                                      ? screenMaxHeight * 0.66
+                                      : screenMaxHeight * .75,
+                                  child: ListView.builder(
+                                    padding: EdgeInsets.all(0.0),
+                                    itemCount: _products.length == null
+                                        ? 0
+                                        : _products.length,
+                                    itemBuilder: (context, index) {
+                                      return CartItem(
+                                        addItemToCart: _addItemToCart,
+                                        index: index,
+                                        products: _products,
+                                      );
+                                    },
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
     );
   }

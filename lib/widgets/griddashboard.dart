@@ -8,49 +8,61 @@ import '../screens/salehistory.dart';
 import '../models/homepage_items.dart';
 
 // ignore: must_be_immutable
-class GridDashboard extends StatelessWidget {
-  final String isAdmin;
-  GridDashboard(this.isAdmin);
+class GridDashboard extends StatefulWidget {
+  final bool isAdmin;
+  final String username;
+  GridDashboard({@required this.isAdmin, @required this.username});
 
-  DashItems item1 = new DashItems(
-    title: "Sell Products",
-    screen: SellProducts(),
-    img: "assets/images/sell_logo.png",
-  );
+  @override
+  _GridDashboardState createState() => _GridDashboardState();
+}
 
-  DashItems item2 = new DashItems(
-    title: "Manage Products",
-    screen: ManageProducts(),
-    img: "assets/images/edit_logo.png",
-  );
+class _GridDashboardState extends State<GridDashboard> {
+  List<DashItems> myList;
 
-  DashItems item3 = new DashItems(
-    title: "Add Products",
-    screen: AddProducts(),
-    img: "assets/images/add_logo.png",
-  );
+  @override
+  void initState() {
+    super.initState();
+    DashItems item1 = new DashItems(
+      title: "Sell Products",
+      screen: SellProducts(widget.username),
+      img: "assets/images/sell_logo.png",
+    );
 
-  DashItems item4 = new DashItems(
-    title: "Refund Sale",
-    screen: RefundSaleID(),
-    img: "assets/images/refund_logo.png",
-  );
+    DashItems item2 = new DashItems(
+      title: "Manage Products",
+      screen: ManageProducts(widget.username),
+      img: "assets/images/edit_logo.png",
+    );
 
-  DashItems item5 = new DashItems(
+    DashItems item3 = new DashItems(
+      title: "Add Products",
+      screen: AddProducts(widget.username),
+      img: "assets/images/add_logo.png",
+    );
+
+    DashItems item4 = new DashItems(
+      title: "Refund Sale",
+      screen: RefundSaleID(widget.username),
+      img: "assets/images/refund_logo.png",
+    );
+
+    DashItems item5 = new DashItems(
       title: "Sales History",
       screen: SalesHistory(),
       img: "assets/images/history_logo.png",
-      visibile: false);
+    );
 
-  DashItems item6 = new DashItems(
+    DashItems item6 = new DashItems(
       title: "Manage Employees",
-      screen: ManageEmployees(),
+      screen: ManageEmployees(widget.username),
       img: "assets/images/employees.png",
-      visibile: false);
+    );
+    myList = [item1, item2, item3, item4, item5, item6];
+  }
 
   @override
   Widget build(BuildContext context) {
-    List<DashItems> myList = [item1, item2, item3, item4, item5, item6];
     return Flexible(
       child: GridView.count(
           childAspectRatio: 1.0,
@@ -60,7 +72,7 @@ class GridDashboard extends StatelessWidget {
           mainAxisSpacing: 18,
           children: myList.map((data) {
             return Visibility(
-                visible: isAdmin == 'e' ? data.visibile : true,
+                visible: widget.isAdmin,
                 child: InkWell(
                   onTap: () {
                     Navigator.push(context,

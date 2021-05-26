@@ -44,6 +44,11 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
         cardColor: Colors.grey[200],
         fontFamily: 'OpenSans',
+        shadowColor: Colors.black,
+        // textTheme: TextTheme(
+        //   bodyText2: TextStyle(
+        //       color: Colors.black, fontSize: 50, fontWeight: FontWeight.bold),
+        // ),
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
@@ -51,8 +56,12 @@ class MyApp extends StatelessWidget {
         accentColor: Colors.teal[200],
         errorColor: Color.fromRGBO(207, 102, 121, 1),
         scaffoldBackgroundColor: Colors.black,
-        cardColor: Color.fromRGBO(30, 30, 30, 1),
+        cardColor: Color.fromRGBO(20, 20, 20, 1),
         fontFamily: 'OpenSans',
+        // textTheme: TextTheme(
+        //   bodyText2: TextStyle(
+        //       color: Colors.white, fontSize: 50, fontWeight: FontWeight.bold),
+        // ),
       ),
       debugShowCheckedModeBanner: false,
       home: HomePage(),

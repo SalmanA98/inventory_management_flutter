@@ -8,15 +8,22 @@ class CustomTextField extends StatelessWidget {
   final int maximumLength;
   final Icon textIcon;
   final bool hideText;
+  final bool isPwd;
+  final Function() showPassword;
+  final Icon pwdIcon;
 
-  CustomTextField(
-      {@required this.textController,
-      @required this.textHint,
-      @required this.textIcon,
-      this.keyboardType = TextInputType.text,
-      this.maximumLines = 1,
-      this.maximumLength = 25,
-      this.hideText = false});
+  CustomTextField({
+    @required this.textController,
+    @required this.textHint,
+    @required this.textIcon,
+    this.keyboardType = TextInputType.text,
+    this.maximumLines = 1,
+    this.maximumLength = 25,
+    this.hideText = false,
+    this.isPwd = false,
+    this.showPassword,
+    this.pwdIcon,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,8 +36,15 @@ class CustomTextField extends StatelessWidget {
         labelText: textHint,
         counterText: '',
         prefixIcon: textIcon,
+        suffixIcon: isPwd
+            ? IconButton(
+                onPressed: () {
+                  showPassword();
+                },
+                icon: pwdIcon)
+            : null,
         filled: true,
-        contentPadding: EdgeInsets.all(18),
+        contentPadding: EdgeInsets.all(15),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
           borderSide: BorderSide(width: 0, style: BorderStyle.none),

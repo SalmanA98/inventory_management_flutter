@@ -5,6 +5,7 @@ import '../widgets/customButton.dart';
 import '../models/paymentdetails.dart';
 import '../models/products.dart';
 import '../models/invoice.dart';
+import './homepage.dart';
 
 // ignore: must_be_immutable
 class CompletedSale extends StatelessWidget {
@@ -27,93 +28,97 @@ class CompletedSale extends StatelessWidget {
   }
 
   Future<void> _onBackPressed(BuildContext context) async {
-    Navigator.pushReplacementNamed(context, '/');
+    Navigator.push(context, MaterialPageRoute(builder: (_) => HomePage()));
   }
 
   @override
   Widget build(BuildContext context) {
     _getStuff();
     return Scaffold(
-      body: WillPopScope(
-        onWillPop: () => _onBackPressed(context),
-        child: Column(
-          children: [
-            CustomAppBar(
-              title: 'Sale Details',
-              subtitle: 'View your save details!',
-              needBackButton: false,
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.all(10),
-                        margin: EdgeInsets.only(top: 15),
-                        alignment: Alignment.centerLeft,
-                        child: FittedBox(
-                          fit: BoxFit.contain,
-                          child: const Text(
-                            'Payment Details',
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold),
-                          ),
-                        )),
-                    ..._paymentDetails.map((element) {
-                      return Container(
+      body: SafeArea(
+        child: WillPopScope(
+          onWillPop: () => _onBackPressed(context),
+          child: Column(
+            children: [
+              CustomAppBar(
+                title: 'Sale Details',
+                subtitle: 'View your save details!',
+                needBackButton: false,
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: <Widget>[
+                      Container(
                           width: double.infinity,
                           padding: EdgeInsets.all(10),
-                          child: Column(children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                FittedBox(
-                                  fit: BoxFit.contain,
-                                  child: Text(
-                                    element.title,
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                FittedBox(
-                                    fit: BoxFit.contain,
-                                    child: Text(element.value)),
-                              ],
+                          margin: EdgeInsets.only(top: 15),
+                          alignment: Alignment.centerLeft,
+                          child: FittedBox(
+                            fit: BoxFit.contain,
+                            child: const Text(
+                              'Payment Details',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
                             ),
-                            Divider(
-                              color: Colors.black,
-                            )
-                          ]));
-                    }).toList(),
-                    Container(
-                      width: double.infinity,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      child: CustomButton(
-                        buttonFunction: () {
-                          _createPDF();
-                        },
-                        buttonText: 'Invoice PDF',
+                          )),
+                      ..._paymentDetails.map((element) {
+                        return Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.all(10),
+                            child: Column(children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  FittedBox(
+                                    fit: BoxFit.contain,
+                                    child: Text(
+                                      element.title,
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  FittedBox(
+                                      fit: BoxFit.contain,
+                                      child: Text(element.value)),
+                                ],
+                              ),
+                              Divider(
+                                color: Colors.black,
+                              )
+                            ]));
+                      }).toList(),
+                      Container(
+                        width: double.infinity,
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        child: CustomButton(
+                          buttonFunction: () {
+                            _createPDF();
+                          },
+                          buttonText: 'Invoice PDF',
+                        ),
                       ),
-                    ),
-                    Container(
-                      width: double.infinity,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      child: CustomButton(
-                        buttonFunction: () {
-                          Navigator.pushReplacementNamed(context, '/');
-                        },
-                        buttonText: 'Go Back',
+                      Container(
+                        width: double.infinity,
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        child: CustomButton(
+                          buttonFunction: () {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (_) => HomePage()));
+                          },
+                          buttonText: 'Go Back',
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

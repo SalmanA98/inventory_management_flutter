@@ -9,6 +9,8 @@ import '../models/database.dart';
 import '../models/products.dart';
 
 class ManageProducts extends StatefulWidget {
+  final String _username;
+  const ManageProducts(this._username);
   @override
   _ManageProductsState createState() => _ManageProductsState();
 }
@@ -24,8 +26,16 @@ class _ManageProductsState extends State<ManageProducts> {
   TextEditingController _searchController = TextEditingController();
 
   Future<void> _getAllProducts(BuildContext context) async {
+    String _shopLocation;
+
+    if (widget._username.toLowerCase().startsWith('a')) {
+      _shopLocation = widget._username.substring(1, 2).toUpperCase();
+    } else {
+      _shopLocation = widget._username.substring(2, 3).toUpperCase();
+    }
+
     await databaseReference
-        .child('D')
+        .child(_shopLocation)
         .child('Products')
         .once()
         .then((DataSnapshot dataSnapshot) {
@@ -89,11 +99,13 @@ class _ManageProductsState extends State<ManageProducts> {
             builder: (_) => EditProduct(
                 productName: product.name,
                 currentPrice: product.price,
-                currentQty: product.qty)));
+                currentQty: product.qty,
+                currentUser: widget._username)));
   }
 
   void _addProduct() {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => AddProducts()));
+    Navigator.push(context,
+        MaterialPageRoute(builder: (_) => AddProducts(widget._username)));
   }
 
   @override
@@ -176,99 +188,105 @@ class _ManageProductsState extends State<ManageProducts> {
               ),
             ),
       body: !_fetchedData
-          ? Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Center(
-                  child: CircularProgressIndicator.adaptive(
-                    backgroundColor: Theme.of(context).primaryColor,
+          ? SafeArea(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Center(
+                    child: CircularProgressIndicator.adaptive(
+                      backgroundColor: Theme.of(context).primaryColor,
+                    ),
                   ),
-                ),
-                Container(
-                    margin: EdgeInsets.symmetric(vertical: 10),
-                    child: FittedBox(child: Text('Please Wait..')))
-              ],
-            )
-          : Column(children: [
-              CustomAppBar(
-                  title: 'Manage Products', subtitle: 'Manage your products!'),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: <Widget>[
-                      Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.all(10),
-                        margin: EdgeInsets.only(top: 15),
-                        alignment: Alignment.centerLeft,
-                        child: FittedBox(
-                          child: Text(
-                            'Available Products',
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ),
-                      if (_showSearchBar)
-                        Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.only(
-                                top: 10, right: 10, left: 10, bottom: 5),
-                            child: Card(
-                              child: new ListTile(
-                                leading: new Icon(Icons.search),
-                                title: new TextField(
-                                  controller: _searchController,
-                                  decoration: new InputDecoration(
-                                      hintText: 'Search',
-                                      border: InputBorder.none),
-                                  onChanged: (searchedProduct) =>
-                                      _searchInProducts(searchedProduct),
-                                ),
-                                trailing: new IconButton(
-                                  icon: new Icon(Icons.cancel),
-                                  onPressed: () {
-                                    _searchController.clear();
-                                    setState(() {
-                                      _availableProducts.clear();
-                                      _availableProducts.addAll(_productsCopy);
-                                    });
-                                    // onSearchTextChanged('');
-                                  },
-                                ),
-                              ),
-                            )),
-                      if (_availableProducts.isNotEmpty)
-                        Container(
-                          height: _showSearchBar
-                              ? screenMaxHeight * 0.58
-                              : screenMaxHeight * .70,
-                          child: ListView.builder(
-                            padding: EdgeInsets.all(0.0),
-                            itemCount: _availableProducts.length,
-                            itemBuilder: (context, index) {
-                              return CartItem(
-                                editProduct: _editProduct,
-                                index: index,
-                                list: _availableProducts,
-                              );
-                            },
-                          ),
-                        ),
-                      if (_availableProducts.isEmpty)
-                        Container(
-                            height: screenMaxHeight * 0.60,
-                            width: double.infinity,
-                            alignment: Alignment.center,
-                            padding: EdgeInsets.symmetric(horizontal: 20),
-                            child: Image.asset(
-                              'assets/images/empty_products.png',
-                            )),
-                    ],
-                  ),
-                ),
+                  Container(
+                      margin: EdgeInsets.symmetric(vertical: 10),
+                      child: FittedBox(child: Text('Please Wait..')))
+                ],
               ),
-            ]),
+            )
+          : SafeArea(
+              child: Column(children: [
+                CustomAppBar(
+                    title: 'Manage Products',
+                    subtitle: 'Manage your products!'),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.all(10),
+                          margin: EdgeInsets.only(top: 15),
+                          alignment: Alignment.centerLeft,
+                          child: FittedBox(
+                            child: Text(
+                              'Available Products',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        if (_showSearchBar)
+                          Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.only(
+                                  top: 10, right: 10, left: 10, bottom: 5),
+                              child: Card(
+                                child: new ListTile(
+                                  leading: new Icon(Icons.search),
+                                  title: new TextField(
+                                    controller: _searchController,
+                                    decoration: new InputDecoration(
+                                        hintText: 'Search',
+                                        border: InputBorder.none),
+                                    onChanged: (searchedProduct) =>
+                                        _searchInProducts(searchedProduct),
+                                  ),
+                                  trailing: new IconButton(
+                                    icon: new Icon(Icons.cancel),
+                                    onPressed: () {
+                                      _searchController.clear();
+                                      setState(() {
+                                        _availableProducts.clear();
+                                        _availableProducts
+                                            .addAll(_productsCopy);
+                                      });
+                                      // onSearchTextChanged('');
+                                    },
+                                  ),
+                                ),
+                              )),
+                        if (_availableProducts.isNotEmpty)
+                          Container(
+                            height: _showSearchBar
+                                ? screenMaxHeight * 0.58
+                                : screenMaxHeight * .68,
+                            child: ListView.builder(
+                              padding: EdgeInsets.all(0.0),
+                              itemCount: _availableProducts.length,
+                              itemBuilder: (context, index) {
+                                return CartItem(
+                                  editProduct: _editProduct,
+                                  index: index,
+                                  list: _availableProducts,
+                                );
+                              },
+                            ),
+                          ),
+                        if (_availableProducts.isEmpty)
+                          Container(
+                              height: screenMaxHeight * 0.60,
+                              width: double.infinity,
+                              alignment: Alignment.center,
+                              padding: EdgeInsets.symmetric(horizontal: 20),
+                              child: Image.asset(
+                                'assets/images/empty_products.png',
+                              )),
+                      ],
+                    ),
+                  ),
+                ),
+              ]),
+            ),
     );
   }
 }

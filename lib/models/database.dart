@@ -2,6 +2,9 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
+
 import './products.dart';
 
 final databaseReference = FirebaseDatabase.instance.reference();
@@ -25,33 +28,45 @@ getUser() async {
 }
 
 //Done except username!
-Future<void> uploadProduct(BuildContext context, Products product) async {
-  databaseReference.child('D').child('Products').child(product.name).set({
+Future<void> uploadProduct(
+    BuildContext context, Products product, String username) async {
+  String _shopLocation;
+
+  if (username.toLowerCase().startsWith('a')) {
+    _shopLocation = username.substring(1, 2).toUpperCase();
+  } else {
+    _shopLocation = username.substring(2, 3).toUpperCase();
+  }
+  databaseReference
+      .child(_shopLocation)
+      .child('Products')
+      .child(product.name)
+      .set({
     'Price': product.price,
     'Qty': product.qty,
     'Last Change': 'Uploaded Product',
-    'Last Changed By': 'User',
+    'Last Changed By': username.toUpperCase(),
     'Last Changed On': DateTime.now().toString()
   }).then((result) {
-    print('Success');
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Uploaded successfully!'),
-      ),
-    );
+    databaseReference
+        .child(_shopLocation)
+        .child('Employees')
+        .child(username.toUpperCase())
+        .update({
+      'Last Activity': 'Uploaded ${product.name}',
+      'Last Actvitiy Time':
+          DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()).toString(),
+    });
   }).onError((error, stacktrace) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(error.toString()),
-      ),
-    );
+    Fluttertoast.showToast(msg: error.toString());
   });
 }
 
-Future<void> getSaleInfo(BuildContext context, String date, String time) async {
+Future<void> getSaleInfo(
+    BuildContext context, String date, String time, String shopLocation) async {
   List<Products> soldProducts = [];
   await databaseReference
-      .child('D')
+      .child(shopLocation)
       .child('Sales')
       .child(date)
       .child(time)
