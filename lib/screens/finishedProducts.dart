@@ -127,7 +127,7 @@ class _FinishedProductsState extends State<FinishedProducts> {
                         alignment: Alignment.center,
                         padding: EdgeInsets.symmetric(horizontal: 20),
                         child: Image.asset(
-                          'assets/images/empty_products.png',
+                          'assets/images/no_items_found.png',
                         )),
                 ],
               ),

@@ -72,12 +72,20 @@ class _CartState extends State<Cart> {
             ),
           ),
           if (widget.cartItems.isEmpty)
-            FittedBox(
-                fit: BoxFit.fill,
-                alignment: Alignment.center,
-                child: Image.asset(
-                  'assets/images/empty_products.png',
-                )),
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: Image.asset(
+                'assets/images/ufo_empty_cart.gif',
+              ),
+            ),
+          if (widget.cartItems.isEmpty)
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              child: CustomButton(
+                buttonFunction: () => Navigator.pop(context),
+                buttonText: 'Continue adding products',
+              ),
+            ),
           if (widget.cartItems.isNotEmpty)
             Container(
               height: screenMaxHeight * .35,

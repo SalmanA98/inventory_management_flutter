@@ -108,8 +108,6 @@ class _CustomerInfoState extends State<CustomerInfo> {
                 ),
                 entryAnimation: EntryAnimation.BOTTOM_LEFT,
                 onOkButtonPressed: () {
-                  Navigator.of(context, rootNavigator: true).pop(context);
-
                   var sell = WriteSaleToDb(
                       customerName: _customerNameInput.text,
                       customerNum: _customerNumInput.text,
@@ -123,6 +121,7 @@ class _CustomerInfoState extends State<CustomerInfo> {
                   if (!currentFocus.hasPrimaryFocus) {
                     currentFocus.unfocus();
                   }
+                  Navigator.of(context, rootNavigator: true).pop(context);
                 },
                 onCancelButtonPressed: () {
                   Navigator.of(context, rootNavigator: true).pop(context);

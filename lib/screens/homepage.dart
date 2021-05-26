@@ -118,11 +118,8 @@ class _HomePageState extends State<HomePage> {
           : SafeArea(
               child: Column(
                 children: <Widget>[
-                  SizedBox(
-                    height: screenMaxHeight * 0.08,
-                  ),
                   Padding(
-                    padding: EdgeInsets.only(left: 16, right: 16),
+                    padding: EdgeInsets.only(left: 16, right: 16, top: 70),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
@@ -136,9 +133,6 @@ class _HomePageState extends State<HomePage> {
                                 style: TextStyle(
                                     fontSize: 30, fontWeight: FontWeight.bold),
                               ),
-                            ),
-                            SizedBox(
-                              height: screenMaxHeight * 0.01,
                             ),
                             FittedBox(
                               fit: BoxFit.contain,

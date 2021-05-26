@@ -39,17 +39,19 @@ class _SellProductsState extends State<SellProducts> {
         .child('Products')
         .once()
         .then((DataSnapshot dataSnapshot) {
-      Map<dynamic, dynamic> values = dataSnapshot.value;
-      values.forEach((key, value) {
-        setState(() {
-          if (int.tryParse(value['Qty'].toString()) > 0) {
-            _products.add(Products(
-                name: key,
-                price: value['Price'].toString(),
-                qty: value['Qty'].toString()));
-          }
+      if (dataSnapshot.value != null) {
+        Map<dynamic, dynamic> values = dataSnapshot.value;
+        values.forEach((key, value) {
+          setState(() {
+            if (int.tryParse(value['Qty'].toString()) > 0) {
+              _products.add(Products(
+                  name: key,
+                  price: value['Price'].toString(),
+                  qty: value['Qty'].toString()));
+            }
+          });
         });
-      });
+      }
 
       _productsCopy.addAll(_products);
       setState(() {
@@ -104,35 +106,13 @@ class _SellProductsState extends State<SellProducts> {
             ));
   }
 
-  showError(String errormessage) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('SORRY!'),
-            content: Text(errormessage),
-            actions: <Widget>[
-              TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('OK'))
-            ],
-          );
-        });
-  }
-
   void _showCart(List<Products> itemsInCart) {
-    if (itemsInCart.isNotEmpty) {
-      showModalBottomSheet(
-          context: context,
-          builder: (_) {
-            return SingleChildScrollView(
-                child: Cart(itemsInCart, widget._username));
-          });
-    } else {
-      showError('Cart is Empty!');
-    }
+    showModalBottomSheet(
+        context: context,
+        builder: (_) {
+          return SingleChildScrollView(
+              child: Cart(itemsInCart, widget._username));
+        });
   }
 
   void _searchInProducts(String searchedProduct) {
@@ -286,7 +266,6 @@ class _SellProductsState extends State<SellProducts> {
                                                 border: InputBorder.none),
                                             onChanged: (searchedItem) =>
                                                 _searchInProducts(searchedItem),
-                                            // onChanged: onSearchTextChanged,
                                           ),
                                           trailing: IconButton(
                                             icon: Icon(Icons.cancel),
@@ -296,7 +275,6 @@ class _SellProductsState extends State<SellProducts> {
                                                 _products.clear();
                                                 _products.addAll(_productsCopy);
                                               });
-                                              // onSearchTextChanged('');
                                             },
                                           ),
                                         ),
