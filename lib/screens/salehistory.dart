@@ -99,7 +99,6 @@ class _SalesHistoryState extends State<SalesHistory> {
   void _onLocationChanged(String locationChosen, int choice) {
     if (choice != -1) {
       _shopLocation = locationChosen.substring(0, 1).toUpperCase();
-      print(_shopLocation);
     } else {
       Fluttertoast.showToast(
           msg: 'Location cannot be empty!',
@@ -141,7 +140,7 @@ class _SalesHistoryState extends State<SalesHistory> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: !_fetchedLocations
+      body: !_fetchedLocations || _isStart
           ? SafeArea(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -209,46 +208,44 @@ class _SalesHistoryState extends State<SalesHistory> {
                                   ),
                                 ),
                               ),
-                              if (!_isStart)
-                                Container(
-                                  width: double.infinity,
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 10),
-                                  child: MyTextFieldDatePicker(
-                                    labelText: "From (Date)",
-                                    prefixIcon: Icon(Icons.date_range),
-                                    suffixIcon: Icon(Icons.arrow_drop_down),
-                                    lastDate: DateTime.now(),
-                                    firstDate: DateTime.now()
-                                        .subtract(Duration(days: 366)),
-                                    initialDate: DateTime.now()
-                                        .subtract(Duration(days: 1)),
-                                    onDateChanged: (selectedDate) {
-                                      // Do something with the selected date
-                                      _fromDate = selectedDate;
-                                    },
-                                  ),
+                              Container(
+                                width: double.infinity,
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 10),
+                                child: MyTextFieldDatePicker(
+                                  labelText: "From (Date)",
+                                  prefixIcon: Icon(Icons.date_range),
+                                  suffixIcon: Icon(Icons.arrow_drop_down),
+                                  lastDate: DateTime.now(),
+                                  firstDate: DateTime.now()
+                                      .subtract(Duration(days: 366)),
+                                  initialDate: DateTime.now()
+                                      .subtract(Duration(days: 1)),
+                                  onDateChanged: (selectedDate) {
+                                    // Do something with the selected date
+                                    _fromDate = selectedDate;
+                                  },
                                 ),
-                              if (!_isStart)
-                                Container(
-                                  width: double.infinity,
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 10),
-                                  child: MyTextFieldDatePicker(
-                                    labelText: "To (Date)",
-                                    prefixIcon: Icon(Icons.date_range),
-                                    suffixIcon: Icon(Icons.arrow_drop_down),
-                                    lastDate: DateTime.now(),
-                                    firstDate: DateTime.now()
-                                        .subtract(Duration(days: 366)),
-                                    initialDate: DateTime.now()
-                                        .subtract(Duration(days: 1)),
-                                    onDateChanged: (selectedDate) {
-                                      // Do something with the selected date
-                                      _toDate = selectedDate;
-                                    },
-                                  ),
+                              ),
+                              Container(
+                                width: double.infinity,
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 10),
+                                child: MyTextFieldDatePicker(
+                                  labelText: "To (Date)",
+                                  prefixIcon: Icon(Icons.date_range),
+                                  suffixIcon: Icon(Icons.arrow_drop_down),
+                                  lastDate: DateTime.now(),
+                                  firstDate: DateTime.now()
+                                      .subtract(Duration(days: 366)),
+                                  initialDate: DateTime.now()
+                                      .subtract(Duration(days: 1)),
+                                  onDateChanged: (selectedDate) {
+                                    // Do something with the selected date
+                                    _toDate = selectedDate;
+                                  },
                                 ),
+                              ),
                               Container(
                                   margin: EdgeInsets.only(top: 10),
                                   width: double.infinity,
@@ -286,34 +283,14 @@ class _SalesHistoryState extends State<SalesHistory> {
                                   },
                                 ).toList(),
                               ),
-                              if (!_isStart)
-                                Container(
-                                  width: double.infinity,
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 5),
-                                  child: CustomButton(
-                                      buttonFunction: _getSaleData,
-                                      buttonText: 'Show Data'),
-                                ),
-                              if (_isStart)
-                                Column(
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.all(10),
-                                      alignment: Alignment.center,
-                                      width: double.infinity,
-                                      child: CircularProgressIndicator(),
-                                    ),
-                                    Container(
-                                      padding: EdgeInsets.all(10),
-                                      alignment: Alignment.center,
-                                      width: double.infinity,
-                                      child: FittedBox(
-                                          fit: BoxFit.contain,
-                                          child: const Text('Please Wait...')),
-                                    )
-                                  ],
-                                ),
+                              Container(
+                                width: double.infinity,
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 5),
+                                child: CustomButton(
+                                    buttonFunction: _getSaleData,
+                                    buttonText: 'Show Data'),
+                              ),
                             ],
                           ),
                         )),

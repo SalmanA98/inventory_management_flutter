@@ -3,9 +3,9 @@ import 'package:inventory_management/screens/homepage.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
-import '../models/database.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
+import '../models/database.dart';
 
 Future<void> getSaleFromDB(List<String> dateList, String filename,
     BuildContext context, String shopLocation) async {
@@ -17,8 +17,14 @@ Future<void> getSaleFromDB(List<String> dateList, String filename,
   //Adding style to heading
   Style headingStyle = workbook.styles.add('headingStyle');
   headingStyle.bold = true;
-  headingStyle.fontSize = 14;
+  headingStyle.fontSize = 12;
   headingStyle.backColor = '#00FFFF';
+
+  Style saleProductStyle = workbook.styles.add('saleProductStyle');
+  saleProductStyle.backColor = '#10ff00';
+
+  Style saleDateStyle = workbook.styles.add('saleDateStyle');
+  saleDateStyle.backColor = '#f8ff00';
 
 // Set the text value.
   // Setting value in the cell.
@@ -55,11 +61,11 @@ Future<void> getSaleFromDB(List<String> dateList, String filename,
   sheet.getRangeByName('O1').cellStyle = headingStyle;
   sheet.getRangeByName('P1').cellStyle = headingStyle;
 
-  int dateRow = 2;
-  int detailsRow = 2;
-  int prodRow = 2;
+  int dateRow = 3;
+  int detailsRow = 3;
+  int prodRow = 3;
   int noOfProducts;
-  Map<dynamic, dynamic> testThis;
+  Map<dynamic, dynamic> dataFromDb;
   for (int i = 0; i < dateList.length; i++) {
     await databaseReference
         .child(shopLocation)
@@ -69,14 +75,18 @@ Future<void> getSaleFromDB(List<String> dateList, String filename,
         .then((datasnapshot) {
       if (datasnapshot.value != null) {
         Map<dynamic, dynamic> results = datasnapshot.value;
+        //Before each date draw yellow seperator
+        sheet.getRangeByName('A${dateRow - 1}:P${dateRow - 1}').cellStyle =
+            saleDateStyle;
         sheet.getRangeByName('A$dateRow').setText(datasnapshot.key);
+
         results.forEach((time, details) {
           noOfProducts = int.tryParse(details['Number of products'].toString());
           for (int i = 0; i <= noOfProducts; i++) {
             if (details[i.toString()] != null) {
-              testThis = details[i.toString()];
+              dataFromDb = details[i.toString()];
 
-              testThis.forEach((prodName, prodDetails) {
+              dataFromDb.forEach((prodName, prodDetails) {
                 sheet.getRangeByName('G$prodRow').setText(prodName.toString());
                 sheet
                     .getRangeByName('H$prodRow')
@@ -109,8 +119,6 @@ Future<void> getSaleFromDB(List<String> dateList, String filename,
               .getRangeByName('F$detailsRow')
               .setText(details['Payment Method'].toString());
 
-          // sheet.getRangeByName('H$detailsRow').setText(details['Customer Name'].toString());
-          //  sheet.getRangeByName('I$detailsRow').setText(details['Customer Name'].toString());
           sheet
               .getRangeByName('J$detailsRow')
               .setText(details['VAT'].toString());
@@ -120,9 +128,7 @@ Future<void> getSaleFromDB(List<String> dateList, String filename,
           sheet
               .getRangeByName('L$detailsRow')
               .setText(details['Final Price'].toString());
-          //  sheet
-          // .getRangeByName('M$detailsRow')
-          // .setText(details['Refund Details'].toString());
+
           sheet
               .getRangeByName('O$detailsRow')
               .setText(details['Refunded Amount'].toString());
@@ -131,6 +137,10 @@ Future<void> getSaleFromDB(List<String> dateList, String filename,
               .setText(details['Total After Refund'].toString());
           detailsRow += noOfProducts;
           dateRow += noOfProducts;
+          //After each time/sale draw green seperator
+          sheet.getRangeByName('B$prodRow:P$prodRow').cellStyle =
+              saleProductStyle;
+          prodRow++;
         });
       }
     }).catchError((error) {
@@ -147,7 +157,7 @@ Future<void> getSaleFromDB(List<String> dateList, String filename,
   workbook.dispose();
 
 // Get external storage directory
-  final directory = await getExternalStorageDirectory();
+  final directory = await getApplicationDocumentsDirectory();
 
 // Get directory path
   final path = directory.path;

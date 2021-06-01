@@ -45,7 +45,6 @@ class _RegisterUserState extends State<RegisterUser> {
         .child('Employees')
         .once()
         .then((snapshot) {
-      print(snapshot.value);
       Map<dynamic, dynamic> users = snapshot.value;
       users.forEach((key, value) {
         if (key.toString().toUpperCase() == _userID) {
