@@ -2,6 +2,36 @@
 
 A flutter project which helps the company maintain control over products, invoices, employees activity and sales. Uses firebase for authentication and realtime database capabilities.
 
+Features:
+
+- Sell Products
+  - Sell one or more products
+  - Ensures there is no discrepancies
+  - Automatic creation of invoice as PDF
+  
+- Manage Products
+  - Add New Products
+  - Edit Existing Products (Update quantity, price)
+  - Delete Exisitng Products
+  
+- Accessibility
+  - Seperate accessibility based on admin privilege
+  - Can be updated through updating employee data
+ 
+- Manage Employees
+  - Add New Employees
+  - Edit Exisitng Employees (Update number, age, admin privilege)
+  - Remove Employees
+  
+- View Sales History
+  - Create invoice of all sales between any two dates
+  - 3-clicks to produce well curated excel sheet
+
+- Refund Sales
+  - Uses unique Sale ID of every sale
+  - Refundable for liquid cash transactions only
+  - Updates sale data, product data.
+
 ## Getting Started
 
 This project is a privately made app which uses Flutter.
