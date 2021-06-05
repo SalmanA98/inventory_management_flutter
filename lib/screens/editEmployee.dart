@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:giffy_dialog/giffy_dialog.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../models/employee.dart';
 import '../widgets/customButton.dart';
 import '../widgets/customTextField.dart';
@@ -21,6 +22,7 @@ class _EditEmployeeState extends State<EditEmployee> {
   final List<PaymentDetails> _editable = [];
   final _ageController = TextEditingController();
   final _numberController = TextEditingController();
+  final _passwordController = TextEditingController();
   final List<String> _adminLabelList = const ['Admin', 'Not Admin'];
   int _adminChipChoice = -1;
   bool _editAdmin = false;
@@ -52,8 +54,8 @@ class _EditEmployeeState extends State<EditEmployee> {
     );
   }
 
-  enterDetailsBox(String message, TextEditingController controller, String hint,
-      bool isAge) {
+  void _enterDetailsBox(String message, TextEditingController controller,
+      String hint, bool isAge) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -74,7 +76,7 @@ class _EditEmployeeState extends State<EditEmployee> {
                       if (controller.text.isNotEmpty) {
                         if (isAge) {
                           _editable[0].value = controller.text;
-                        } else {
+                        } else if (!isAge) {
                           _editable[1].value = controller.text;
                         }
                         _hasUpdated = true;
@@ -117,22 +119,18 @@ class _EditEmployeeState extends State<EditEmployee> {
 
   void _editAttribute(String attribute) {
     if (attribute?.toLowerCase() == 'age') {
-      enterDetailsBox('Enter the Age', _ageController, 'Updated Age', true);
+      _enterDetailsBox('Enter the Age', _ageController, 'Updated Age', true);
     } else if (attribute?.toLowerCase() == 'admin privilege') {
       setState(() {
         _editAdmin = true;
       });
     } else if (attribute?.toLowerCase() == 'number') {
-      enterDetailsBox(
+      _enterDetailsBox(
           'Enter the Number', _numberController, 'Updated Number', false);
     }
   }
 
-  Future<void> _deleteUser() async {
-    setState(() {
-      _startProgress = true;
-    });
-
+  Future<void> _deleteUser(String username) async {
     showDialog(
         context: context,
         builder: (_) => NetworkGiffyDialog(
@@ -148,7 +146,9 @@ class _EditEmployeeState extends State<EditEmployee> {
               entryAnimation: EntryAnimation.BOTTOM_LEFT,
               onOkButtonPressed: () {
                 Navigator.of(context, rootNavigator: true).pop(context);
-
+                setState(() {
+                  _startProgress = true;
+                });
                 databaseReference
                     .child(_employeeDetails[2].value)
                     .child('Employees')
@@ -453,13 +453,8 @@ class _EditEmployeeState extends State<EditEmployee> {
                                   width: double.infinity,
                                   padding: EdgeInsets.symmetric(horizontal: 10),
                                   child: CustomButton(
-                                    buttonFunction: () {
-                                      Fluttertoast.showToast(
-                                          msg: 'Detele manually in db',
-                                          gravity: ToastGravity.CENTER,
-                                          toastLength: Toast.LENGTH_SHORT,
-                                          timeInSecForIosWeb: 1);
-                                    },
+                                    buttonFunction: () =>
+                                        _deleteUser(_employeeDetails[0].value),
                                     buttonText: 'Delete User',
                                   )),
                           ],

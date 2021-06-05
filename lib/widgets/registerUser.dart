@@ -81,7 +81,7 @@ class _RegisterUserState extends State<RegisterUser> {
                     firebaseAuth
                         .createUserWithEmailAndPassword(
                             email: _employeeID + '@hekayet3tr.com',
-                            password: pwd)
+                            password: pwd.toLowerCase())
                         .then((_) {
                       databaseReference
                           .child(widget.userLocation)

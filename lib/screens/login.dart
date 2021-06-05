@@ -4,6 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:progress_state_button/iconed_button.dart';
 import 'package:progress_state_button/progress_button.dart';
 import '../widgets/customTextField.dart';
+import '../models/database.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -24,11 +25,12 @@ class _LoginPageState extends State<LoginPage> {
 
   isUserSignedIn() async {
     _auth.authStateChanges().listen((User user) async {
-      if (user != null) {
-        print('User signed in');
-        //Navigate to main
-
-        Navigator.pushReplacementNamed(context, "/");
+      if (mounted) {
+        if (user != null) {
+          print('User signed in');
+          //Navigate to main
+          Navigator.pushReplacementNamed(context, "/");
+        }
       }
     });
   }
@@ -81,18 +83,6 @@ class _LoginPageState extends State<LoginPage> {
                 email: username + '@hekayet3tr.com',
                 password: pwd.toLowerCase())
             .then((value) {
-          // databaseReference
-          //     .child(location)
-          //     .child('Employees')
-          //     .child(username)
-          //     .once().then((user) {
-          //       if(user == null){
-
-          //       }
-          //       else{
-
-          //       }
-          // });
           setState(() {
             loginBtState = ButtonState.success;
           });
