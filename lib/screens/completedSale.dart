@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import '../widgets/customAppBar.dart';
 import '../widgets/customButton.dart';
 import '../models/paymentdetails.dart';
@@ -8,17 +9,24 @@ import '../models/invoice.dart';
 import './homepage.dart';
 
 // ignore: must_be_immutable
-class CompletedSale extends StatelessWidget {
+class CompletedSale extends StatefulWidget {
   final List<Map<String, Object>> details;
-  final List<PaymentDetails> _paymentDetails = [];
-  List<Products> _productsSold;
 
   CompletedSale({@required this.details});
 
-  void _getStuff() {
-    _productsSold = details[4]['Items Purchased'];
-    for (int i = 0; i < details.length; i++) {
-      details[i].forEach((key, value) {
+  @override
+  _CompletedSaleState createState() => _CompletedSaleState();
+}
+
+class _CompletedSaleState extends State<CompletedSale> {
+  final List<PaymentDetails> _paymentDetails = [];
+
+  List<Products> _productsSold;
+
+  void _getSaleData() {
+    _productsSold = widget.details[4]['Items Purchased'];
+    for (int i = 0; i < widget.details.length; i++) {
+      widget.details[i].forEach((key, value) {
         if (key.toString() != 'Items Purchased') {
           _paymentDetails.add(
               PaymentDetails(title: key.toString(), value: value.toString()));
@@ -31,9 +39,35 @@ class CompletedSale extends StatelessWidget {
     Navigator.push(context, MaterialPageRoute(builder: (_) => HomePage()));
   }
 
+  void _showSuccessDialog(BuildContext context) {
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.SUCCES,
+      borderSide: BorderSide(color: Theme.of(context).accentColor, width: 2),
+      width: double.infinity,
+      buttonsBorderRadius: BorderRadius.all(Radius.circular(2)),
+      headerAnimationLoop: true,
+      useRootNavigator: true,
+      animType: AnimType.BOTTOMSLIDE,
+      title: 'Sale Successful',
+      desc: 'Please save the invoice manually to not lose it!',
+      dismissOnBackKeyPress: true,
+      btnOkText: 'Got It!',
+      btnOkOnPress: () {},
+    )..show();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getSaleData();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      _showSuccessDialog(context);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    _getStuff();
     return Scaffold(
       body: SafeArea(
         child: WillPopScope(
@@ -52,7 +86,7 @@ class CompletedSale extends StatelessWidget {
                       Container(
                           width: double.infinity,
                           padding: EdgeInsets.all(10),
-                          margin: EdgeInsets.only(top: 15),
+                          margin: EdgeInsets.only(top: 15, bottom: 5),
                           alignment: Alignment.centerLeft,
                           child: FittedBox(
                             fit: BoxFit.contain,
@@ -86,7 +120,7 @@ class CompletedSale extends StatelessWidget {
                                 ],
                               ),
                               Divider(
-                                color: Colors.black,
+                                color: Theme.of(context).primaryColor,
                               )
                             ]));
                       }).toList(),
@@ -149,10 +183,9 @@ class CompletedSale extends StatelessWidget {
     document.dispose();
     //Save and launch the file.
     await saveAndLaunchFile(bytes,
-        '${details[0]['Customer Name']}~${details[2]['Date']}~${details[3]['Time']}.pdf');
+        '${widget.details[0]['Customer Name']}~${widget.details[2]['Date']}~${widget.details[3]['Time']}.pdf');
   }
 
-  //Draws the invoice header
   PdfLayoutResult drawHeader(PdfPage page, Size pageSize, PdfGrid grid) {
     //Draw rectangle
     page.graphics.drawRectangle(
@@ -181,13 +214,13 @@ class CompletedSale extends StatelessWidget {
 
     //Create data foramt and convert it to text.
     final String rightInfo =
-        'Sale ID: ${details[9]['Sale ID']}\r\nDate: ${details[2]['Date']}\r\nTime: ${details[3]['Time']}\r\nEmployee ID: ${details[8]['Employee ID'].toString().toUpperCase()}';
+        'Sale ID: ${widget.details[9]['Sale ID']}\r\nDate: ${widget.details[2]['Date']}\r\nTime: ${widget.details[3]['Time']}\r\nEmployee ID: ${widget.details[8]['Employee ID'].toString().toUpperCase()}';
 
     final Size contentSize = contentFont.measureString(rightInfo);
     // ignore: leading_newlines_in_multiline_strings
     final String leftInfo =
-        '''Customer Details: \r\nCustomer Name: ${details[0]['Customer Name']} 
-        \r\nCustomer Number:  ${details[1]['Customer Number']} \r\n\Payment Method:  ${details[7]['Payment Method']}''';
+        '''Customer Details: \r\nCustomer Name: ${widget.details[0]['Customer Name']} 
+        \r\nCustomer Number:  ${widget.details[1]['Customer Number']} \r\n\Payment Method:  ${widget.details[7]['Payment Method']}''';
 
     PdfTextElement(text: rightInfo, font: contentFont).draw(
         page: page,
@@ -200,7 +233,6 @@ class CompletedSale extends StatelessWidget {
             pageSize.width - (contentSize.width + 30), pageSize.height - 120));
   }
 
-  //Draws the grid
   void drawGrid(PdfPage page, PdfGrid grid, PdfLayoutResult result) {
     Rect totalPriceCellBounds;
     Rect quantityCellBounds;
@@ -225,7 +257,7 @@ class CompletedSale extends StatelessWidget {
             result.bounds.bottom + 10,
             quantityCellBounds.width,
             quantityCellBounds.height));
-    page.graphics.drawString('${details[5]['VAT'].toString()}',
+    page.graphics.drawString('${widget.details[5]['VAT'].toString()}',
         PdfStandardFont(PdfFontFamily.helvetica, 9, style: PdfFontStyle.bold),
         bounds: Rect.fromLTWH(
             totalPriceCellBounds.left,
@@ -241,7 +273,7 @@ class CompletedSale extends StatelessWidget {
             result.bounds.bottom + 20,
             quantityCellBounds.width,
             quantityCellBounds.height));
-    page.graphics.drawString('${details[6]['Discount'].toString()}%',
+    page.graphics.drawString('${widget.details[6]['Discount'].toString()}%',
         PdfStandardFont(PdfFontFamily.helvetica, 9, style: PdfFontStyle.bold),
         bounds: Rect.fromLTWH(
             totalPriceCellBounds.left,
@@ -257,7 +289,8 @@ class CompletedSale extends StatelessWidget {
             result.bounds.bottom + 30,
             quantityCellBounds.width,
             quantityCellBounds.height));
-    page.graphics.drawString('AED: ${details[10]['Total Price'].toString()}',
+    page.graphics.drawString(
+        'AED: ${widget.details[10]['Total Price'].toString()}',
         PdfStandardFont(PdfFontFamily.helvetica, 9, style: PdfFontStyle.bold),
         bounds: Rect.fromLTWH(
             totalPriceCellBounds.left,
@@ -266,7 +299,6 @@ class CompletedSale extends StatelessWidget {
             totalPriceCellBounds.height));
   }
 
-  //Draw the invoice footer data.
   void drawFooter(PdfPage page, Size pageSize) {
     final PdfPen linePen =
         PdfPen(PdfColor(142, 170, 219, 255), dashStyle: PdfDashStyle.custom);
@@ -287,7 +319,6 @@ class CompletedSale extends StatelessWidget {
         bounds: Rect.fromLTWH(pageSize.width - 30, pageSize.height - 70, 0, 0));
   }
 
-  //Create PDF grid and return
   PdfGrid getGrid() {
     //Create a PDF grid
     final PdfGrid grid = PdfGrid();
@@ -340,7 +371,6 @@ class CompletedSale extends StatelessWidget {
     return grid;
   }
 
-  //Create and row for the grid.
   void addProducts(String productId, String productName, double price,
       int quantity, double total, PdfGrid grid) {
     final PdfGridRow row = grid.rows.add();
@@ -351,7 +381,6 @@ class CompletedSale extends StatelessWidget {
     row.cells[4].value = total.toString();
   }
 
-  //Get the total amount.
   double getTotalAmount(PdfGrid grid) {
     double total = 0;
     for (int i = 0; i < grid.rows.count; i++) {

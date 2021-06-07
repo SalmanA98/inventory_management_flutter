@@ -39,13 +39,16 @@ class _AddEmployeeState extends State<AddEmployee> {
     String age = ageController.text;
     String number = numberController.text;
     String shop = shopChosen;
+    String numberPattern = r'(^(?:05)(?:0|5|2|6|8|4)[0-9]{7}$)';
+    RegExp regExp = new RegExp(numberPattern);
 
     if (name.isNotEmpty &&
         age.isNotEmpty &&
         number.isNotEmpty &&
         _adminPriv.isNotEmpty &&
         shop.isNotEmpty) {
-      if (number.length >= 10) {
+      if (regExp.hasMatch(number)) {
+        WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
         showModalBottomSheet(
             context: context,
             isScrollControlled: true,
@@ -64,7 +67,7 @@ class _AddEmployeeState extends State<AddEmployee> {
             });
       } else {
         Fluttertoast.showToast(
-            msg: 'Number should be 10 digits!',
+            msg: 'Please enter a valid number! (example: 0501234567)',
             gravity: ToastGravity.CENTER,
             toastLength: Toast.LENGTH_SHORT,
             timeInSecForIosWeb: 1);
@@ -187,12 +190,9 @@ class _AddEmployeeState extends State<AddEmployee> {
                         subtitle: 'Add new user and login credentials'),
                     Expanded(
                       child: GestureDetector(
-                        onTap: () {
-                          FocusScopeNode currentFocus = FocusScope.of(context);
-                          if (!currentFocus.hasPrimaryFocus) {
-                            currentFocus.unfocus();
-                          }
-                        },
+                        onTap: () => WidgetsBinding
+                            .instance.focusManager.primaryFocus
+                            ?.unfocus(),
                         child: SingleChildScrollView(
                           child: Column(
                             children: [

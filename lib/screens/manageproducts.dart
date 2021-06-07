@@ -250,7 +250,6 @@ class _ManageProductsState extends State<ManageProducts> {
                                         _availableProducts
                                             .addAll(_productsCopy);
                                       });
-                                      // onSearchTextChanged('');
                                     },
                                   ),
                                 ),
@@ -315,7 +314,6 @@ class CartItem extends StatelessWidget {
                 margin:
                     EdgeInsets.only(left: 5, right: 16, top: 10, bottom: 10),
                 decoration: BoxDecoration(
-                    //    color: Colors.white,
                     borderRadius: BorderRadius.all(Radius.circular(16))),
                 child: Row(
                   children: <Widget>[

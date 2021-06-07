@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:giffy_dialog/giffy_dialog.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import '../models/products.dart';
 import '../widgets/customAppBar.dart';
 import '../models/database.dart';
@@ -75,35 +75,32 @@ class _SellProductsState extends State<SellProducts> {
   }
 
   void _addItemToCart(Products product) {
-    showDialog(
-        context: context,
-        builder: (_) => NetworkGiffyDialog(
-              image: Image.asset('assets/images/logo.png'),
-              title: Text('Add Product?',
-                  textAlign: TextAlign.center,
-                  style:
-                      TextStyle(fontSize: 22.0, fontWeight: FontWeight.w600)),
-              description: Text(
-                'Adding ${product.name} to cart\nAre you sure?',
-                textAlign: TextAlign.center,
-              ),
-              entryAnimation: EntryAnimation.BOTTOM_LEFT,
-              onOkButtonPressed: () {
-                Navigator.of(context, rootNavigator: true).pop(context);
-                if (!_toCart.contains(product)) {
-                  _toCart.add(product);
-                  Fluttertoast.showToast(
-                      msg: 'Added ${product.name} to cart!',
-                      gravity: ToastGravity.CENTER,
-                      toastLength: Toast.LENGTH_SHORT,
-                      timeInSecForIosWeb: 1,
-                      fontSize: 16.0);
-                }
-              },
-              onCancelButtonPressed: () {
-                Navigator.of(context, rootNavigator: true).pop(context);
-              },
-            ));
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.INFO,
+      borderSide: BorderSide(color: Theme.of(context).accentColor, width: 2),
+      width: double.infinity,
+      buttonsBorderRadius: BorderRadius.all(Radius.circular(2)),
+      headerAnimationLoop: true,
+      useRootNavigator: true,
+      animType: AnimType.BOTTOMSLIDE,
+      title: 'Confirm Product',
+      desc: 'Add product ${product.name} to cart?.',
+      dismissOnBackKeyPress: true,
+      btnCancelOnPress: () {},
+      btnOkText: 'Confirm',
+      btnOkOnPress: () {
+        if (!_toCart.contains(product)) {
+          _toCart.add(product);
+          Fluttertoast.showToast(
+              msg: 'Added ${product.name} to cart!',
+              gravity: ToastGravity.CENTER,
+              toastLength: Toast.LENGTH_SHORT,
+              timeInSecForIosWeb: 1,
+              fontSize: 16.0);
+        }
+      },
+    )..show();
   }
 
   void _showCart(List<Products> itemsInCart) {

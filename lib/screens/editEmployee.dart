@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:giffy_dialog/giffy_dialog.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import '../models/employee.dart';
 import '../widgets/customButton.dart';
 import '../widgets/customTextField.dart';
@@ -22,7 +21,6 @@ class _EditEmployeeState extends State<EditEmployee> {
   final List<PaymentDetails> _editable = [];
   final _ageController = TextEditingController();
   final _numberController = TextEditingController();
-  final _passwordController = TextEditingController();
   final List<String> _adminLabelList = const ['Admin', 'Not Admin'];
   int _adminChipChoice = -1;
   bool _editAdmin = false;
@@ -56,6 +54,9 @@ class _EditEmployeeState extends State<EditEmployee> {
 
   void _enterDetailsBox(String message, TextEditingController controller,
       String hint, bool isAge) {
+    String numberPattern = r'(^(?:05)(?:0|5|2|6|8|4)[0-9]{7}$)';
+    RegExp regExp = new RegExp(numberPattern);
+
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -77,7 +78,13 @@ class _EditEmployeeState extends State<EditEmployee> {
                         if (isAge) {
                           _editable[0].value = controller.text;
                         } else if (!isAge) {
-                          _editable[1].value = controller.text;
+                          if (regExp.hasMatch(controller.text)) {
+                            _editable[1].value = controller.text;
+                          } else {
+                            Fluttertoast.showToast(
+                                msg:
+                                    'Please enter a valid number! (example: 0501234567)');
+                          }
                         }
                         _hasUpdated = true;
                       } else {
@@ -131,54 +138,49 @@ class _EditEmployeeState extends State<EditEmployee> {
   }
 
   Future<void> _deleteUser(String username) async {
-    showDialog(
-        context: context,
-        builder: (_) => NetworkGiffyDialog(
-              image: Image.asset('assets/images/logo.png'),
-              title: Text('Confirm Delete?',
-                  textAlign: TextAlign.center,
-                  style:
-                      TextStyle(fontSize: 22.0, fontWeight: FontWeight.w600)),
-              description: Text(
-                'This cannot be undone.\nAre you sure you want to remove user: ${_employeeDetails[0].value}?',
-                textAlign: TextAlign.center,
-              ),
-              entryAnimation: EntryAnimation.BOTTOM_LEFT,
-              onOkButtonPressed: () {
-                Navigator.of(context, rootNavigator: true).pop(context);
-                setState(() {
-                  _startProgress = true;
-                });
-                databaseReference
-                    .child(_employeeDetails[2].value)
-                    .child('Employees')
-                    .child(_employeeDetails[0].value)
-                    .remove()
-                    .then((_) {
-                  Fluttertoast.showToast(
-                      msg: 'Deleted user succesfully!',
-                      gravity: ToastGravity.CENTER,
-                      toastLength: Toast.LENGTH_SHORT,
-                      timeInSecForIosWeb: 1);
-                  setState(() {
-                    _startProgress = false;
-                    _hasDeletedUser = true;
-                  });
-                }).catchError((onError) {
-                  Fluttertoast.showToast(
-                      msg: onError.toString(),
-                      gravity: ToastGravity.CENTER,
-                      toastLength: Toast.LENGTH_SHORT,
-                      timeInSecForIosWeb: 1);
-                  setState(() {
-                    _startProgress = false;
-                  });
-                });
-              },
-              onCancelButtonPressed: () {
-                Navigator.of(context, rootNavigator: true).pop(context);
-              },
-            ));
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.WARNING,
+      borderSide: BorderSide(color: Theme.of(context).accentColor, width: 2),
+      width: double.infinity,
+      buttonsBorderRadius: BorderRadius.all(Radius.circular(2)),
+      headerAnimationLoop: true,
+      useRootNavigator: true,
+      animType: AnimType.BOTTOMSLIDE,
+      title: 'Confirm Delete',
+      desc:
+          'Are you sure you want to remove user: ${_employeeDetails[0].value}? This cannot be undone once you press \'confirm\'.',
+      dismissOnBackKeyPress: true,
+      btnCancelOnPress: () {},
+      btnOkText: 'Confirm',
+      btnOkOnPress: () {
+        databaseReference
+            .child(_employeeDetails[2].value)
+            .child('Employees')
+            .child(_employeeDetails[0].value)
+            .remove()
+            .then((_) {
+          Fluttertoast.showToast(
+              msg: 'Deleted user succesfully!',
+              gravity: ToastGravity.CENTER,
+              toastLength: Toast.LENGTH_SHORT,
+              timeInSecForIosWeb: 1);
+          setState(() {
+            _startProgress = false;
+            _hasDeletedUser = true;
+          });
+        }).catchError((onError) {
+          Fluttertoast.showToast(
+              msg: onError.toString(),
+              gravity: ToastGravity.CENTER,
+              toastLength: Toast.LENGTH_SHORT,
+              timeInSecForIosWeb: 1);
+          setState(() {
+            _startProgress = false;
+          });
+        });
+      },
+    )..show();
   }
 
   Future<void> _applyChanges() async {
@@ -186,54 +188,52 @@ class _EditEmployeeState extends State<EditEmployee> {
       setState(() {
         _startProgress = true;
       });
-      showDialog(
-          context: context,
-          builder: (_) => NetworkGiffyDialog(
-                image: Image.asset('assets/images/logo.png'),
-                title: Text('Confirm Changes?',
-                    textAlign: TextAlign.center,
-                    style:
-                        TextStyle(fontSize: 22.0, fontWeight: FontWeight.w600)),
-                description: Text(
-                  'This cannot be undone.\nAre you sure?',
-                  textAlign: TextAlign.center,
-                ),
-                entryAnimation: EntryAnimation.BOTTOM_LEFT,
-                onOkButtonPressed: () {
-                  Navigator.of(context, rootNavigator: true).pop(context);
-                  databaseReference
-                      .child(_employeeDetails[2].value)
-                      .child('Employees')
-                      .child(_employeeDetails[0].value)
-                      .update({
-                    'Admin Privilege': _editable[2].value,
-                    'Age': _editable[0].value,
-                    'Number': _editable[1].value,
-                  }).then((_) {
-                    Fluttertoast.showToast(
-                        msg: 'Updated successfully!',
-                        gravity: ToastGravity.CENTER,
-                        toastLength: Toast.LENGTH_SHORT,
-                        timeInSecForIosWeb: 1);
-                    setState(() {
-                      _hasUpdated = false;
-                      _startProgress = false;
-                    });
-                  }).catchError((error) {
-                    Fluttertoast.showToast(
-                        msg: error.toString(),
-                        gravity: ToastGravity.CENTER,
-                        toastLength: Toast.LENGTH_SHORT,
-                        timeInSecForIosWeb: 1);
-                    setState(() {
-                      _startProgress = false;
-                    });
-                  });
-                },
-                onCancelButtonPressed: () {
-                  Navigator.of(context, rootNavigator: true).pop(context);
-                },
-              ));
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.WARNING,
+        borderSide: BorderSide(color: Theme.of(context).accentColor, width: 2),
+        width: double.infinity,
+        buttonsBorderRadius: BorderRadius.all(Radius.circular(2)),
+        headerAnimationLoop: true,
+        useRootNavigator: true,
+        animType: AnimType.BOTTOMSLIDE,
+        title: 'Confirm Update',
+        desc:
+            'Are you sure you want to update user: ${_employeeDetails[0].value}? This cannot be undone once you press \'confirm\'.',
+        dismissOnBackKeyPress: true,
+        btnCancelOnPress: () {},
+        btnOkText: 'Confirm',
+        btnOkOnPress: () {
+          databaseReference
+              .child(_employeeDetails[2].value)
+              .child('Employees')
+              .child(_employeeDetails[0].value)
+              .update({
+            'Admin Privilege': _editable[2].value,
+            'Age': _editable[0].value,
+            'Number': _editable[1].value,
+          }).then((_) {
+            Fluttertoast.showToast(
+                msg: 'Updated successfully!',
+                gravity: ToastGravity.CENTER,
+                toastLength: Toast.LENGTH_SHORT,
+                timeInSecForIosWeb: 1);
+            setState(() {
+              _hasUpdated = false;
+              _startProgress = false;
+            });
+          }).catchError((error) {
+            Fluttertoast.showToast(
+                msg: error.toString(),
+                gravity: ToastGravity.CENTER,
+                toastLength: Toast.LENGTH_SHORT,
+                timeInSecForIosWeb: 1);
+            setState(() {
+              _startProgress = false;
+            });
+          });
+        },
+      )..show();
     } else {
       Fluttertoast.showToast(
           msg: 'No changes were made!',

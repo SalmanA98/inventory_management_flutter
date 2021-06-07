@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:giffy_dialog/giffy_dialog.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import '../widgets/customAppBar.dart';
 import '../widgets/customButton.dart';
 import '../widgets/textfieldDatePicker.dart';
@@ -40,39 +40,35 @@ class _SalesHistoryState extends State<SalesHistory> {
               '__' +
               DateFormat('yyyy-MM-dd').format(_toDate) +
               '__INVOICE_DATA';
-          showDialog(
-              context: context,
-              builder: (_) => NetworkGiffyDialog(
-                    image: Image.asset('assets/images/logo.png'),
-                    title: Text('Confirm Dates?',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: 22.0, fontWeight: FontWeight.w600)),
-                    description: Text(
-                      'This cannot be undone.\nThis requires internet connection. Are you sure?',
-                      textAlign: TextAlign.center,
-                    ),
-                    entryAnimation: EntryAnimation.BOTTOM_LEFT,
-                    onOkButtonPressed: () {
-                      Navigator.of(context, rootNavigator: true).pop(context);
-
-                      for (int i = 0;
-                          i <= _toDate.difference(_fromDate).inDays;
-                          i++) {
-                        datesList.add(DateFormat('yyyy-MM-dd')
-                            .format(_fromDate.add(Duration(days: i)))
-                            .toString());
-                      }
-                      getSaleFromDB(
-                          datesList, filename, context, _shopLocation);
-                      setState(() {
-                        _isStart = true;
-                      });
-                    },
-                    onCancelButtonPressed: () {
-                      Navigator.of(context, rootNavigator: true).pop(context);
-                    },
-                  ));
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.INFO,
+            borderSide:
+                BorderSide(color: Theme.of(context).accentColor, width: 2),
+            width: double.infinity,
+            buttonsBorderRadius: BorderRadius.all(Radius.circular(2)),
+            headerAnimationLoop: true,
+            useRootNavigator: true,
+            animType: AnimType.BOTTOMSLIDE,
+            title: 'Confirm Dates',
+            desc:
+                'Are you sure you want to check for these dates? This cannot be undone once you press \'confirm\'.',
+            dismissOnBackKeyPress: true,
+            btnCancelOnPress: () {},
+            btnOkText: 'Confirm',
+            btnOkOnPress: () {
+              for (int i = 0; i <= _toDate.difference(_fromDate).inDays; i++) {
+                datesList.add(DateFormat('yyyy-MM-dd')
+                    .format(_fromDate.add(Duration(days: i)))
+                    .toString());
+              }
+              getSaleFromDB(datesList, filename, context, _shopLocation);
+              setState(() {
+                _isStart = true;
+              });
+              WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+            },
+          )..show();
         } else {
           Fluttertoast.showToast(
               msg: 'From cannot be after To!',
@@ -169,12 +165,9 @@ class _SalesHistoryState extends State<SalesHistory> {
                   ),
                   Expanded(
                     child: GestureDetector(
-                        onTap: () {
-                          FocusScopeNode currentFocus = FocusScope.of(context);
-                          if (!currentFocus.hasPrimaryFocus) {
-                            currentFocus.unfocus();
-                          }
-                        },
+                        onTap: () => WidgetsBinding
+                            .instance.focusManager.primaryFocus
+                            ?.unfocus(),
                         child: SingleChildScrollView(
                           child: Column(
                             children: [

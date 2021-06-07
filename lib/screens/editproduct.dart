@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:giffy_dialog/giffy_dialog.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:intl/intl.dart';
 import '../models/database.dart';
 import '../models/paymentdetails.dart';
@@ -45,103 +45,103 @@ class _EditProductState extends State<EditProduct> {
     int _priceToUpdate = int.tryParse(_priceInput.text.toString());
 
     if (_priceToUpdate != null || _qtyToUpdate != null) {
-      showDialog(
-          context: context,
-          builder: (_) => NetworkGiffyDialog(
-                image: Image.asset('assets/images/logo.png'),
-                title: Text('Confirm Changes?',
-                    textAlign: TextAlign.center,
-                    style:
-                        TextStyle(fontSize: 22.0, fontWeight: FontWeight.w600)),
-                description: Text(
-                  'This cannot be undone.\nAre you sure you want to update: $productName?',
-                  textAlign: TextAlign.center,
-                ),
-                entryAnimation: EntryAnimation.BOTTOM_LEFT,
-                onOkButtonPressed: () {
-                  Navigator.of(context, rootNavigator: true).pop(context);
-
-                  if (_priceToUpdate != null) {
-                    databaseReference
-                        .child(_shopLocation)
-                        .child('Products')
-                        .child(productName)
-                        .update({
-                      'Price': _priceToUpdate,
-                      'Last Change': 'Updated Price',
-                      'Last Changed By': widget.currentUser.toUpperCase(),
-                      'Last Changed On': DateTime.now().toString()
-                    }).then((result) {
-                      databaseReference
-                          .child(_shopLocation)
-                          .child('Employees')
-                          .child(username.toUpperCase())
-                          .update({
-                        'Last Activity': 'Updated Price $productName',
-                        'Last Actvitiy Time': DateFormat('yyyy-MM-dd HH:mm:ss')
-                            .format(DateTime.now())
-                            .toString(),
-                      });
-                      setState(() {
-                        _updateSuccess = true;
-                        _productDetails[1].value = _priceToUpdate.toString();
-                      });
-                      Fluttertoast.showToast(
-                          msg: 'Updated Price Successfully',
-                          gravity: ToastGravity.CENTER,
-                          toastLength: Toast.LENGTH_SHORT,
-                          timeInSecForIosWeb: 1);
-                    }).onError((error, stacktrace) {
-                      Fluttertoast.showToast(
-                          msg: error.toString(),
-                          gravity: ToastGravity.CENTER,
-                          toastLength: Toast.LENGTH_SHORT,
-                          timeInSecForIosWeb: 1);
-                    });
-                  }
-                  if (_qtyToUpdate != null) {
-                    databaseReference
-                        .child(_shopLocation)
-                        .child('Products')
-                        .child(productName)
-                        .update({
-                      'Qty': _qtyToUpdate,
-                      'Last Change': 'Updated Qty',
-                      'Last Changed By': widget.currentUser.toUpperCase(),
-                      'Last Changed On': DateTime.now().toString()
-                    }).then((result) {
-                      databaseReference
-                          .child(_shopLocation)
-                          .child('Employees')
-                          .child(username.toUpperCase())
-                          .update({
-                        'Last Activity': 'Updated Qty $productName',
-                        'Last Actvitiy Time': DateFormat('yyyy-MM-dd HH:mm:ss')
-                            .format(DateTime.now())
-                            .toString(),
-                      });
-                      setState(() {
-                        _updateSuccess = true;
-                        _productDetails[2].value = _qtyToUpdate.toString();
-                      });
-                      Fluttertoast.showToast(
-                          msg: 'Updated Qty Successfully',
-                          gravity: ToastGravity.CENTER,
-                          toastLength: Toast.LENGTH_SHORT,
-                          timeInSecForIosWeb: 1);
-                    }).onError((error, stacktrace) {
-                      Fluttertoast.showToast(
-                          msg: error.toString(),
-                          gravity: ToastGravity.CENTER,
-                          toastLength: Toast.LENGTH_SHORT,
-                          timeInSecForIosWeb: 1);
-                    });
-                  }
-                },
-                onCancelButtonPressed: () {
-                  Navigator.of(context, rootNavigator: true).pop(context);
-                },
-              ));
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.INFO,
+        borderSide: BorderSide(color: Theme.of(context).accentColor, width: 2),
+        width: double.infinity,
+        buttonsBorderRadius: BorderRadius.all(Radius.circular(2)),
+        headerAnimationLoop: true,
+        useRootNavigator: true,
+        animType: AnimType.BOTTOMSLIDE,
+        title: 'Confirm Update',
+        desc:
+            'Are you sure you want to update the product: $productName? This cannot be undone once you press \'confirm\'.',
+        dismissOnBackKeyPress: true,
+        btnCancelOnPress: () {},
+        btnOkText: 'Confirm',
+        btnOkOnPress: () {
+          if (_priceToUpdate != null) {
+            _priceInput.clear();
+            databaseReference
+                .child(_shopLocation)
+                .child('Products')
+                .child(productName)
+                .update({
+              'Price': _priceToUpdate,
+              'Last Change': 'Updated Price',
+              'Last Changed By': widget.currentUser.toUpperCase(),
+              'Last Changed On': DateTime.now().toString()
+            }).then((result) {
+              databaseReference
+                  .child(_shopLocation)
+                  .child('Employees')
+                  .child(widget.currentUser.toUpperCase())
+                  .update({
+                'Last Activity': 'Updated Price $productName',
+                'Last Actvitiy Time': DateFormat('yyyy-MM-dd HH:mm:ss')
+                    .format(DateTime.now())
+                    .toString(),
+              });
+              setState(() {
+                _updateSuccess = true;
+                _productDetails[1].value = _priceToUpdate.toString();
+              });
+              Fluttertoast.showToast(
+                  msg: 'Updated Price Successfully',
+                  gravity: ToastGravity.CENTER,
+                  toastLength: Toast.LENGTH_SHORT,
+                  timeInSecForIosWeb: 1);
+            }).onError((error, stacktrace) {
+              Fluttertoast.showToast(
+                  msg: error.toString(),
+                  gravity: ToastGravity.CENTER,
+                  toastLength: Toast.LENGTH_SHORT,
+                  timeInSecForIosWeb: 1);
+            });
+          }
+          if (_qtyToUpdate != null) {
+            _qtyInput.clear();
+            databaseReference
+                .child(_shopLocation)
+                .child('Products')
+                .child(productName)
+                .update({
+              'Qty': _qtyToUpdate,
+              'Last Change': 'Updated Qty',
+              'Last Changed By': widget.currentUser.toUpperCase(),
+              'Last Changed On': DateTime.now().toString()
+            }).then((result) {
+              databaseReference
+                  .child(_shopLocation)
+                  .child('Employees')
+                  .child(widget.currentUser.toUpperCase())
+                  .update({
+                'Last Activity': 'Updated Qty $productName',
+                'Last Actvitiy Time': DateFormat('yyyy-MM-dd HH:mm:ss')
+                    .format(DateTime.now())
+                    .toString(),
+              });
+              setState(() {
+                _updateSuccess = true;
+                _productDetails[2].value = _qtyToUpdate.toString();
+              });
+              Fluttertoast.showToast(
+                  msg: 'Updated Qty Successfully',
+                  gravity: ToastGravity.CENTER,
+                  toastLength: Toast.LENGTH_SHORT,
+                  timeInSecForIosWeb: 1);
+            }).onError((error, stacktrace) {
+              Fluttertoast.showToast(
+                  msg: error.toString(),
+                  gravity: ToastGravity.CENTER,
+                  toastLength: Toast.LENGTH_SHORT,
+                  timeInSecForIosWeb: 1);
+            });
+          }
+          WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+        },
+      )..show();
     } else {
       Fluttertoast.showToast(msg: 'Fields are empty! Not updated.');
     }
@@ -155,47 +155,46 @@ class _EditProductState extends State<EditProduct> {
     } else {
       _shopLocation = widget.currentUser.substring(2, 3).toUpperCase();
     }
-    showDialog(
-        context: context,
-        builder: (_) => NetworkGiffyDialog(
-              image: Image.asset('assets/images/logo.png'),
-              title: Text('Confirm Delete?',
-                  textAlign: TextAlign.center,
-                  style:
-                      TextStyle(fontSize: 22.0, fontWeight: FontWeight.w600)),
-              description: Text(
-                'This cannot be undone.\nAre you sure you want to delete product: $productName?',
-                textAlign: TextAlign.center,
-              ),
-              entryAnimation: EntryAnimation.BOTTOM_LEFT,
-              onOkButtonPressed: () {
-                Navigator.of(context, rootNavigator: true).pop(context);
-                databaseReference
-                    .child(_shopLocation)
-                    .child('Products')
-                    .child(productName)
-                    .remove()
-                    .then((_) {
-                  setState(() {
-                    _updateSuccess = true;
-                  });
-                  Fluttertoast.showToast(
-                      msg: 'Removed product -> $productName!',
-                      gravity: ToastGravity.CENTER,
-                      toastLength: Toast.LENGTH_SHORT,
-                      timeInSecForIosWeb: 1);
-                }).onError((error, stacktrace) {
-                  Fluttertoast.showToast(
-                      msg: error.toString(),
-                      gravity: ToastGravity.CENTER,
-                      toastLength: Toast.LENGTH_SHORT,
-                      timeInSecForIosWeb: 1);
-                });
-              },
-              onCancelButtonPressed: () {
-                Navigator.of(context, rootNavigator: true).pop(context);
-              },
-            ));
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.WARNING,
+      borderSide: BorderSide(color: Theme.of(context).accentColor, width: 2),
+      width: double.infinity,
+      buttonsBorderRadius: BorderRadius.all(Radius.circular(2)),
+      headerAnimationLoop: true,
+      useRootNavigator: true,
+      animType: AnimType.BOTTOMSLIDE,
+      title: 'Confirm Delete',
+      desc:
+          'Are you sure you want to remove the product: $productName? This cannot be undone once you press \'confirm\'.',
+      dismissOnBackKeyPress: true,
+      btnCancelOnPress: () {},
+      btnOkText: 'Confirm',
+      btnOkOnPress: () {
+        databaseReference
+            .child(_shopLocation)
+            .child('Products')
+            .child(productName)
+            .remove()
+            .then((_) {
+          setState(() {
+            _updateSuccess = true;
+          });
+          Fluttertoast.showToast(
+              msg: 'Removed product -> $productName!',
+              gravity: ToastGravity.CENTER,
+              toastLength: Toast.LENGTH_SHORT,
+              timeInSecForIosWeb: 1);
+        }).onError((error, stacktrace) {
+          Fluttertoast.showToast(
+              msg: error.toString(),
+              gravity: ToastGravity.CENTER,
+              toastLength: Toast.LENGTH_SHORT,
+              timeInSecForIosWeb: 1);
+        });
+        WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+      },
+    )..show();
   }
 
   @override
@@ -227,12 +226,8 @@ class _EditProductState extends State<EditProduct> {
               subtitle: 'Update/Remove the product chosen'),
           Expanded(
             child: GestureDetector(
-              onTap: () {
-                FocusScopeNode currentFocus = FocusScope.of(context);
-                if (!currentFocus.hasPrimaryFocus) {
-                  currentFocus.unfocus();
-                }
-              },
+              onTap: () =>
+                  WidgetsBinding.instance.focusManager.primaryFocus?.unfocus(),
               child: SingleChildScrollView(
                 child: Column(
                   children: [

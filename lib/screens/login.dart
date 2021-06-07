@@ -3,8 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:progress_state_button/iconed_button.dart';
 import 'package:progress_state_button/progress_button.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import '../widgets/customTextField.dart';
-import '../models/database.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -41,24 +41,6 @@ class _LoginPageState extends State<LoginPage> {
     this.isUserSignedIn();
   }
 
-  showError(String errormessage) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('ERROR'),
-            content: Text(errormessage),
-            actions: <Widget>[
-              TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('OK'))
-            ],
-          );
-        });
-  }
-
   _authenticateUser() async {
     username = _usernameInput.text;
     pwd = _pwdInput.text;
@@ -89,11 +71,22 @@ class _LoginPageState extends State<LoginPage> {
         });
       } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {
-          Fluttertoast.showToast(
-              msg: 'User not found',
-              gravity: ToastGravity.CENTER,
-              toastLength: Toast.LENGTH_SHORT,
-              timeInSecForIosWeb: 1);
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.ERROR,
+            borderSide:
+                BorderSide(color: Theme.of(context).accentColor, width: 2),
+            width: double.infinity,
+            buttonsBorderRadius: BorderRadius.all(Radius.circular(2)),
+            headerAnimationLoop: true,
+            useRootNavigator: true,
+            animType: AnimType.BOTTOMSLIDE,
+            title: 'Error Logging In',
+            desc: 'User ID not found! Check if the user ID is correct.',
+            dismissOnBackKeyPress: true,
+            btnOkText: 'Ok, Got It!',
+            btnOkOnPress: () {},
+          )..show();
           setState(() {
             loginBtState = ButtonState.fail;
           });
@@ -103,11 +96,22 @@ class _LoginPageState extends State<LoginPage> {
             });
           });
         } else if (e.code == 'wrong-password') {
-          Fluttertoast.showToast(
-              msg: 'Wrong password',
-              gravity: ToastGravity.CENTER,
-              toastLength: Toast.LENGTH_SHORT,
-              timeInSecForIosWeb: 1);
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.ERROR,
+            borderSide:
+                BorderSide(color: Theme.of(context).accentColor, width: 2),
+            width: double.infinity,
+            buttonsBorderRadius: BorderRadius.all(Radius.circular(2)),
+            headerAnimationLoop: true,
+            useRootNavigator: true,
+            animType: AnimType.BOTTOMSLIDE,
+            title: 'Error Logging In',
+            desc: 'Sorry, Wrong password! Try again.',
+            dismissOnBackKeyPress: true,
+            btnOkText: 'Ok, Got It!',
+            btnOkOnPress: () {},
+          )..show();
           setState(() {
             loginBtState = ButtonState.fail;
           });
@@ -117,11 +121,22 @@ class _LoginPageState extends State<LoginPage> {
             });
           });
         } else {
-          Fluttertoast.showToast(
-              msg: e.message.toString(),
-              gravity: ToastGravity.CENTER,
-              toastLength: Toast.LENGTH_SHORT,
-              timeInSecForIosWeb: 1);
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.ERROR,
+            borderSide:
+                BorderSide(color: Theme.of(context).accentColor, width: 2),
+            width: double.infinity,
+            buttonsBorderRadius: BorderRadius.all(Radius.circular(2)),
+            headerAnimationLoop: true,
+            useRootNavigator: true,
+            animType: AnimType.BOTTOMSLIDE,
+            title: 'Error Logging In',
+            desc: e.toString(),
+            dismissOnBackKeyPress: true,
+            btnOkText: 'Ok, Got It!',
+            btnOkOnPress: () {},
+          )..show();
           setState(() {
             loginBtState = ButtonState.fail;
           });
@@ -188,12 +203,8 @@ class _LoginPageState extends State<LoginPage> {
             ),
             Expanded(
               child: GestureDetector(
-                onTap: () {
-                  FocusScopeNode currentFocus = FocusScope.of(context);
-                  if (!currentFocus.hasPrimaryFocus) {
-                    currentFocus.unfocus();
-                  }
-                },
+                onTap: () => WidgetsBinding.instance.focusManager.primaryFocus
+                    ?.unfocus(),
                 child: SingleChildScrollView(
                   child: Column(
                     children: <Widget>[

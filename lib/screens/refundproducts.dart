@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:giffy_dialog/giffy_dialog.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:intl/intl.dart';
 import '../models/paymentdetails.dart';
 import '../widgets/customButton.dart';
@@ -114,202 +114,195 @@ class _RefundProductsState extends State<RefundProducts> {
     double totalRefunded;
     double totalAfterRefund;
     int initialQty;
-
-    showDialog(
-        context: context,
-        builder: (_) => NetworkGiffyDialog(
-              image: Image.asset('assets/images/logo.png'),
-              title: Text('Confirm Refund?',
-                  textAlign: TextAlign.center,
-                  style:
-                      TextStyle(fontSize: 22.0, fontWeight: FontWeight.w600)),
-              description: Text(
-                'This cannot be undone.\nAre you sure?',
-                textAlign: TextAlign.center,
-              ),
-              entryAnimation: EntryAnimation.BOTTOM_LEFT,
-              onOkButtonPressed: () {
-                Navigator.of(context, rootNavigator: true).pop(context);
-                if (refundedAll) {
-                  databaseReference
-                      .child(_shopLocation)
-                      .child('Sales')
-                      .child(widget._date)
-                      .child(widget._time)
-                      .once()
-                      .then((result) {
-                    Map<dynamic, dynamic> values = result.value;
-                    values.forEach((prodNum, value) {
-                      if (int.tryParse(prodNum.toString()) != null) {
-                        if (value[product.name] != null) {
-                          //Update db
-                          setState(() {
-                            databaseReference
-                                .child(_shopLocation)
-                                .child('Sales')
-                                .child(widget._date)
-                                .child(widget._time)
-                                .child(prodNum)
-                                .child(product.name)
-                                .update({
-                              'Qty': 0,
-                              'Refunded': 'Yes',
-                              'Refunded Qty': product.qty,
-                            });
-
-                            databaseReference
-                                .child(_shopLocation)
-                                .child('Sales')
-                                .child(widget._date)
-                                .child(widget._time)
-                                .update({
-                              'Refunded Amount': _totalPrice,
-                              'Total After Refund': 0,
-                            });
-
-                            _products.clear();
-                            _paymentDetails.clear();
-                            getSaleInfo(context, widget._date, widget._time,
-                                _shopLocation);
-                          });
-                        }
-                      }
-                    });
-                  }).onError((error, stackTrace) => null);
-                } else {
-                  if (qtyToRefud.isEmpty || int.tryParse(qtyToRefud) < 1) {
-                    Fluttertoast.showToast(
-                        msg: 'Refund qty should be more than 0!',
-                        toastLength: Toast.LENGTH_SHORT,
-                        timeInSecForIosWeb: 1,
-                        fontSize: 16.0);
-                  } else {
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.WARNING,
+      borderSide: BorderSide(color: Theme.of(context).accentColor, width: 2),
+      width: double.infinity,
+      buttonsBorderRadius: BorderRadius.all(Radius.circular(2)),
+      headerAnimationLoop: true,
+      useRootNavigator: true,
+      animType: AnimType.BOTTOMSLIDE,
+      title: 'Confirm Refund',
+      desc: 'Are you sure? This cannot be undone once you press \'confirm\'.',
+      dismissOnBackKeyPress: true,
+      btnCancelOnPress: () {},
+      btnOkText: 'Confirm',
+      btnOkOnPress: () {
+        if (refundedAll) {
+          databaseReference
+              .child(_shopLocation)
+              .child('Sales')
+              .child(widget._date)
+              .child(widget._time)
+              .once()
+              .then((result) {
+            Map<dynamic, dynamic> values = result.value;
+            values.forEach((prodNum, value) {
+              if (int.tryParse(prodNum.toString()) != null) {
+                if (value[product.name] != null) {
+                  //Update db
+                  setState(() {
                     databaseReference
                         .child(_shopLocation)
                         .child('Sales')
                         .child(widget._date)
                         .child(widget._time)
-                        .once()
-                        .then((result) {
-                      Map<dynamic, dynamic> values = result.value;
-                      values.forEach((prodNum, value) {
-                        if (int.tryParse(prodNum.toString()) != null) {
-                          if (value[product.name] != null) {
-                            int finalQty = int.tryParse(product.qty) -
-                                int.tryParse(qtyToRefud);
+                        .child(prodNum)
+                        .child(product.name)
+                        .update({
+                      'Qty': 0,
+                      'Refunded': 'Yes',
+                      'Refunded Qty': product.qty,
+                    });
 
-                            //Calculations
-                            _discount =
-                                _discount.substring(0, _discount.length - 1);
+                    databaseReference
+                        .child(_shopLocation)
+                        .child('Sales')
+                        .child(widget._date)
+                        .child(widget._time)
+                        .update({
+                      'Refunded Amount': _totalPrice,
+                      'Total After Refund': 0,
+                    });
 
-                            _vat = _vat.substring(0, _vat.length - 1);
-                            priceForQty = double.tryParse(product.price) *
-                                int.tryParse(product.qty);
-                            //If there is discount
-                            if (int.tryParse(_discount) > 0) {
-                              priceAfterDiscount = priceForQty -
-                                  ((priceForQty * int.tryParse(_discount)) /
-                                      100);
-                            } else {
-                              priceAfterDiscount = priceForQty;
-                            }
-                            //If there is vat
-                            if (int.tryParse(_vat) > 0) {
-                              priceAfterVat = priceAfterDiscount +
-                                  ((priceForQty * int.tryParse(_vat)) / 100);
-                            } else {
-                              priceAfterVat = priceAfterDiscount;
-                            }
-                            totalRefunded =
-                                priceAfterVat + double.tryParse(_refundedPrice);
-                            totalAfterRefund =
-                                double.tryParse(_totalPrice) - totalRefunded;
+                    _products.clear();
+                    _paymentDetails.clear();
+                    getSaleInfo(
+                        context, widget._date, widget._time, _shopLocation);
+                  });
+                }
+              }
+            });
+          }).onError((error, stackTrace) => null);
+        } else {
+          if (qtyToRefud.isEmpty || int.tryParse(qtyToRefud) < 1) {
+            Fluttertoast.showToast(
+                msg: 'Refund qty should be more than 0!',
+                toastLength: Toast.LENGTH_SHORT,
+                timeInSecForIosWeb: 1,
+                fontSize: 16.0);
+          } else {
+            databaseReference
+                .child(_shopLocation)
+                .child('Sales')
+                .child(widget._date)
+                .child(widget._time)
+                .once()
+                .then((result) {
+              Map<dynamic, dynamic> values = result.value;
+              values.forEach((prodNum, value) {
+                if (int.tryParse(prodNum.toString()) != null) {
+                  if (value[product.name] != null) {
+                    int finalQty =
+                        int.tryParse(product.qty) - int.tryParse(qtyToRefud);
 
-                            //Update db
-                            setState(() {
-                              databaseReference
-                                  .child(_shopLocation)
-                                  .child('Sales')
-                                  .child(widget._date)
-                                  .child(widget._time)
-                                  .child(prodNum)
-                                  .child(product.name)
-                                  .update({
-                                'Qty': finalQty,
-                                'Refunded': finalQty == 0 ? 'Yes' : 'Partial',
-                                'Refunded Qty': qtyToRefud,
-                              }).then((_) {
-                                databaseReference
-                                    .child(_shopLocation)
-                                    .child('Sales')
-                                    .child(widget._date)
-                                    .child(widget._time)
-                                    .update({
-                                  'Refunded Amount': totalRefunded,
-                                  'Total After Refund': totalAfterRefund,
-                                }).then((_) {
-                                  databaseReference
+                    //Calculations
+                    _discount = _discount.substring(0, _discount.length - 1);
+
+                    _vat = _vat.substring(0, _vat.length - 1);
+                    priceForQty = double.tryParse(product.price) *
+                        int.tryParse(product.qty);
+                    //If there is discount
+                    if (int.tryParse(_discount) > 0) {
+                      priceAfterDiscount = priceForQty -
+                          ((priceForQty * int.tryParse(_discount)) / 100);
+                    } else {
+                      priceAfterDiscount = priceForQty;
+                    }
+                    //If there is vat
+                    if (int.tryParse(_vat) > 0) {
+                      priceAfterVat = priceAfterDiscount +
+                          ((priceForQty * int.tryParse(_vat)) / 100);
+                    } else {
+                      priceAfterVat = priceAfterDiscount;
+                    }
+                    totalRefunded =
+                        priceAfterVat + double.tryParse(_refundedPrice);
+                    totalAfterRefund =
+                        double.tryParse(_totalPrice) - totalRefunded;
+
+                    //Update db
+                    setState(() {
+                      databaseReference
+                          .child(_shopLocation)
+                          .child('Sales')
+                          .child(widget._date)
+                          .child(widget._time)
+                          .child(prodNum)
+                          .child(product.name)
+                          .update({
+                        'Qty': finalQty,
+                        'Refunded': finalQty == 0 ? 'Yes' : 'Partial',
+                        'Refunded Qty': qtyToRefud,
+                      }).then((_) {
+                        databaseReference
+                            .child(_shopLocation)
+                            .child('Sales')
+                            .child(widget._date)
+                            .child(widget._time)
+                            .update({
+                          'Refunded Amount': totalRefunded,
+                          'Total After Refund': totalAfterRefund,
+                        }).then((_) {
+                          databaseReference
+                              .child(_shopLocation)
+                              .child('Products')
+                              .child(product.name)
+                              .child('Qty')
+                              .once()
+                              .then((result) {
+                                initialQty =
+                                    int.tryParse(result.value.toString());
+                              })
+                              .then((_) => databaseReference
                                       .child(_shopLocation)
                                       .child('Products')
                                       .child(product.name)
-                                      .child('Qty')
-                                      .once()
-                                      .then((result) {
-                                        initialQty = int.tryParse(
-                                            result.value.toString());
-                                      })
-                                      .then((_) => databaseReference
-                                              .child(_shopLocation)
-                                              .child('Products')
-                                              .child(product.name)
-                                              .update({
-                                            'Qty': initialQty +
-                                                int.tryParse(
-                                                    qtyToRefud.toString())
-                                          }))
-                                      .then((_) {
-                                        databaseReference
-                                            .child(_shopLocation)
-                                            .child('Employees')
-                                            .child(username.toUpperCase())
-                                            .update({
-                                          'Last Activity':
-                                              'Refunded ${widget._saleID}',
-                                          'Last Activity Time':
-                                              DateFormat('yyyy-MM-dd HH:mm:ss')
-                                                  .format(DateTime.now())
-                                                  .toString(),
-                                        });
-                                        _products.clear();
-                                        _paymentDetails.clear();
-                                        getSaleInfo(context, widget._date,
-                                            widget._time, _shopLocation);
-
-                                        Fluttertoast.showToast(
-                                            msg: 'Refund Success',
-                                            gravity: ToastGravity.CENTER,
-                                            toastLength: Toast.LENGTH_SHORT,
-                                            timeInSecForIosWeb: 1,
-                                            fontSize: 16.0);
-                                      });
+                                      .update({
+                                    'Qty': initialQty +
+                                        int.tryParse(qtyToRefud.toString())
+                                  }))
+                              .then((_) {
+                                databaseReference
+                                    .child(_shopLocation)
+                                    .child('Employees')
+                                    .child(username.toUpperCase())
+                                    .update({
+                                  'Last Activity': 'Refunded ${widget._saleID}',
+                                  'Last Activity Time':
+                                      DateFormat('yyyy-MM-dd HH:mm:ss')
+                                          .format(DateTime.now())
+                                          .toString(),
                                 });
+                                _products.clear();
+                                _paymentDetails.clear();
+                                getSaleInfo(context, widget._date, widget._time,
+                                    _shopLocation);
+
+                                Fluttertoast.showToast(
+                                    msg: 'Refund Success',
+                                    gravity: ToastGravity.CENTER,
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    timeInSecForIosWeb: 1,
+                                    fontSize: 16.0);
                               });
-                            });
-                          }
-                        }
+                        });
                       });
-                    }).onError((error, stackTrace) => Fluttertoast.showToast(
-                            msg: error.toString(),
-                            toastLength: Toast.LENGTH_SHORT,
-                            timeInSecForIosWeb: 1,
-                            fontSize: 16.0));
+                    });
                   }
                 }
-              },
-              onCancelButtonPressed: () {
-                Navigator.of(context, rootNavigator: true).pop(context);
-              },
-            ));
+              });
+            }).onError((error, stackTrace) => Fluttertoast.showToast(
+                    msg: error.toString(),
+                    toastLength: Toast.LENGTH_SHORT,
+                    timeInSecForIosWeb: 1,
+                    fontSize: 16.0));
+          }
+        }
+        WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+      },
+    )..show();
   }
 
   @override
@@ -330,12 +323,8 @@ class _RefundProductsState extends State<RefundProducts> {
                 subtitle: 'Sale ID: ${widget._saleID}'),
             Expanded(
               child: GestureDetector(
-                onTap: () {
-                  FocusScopeNode currentFocus = FocusScope.of(context);
-                  if (!currentFocus.hasPrimaryFocus) {
-                    currentFocus.unfocus();
-                  }
-                },
+                onTap: () => WidgetsBinding.instance.focusManager.primaryFocus
+                    ?.unfocus(),
                 child: SingleChildScrollView(
                   child: Column(
                     children: [

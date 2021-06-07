@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:giffy_dialog/giffy_dialog.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import '../widgets/customButton.dart';
 import '../widgets/customTextField.dart';
 import '../widgets/customAppBar.dart';
@@ -29,47 +29,45 @@ class _AddProductsState extends State<AddProducts> {
           toastLength: Toast.LENGTH_SHORT,
           timeInSecForIosWeb: 1);
     } else {
-      showDialog(
-          context: context,
-          builder: (_) => NetworkGiffyDialog(
-                image: Image.asset('assets/images/logo.png'),
-                title: Text('Confirm Upload?',
-                    textAlign: TextAlign.center,
-                    style:
-                        TextStyle(fontSize: 22.0, fontWeight: FontWeight.w600)),
-                description: Text(
-                  'This cannot be undone.\nAre you sure?',
-                  textAlign: TextAlign.center,
-                ),
-                entryAnimation: EntryAnimation.BOTTOM_LEFT,
-                onOkButtonPressed: () {
-                  Navigator.of(context, rootNavigator: true).pop(context);
-                  //Fix username for last changed by
-                  uploadProduct(
-                      context,
-                      Products(
-                        name: _nameInput.text,
-                        price: _priceInput.text,
-                        qty: _qtyInput.text,
-                      ),
-                      widget._username);
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.WARNING,
+        borderSide: BorderSide(color: Theme.of(context).accentColor, width: 2),
+        width: double.infinity,
+        buttonsBorderRadius: BorderRadius.all(Radius.circular(2)),
+        headerAnimationLoop: true,
+        useRootNavigator: true,
+        animType: AnimType.BOTTOMSLIDE,
+        title: 'Confirm Upload',
+        desc:
+            'Are you sure you want to add the product: ${_nameInput.text}? This cannot be undone once you press \'confirm\'.',
+        dismissOnBackKeyPress: true,
+        btnCancelOnPress: () {},
+        btnOkText: 'Confirm',
+        btnOkOnPress: () {
+          //Fix username for last changed by
+          uploadProduct(
+              context,
+              Products(
+                name: _nameInput.text,
+                price: _priceInput.text,
+                qty: _qtyInput.text,
+              ),
+              widget._username);
 
-                  setState(() {
-                    _nameInput.clear();
-                    _priceInput.clear();
-                    _qtyInput.clear();
-                  });
-                  WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
-                  Fluttertoast.showToast(
-                      msg: 'Added product successfully!',
-                      gravity: ToastGravity.CENTER,
-                      toastLength: Toast.LENGTH_SHORT,
-                      timeInSecForIosWeb: 1);
-                },
-                onCancelButtonPressed: () {
-                  Navigator.of(context, rootNavigator: true).pop(context);
-                },
-              ));
+          setState(() {
+            _nameInput.clear();
+            _priceInput.clear();
+            _qtyInput.clear();
+          });
+          WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+          Fluttertoast.showToast(
+              msg: 'Added product successfully!',
+              gravity: ToastGravity.CENTER,
+              toastLength: Toast.LENGTH_SHORT,
+              timeInSecForIosWeb: 1);
+        },
+      )..show();
     }
   }
 
@@ -100,12 +98,8 @@ class _AddProductsState extends State<AddProducts> {
             ),
             Expanded(
               child: GestureDetector(
-                onTap: () {
-                  FocusScopeNode currentFocus = FocusScope.of(context);
-                  if (!currentFocus.hasPrimaryFocus) {
-                    currentFocus.unfocus();
-                  }
-                },
+                onTap: () => WidgetsBinding.instance.focusManager.primaryFocus
+                    ?.unfocus(),
                 child: SingleChildScrollView(
                   child: Column(
                     children: [

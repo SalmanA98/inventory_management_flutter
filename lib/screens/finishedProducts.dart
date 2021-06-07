@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:giffy_dialog/giffy_dialog.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import '../models/products.dart';
 import '../widgets/customAppBar.dart';
 import '../models/database.dart';
@@ -16,48 +16,46 @@ class _FinishedProductsState extends State<FinishedProducts> {
   List<Products> productsCopy = [];
 
   void _deleteProduct(Products product) {
-    showDialog(
-        context: context,
-        builder: (_) => NetworkGiffyDialog(
-              image: Image.asset('assets/images/logo.png'),
-              title: Text('Confirm Delete?',
-                  textAlign: TextAlign.center,
-                  style:
-                      TextStyle(fontSize: 22.0, fontWeight: FontWeight.w600)),
-              description: Text(
-                'This cannot be undone.\nAre you sure you want to remove ${product.name}?',
-                textAlign: TextAlign.center,
-              ),
-              entryAnimation: EntryAnimation.BOTTOM_LEFT,
-              onOkButtonPressed: () {
-                Navigator.of(context, rootNavigator: true).pop(context);
-                databaseReference
-                    .child('D')
-                    .child('Products')
-                    .child(product.name)
-                    .remove()
-                    .then((_) {
-                  setState(() {
-                    widget.finishedProductsList.remove(product);
-                  });
-                  Fluttertoast.showToast(
-                      msg: 'Removed Product Successfully',
-                      gravity: ToastGravity.CENTER,
-                      toastLength: Toast.LENGTH_SHORT,
-                      timeInSecForIosWeb: 1);
-                }).onError((error, stacktrace) {
-                  print('ERROR: ${error.toString()}\nSTACK: $stacktrace');
-                  Fluttertoast.showToast(
-                      msg: error.toString(),
-                      gravity: ToastGravity.CENTER,
-                      toastLength: Toast.LENGTH_SHORT,
-                      timeInSecForIosWeb: 1);
-                });
-              },
-              onCancelButtonPressed: () {
-                Navigator.of(context, rootNavigator: true).pop(context);
-              },
-            ));
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.WARNING,
+      borderSide: BorderSide(color: Theme.of(context).accentColor, width: 2),
+      width: double.infinity,
+      buttonsBorderRadius: BorderRadius.all(Radius.circular(2)),
+      headerAnimationLoop: true,
+      useRootNavigator: true,
+      animType: AnimType.BOTTOMSLIDE,
+      title: 'Confirm Delete',
+      desc:
+          'Are you sure you want to remove the product: ${product.name}? This cannot be undone once you press \'confirm\'.',
+      dismissOnBackKeyPress: true,
+      btnCancelOnPress: () {},
+      btnOkText: 'Confirm',
+      btnOkOnPress: () {
+        databaseReference
+            .child('D')
+            .child('Products')
+            .child(product.name)
+            .remove()
+            .then((_) {
+          setState(() {
+            widget.finishedProductsList.remove(product);
+          });
+          Fluttertoast.showToast(
+              msg: 'Removed Product Successfully',
+              gravity: ToastGravity.CENTER,
+              toastLength: Toast.LENGTH_SHORT,
+              timeInSecForIosWeb: 1);
+        }).onError((error, stacktrace) {
+          print('ERROR: ${error.toString()}\nSTACK: $stacktrace');
+          Fluttertoast.showToast(
+              msg: error.toString(),
+              gravity: ToastGravity.CENTER,
+              toastLength: Toast.LENGTH_SHORT,
+              timeInSecForIosWeb: 1);
+        });
+      },
+    )..show();
   }
 
   @override

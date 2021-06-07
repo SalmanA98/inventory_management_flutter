@@ -95,6 +95,7 @@ class _RefundSaleIDState extends State<RefundSaleID> {
   }
 
   void _checkSaleID(BuildContext context) {
+    WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
     String saleID = _saleIdInput.text;
     if (saleID.isEmpty) {
       Fluttertoast.showToast(
@@ -121,12 +122,8 @@ class _RefundSaleIDState extends State<RefundSaleID> {
     return Scaffold(
       body: SafeArea(
         child: GestureDetector(
-          onTap: () {
-            FocusScopeNode currentFocus = FocusScope.of(context);
-            if (!currentFocus.hasPrimaryFocus) {
-              currentFocus.unfocus();
-            }
-          },
+          onTap: () =>
+              WidgetsBinding.instance.focusManager.primaryFocus?.unfocus(),
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -154,7 +151,20 @@ class _RefundSaleIDState extends State<RefundSaleID> {
                           buttonFunction: () => _checkSaleID(context),
                           buttonText: 'Authenticate Sale ID',
                         ),
-                      if (_startedCheck) LinearProgressIndicator(),
+                      if (_startedCheck)
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Center(
+                              child: CircularProgressIndicator.adaptive(
+                                backgroundColor: Theme.of(context).primaryColor,
+                              ),
+                            ),
+                            Container(
+                                margin: EdgeInsets.symmetric(vertical: 10),
+                                child: FittedBox(child: Text('Please Wait..')))
+                          ],
+                        ),
                     ],
                   ),
                 ),

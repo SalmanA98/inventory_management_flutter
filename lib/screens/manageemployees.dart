@@ -180,12 +180,9 @@ class _ManageEmployeesState extends State<ManageEmployees> {
                       subtitle: 'Edit, Add or Remove Employees!'),
                   Expanded(
                     child: GestureDetector(
-                      onTap: () {
-                        FocusScopeNode currentFocus = FocusScope.of(context);
-                        if (!currentFocus.hasPrimaryFocus) {
-                          currentFocus.unfocus();
-                        }
-                      },
+                      onTap: () => WidgetsBinding
+                          .instance.focusManager.primaryFocus
+                          ?.unfocus(),
                       child: SingleChildScrollView(
                         child: Column(
                           children: [
@@ -205,7 +202,6 @@ class _ManageEmployeesState extends State<ManageEmployees> {
                                         onChanged: (searchedEmployee) =>
                                             _searchInEmployees(
                                                 searchedEmployee),
-                                        // onChanged: onSearchTextChanged,
                                       ),
                                       trailing: new IconButton(
                                         icon: new Icon(Icons.cancel),
@@ -216,7 +212,6 @@ class _ManageEmployeesState extends State<ManageEmployees> {
                                             _employeesList
                                                 .addAll(_employeesCopy);
                                           });
-                                          // onSearchTextChanged('');
                                         },
                                       ),
                                     ),
@@ -274,7 +269,6 @@ class CartItem extends StatelessWidget {
                 margin:
                     EdgeInsets.only(left: 5, right: 16, top: 10, bottom: 10),
                 decoration: BoxDecoration(
-                    // color: Colors.white,
                     borderRadius: BorderRadius.all(Radius.circular(16))),
                 child: Row(
                   children: <Widget>[

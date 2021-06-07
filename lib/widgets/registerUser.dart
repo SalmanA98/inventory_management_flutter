@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:giffy_dialog/giffy_dialog.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import '../screens/homepage.dart';
 import './customButton.dart';
 import './customTextField.dart';
@@ -63,70 +63,60 @@ class _RegisterUserState extends State<RegisterUser> {
     String confirmPwd = _confirmPwdInput.text;
     if (pwd.isNotEmpty && confirmPwd.isNotEmpty) {
       if (pwd == confirmPwd) {
-        showDialog(
-            context: context,
-            builder: (_) => NetworkGiffyDialog(
-                  image: Image.asset('assets/images/logo.png'),
-                  title: Text('Confirm Details?',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontSize: 22.0, fontWeight: FontWeight.w600)),
-                  description: Text(
-                    'This cannot be undone.\nAre you sure?',
-                    textAlign: TextAlign.center,
-                  ),
-                  entryAnimation: EntryAnimation.BOTTOM_LEFT,
-                  onOkButtonPressed: () {
-                    Navigator.of(context, rootNavigator: true).pop(context);
-                    firebaseAuth
-                        .createUserWithEmailAndPassword(
-                            email: _employeeID + '@hekayet3tr.com',
-                            password: pwd.toLowerCase())
-                        .then((_) {
-                      databaseReference
-                          .child(widget.userLocation)
-                          .child('Employees')
-                          .child(_employeeID)
-                          .update({
-                        'Name': widget.userName,
-                        'Age': widget.userAge,
-                        'Number': widget.userNumber,
-                        'Admin Privilege': widget.adminPriv
-                      }).then((_) {
-                        Fluttertoast.showToast(
-                            msg: 'Created Successully',
-                            gravity: ToastGravity.CENTER,
-                            toastLength: Toast.LENGTH_SHORT,
-                            timeInSecForIosWeb: 1);
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (_) => HomePage()));
-                      });
-                    }).catchError((e) {
-                      showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                                title: Text("Error"),
-                                content: Text(e.message),
-                                actions: [
-                                  TextButton(
-                                    child: Text("Ok"),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                  )
-                                ]);
-                          });
-                    });
+        AwesomeDialog(
+          context: context,
+          dialogType: DialogType.WARNING,
+          borderSide:
+              BorderSide(color: Theme.of(context).accentColor, width: 2),
+          width: double.infinity,
+          buttonsBorderRadius: BorderRadius.all(Radius.circular(2)),
+          headerAnimationLoop: true,
+          useRootNavigator: true,
+          animType: AnimType.BOTTOMSLIDE,
+          title: 'Confirm Registration',
+          desc:
+              'Are you sure you want to add the new user: ${widget.userName}? This cannot be undone once you press \'confirm\'.',
+          dismissOnBackKeyPress: true,
+          btnCancelOnPress: () {},
+          btnOkText: 'Confirm',
+          btnOkOnPress: () {
+            firebaseAuth
+                .createUserWithEmailAndPassword(
+                    email: _employeeID + '@hekayet3tr.com',
+                    password: pwd.toLowerCase())
+                .then((_) {
+              databaseReference
+                  .child(widget.userLocation)
+                  .child('Employees')
+                  .child(_employeeID)
+                  .update({
+                'Name': widget.userName,
+                'Age': widget.userAge,
+                'Number': widget.userNumber,
+                'Admin Privilege': widget.adminPriv
+              }).then((_) {
+                Fluttertoast.showToast(
+                    msg: 'Created Successully',
+                    gravity: ToastGravity.CENTER,
+                    toastLength: Toast.LENGTH_SHORT,
+                    timeInSecForIosWeb: 1);
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (_) => HomePage()));
+              });
+            }).catchError((e) {
+              Fluttertoast.showToast(
+                  msg: e.toString(),
+                  gravity: ToastGravity.CENTER,
+                  toastLength: Toast.LENGTH_SHORT,
+                  timeInSecForIosWeb: 1);
+            });
 
-                    setState(() {
-                      _isCreating = true;
-                    });
-                  },
-                  onCancelButtonPressed: () {
-                    Navigator.of(context, rootNavigator: true).pop(context);
-                  },
-                ));
+            setState(() {
+              _isCreating = true;
+            });
+            WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+          },
+        )..show();
       } else {
         Fluttertoast.showToast(
             msg: 'Passwords do no match!',
@@ -174,12 +164,8 @@ class _RegisterUserState extends State<RegisterUser> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: GestureDetector(
-        onTap: () {
-          FocusScopeNode currentFocus = FocusScope.of(context);
-          if (!currentFocus.hasPrimaryFocus) {
-            currentFocus.unfocus();
-          }
-        },
+        onTap: () =>
+            WidgetsBinding.instance.focusManager.primaryFocus?.unfocus(),
         child: Card(
           color: Theme.of(context).scaffoldBackgroundColor,
           child: _employeeID == null || _isCreating
