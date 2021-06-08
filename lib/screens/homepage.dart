@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:inventory_management/models/database.dart';
 import 'package:inventory_management/widgets/customButton.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import '../widgets/griddashboard.dart';
 
 class HomePage extends StatefulWidget {
@@ -137,106 +139,147 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     var screenMaxHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       body: !_checkComplete || !_isLoggedIn
-          ? SafeArea(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Center(
-                    child: CircularProgressIndicator.adaptive(
-                      backgroundColor: Theme.of(context).primaryColor,
+          ? WillPopScope(
+              onWillPop: () => SystemNavigator.pop(),
+              child: SafeArea(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Center(
+                      child: CircularProgressIndicator.adaptive(
+                        backgroundColor: Theme.of(context).primaryColor,
+                      ),
                     ),
-                  ),
-                  Container(
-                      margin: EdgeInsets.symmetric(vertical: 10),
-                      child: FittedBox(
-                          fit: BoxFit.contain,
-                          child: const Text('Please Wait..')))
-                ],
+                    Container(
+                        margin: EdgeInsets.symmetric(vertical: 10),
+                        child: FittedBox(
+                            fit: BoxFit.contain,
+                            child: const Text('Please Wait..')))
+                  ],
+                ),
               ),
             )
           : !_userDataExists
-              ? SafeArea(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Center(
-                        child: CircularProgressIndicator.adaptive(
-                          backgroundColor: Theme.of(context).primaryColor,
+              ? WillPopScope(
+                  onWillPop: () {
+                    signOut();
+                    return SystemNavigator.pop();
+                  },
+                  child: SafeArea(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Center(
+                          child: CircularProgressIndicator.adaptive(
+                            backgroundColor: Theme.of(context).primaryColor,
+                          ),
                         ),
-                      ),
-                      Container(
-                          margin: EdgeInsets.symmetric(vertical: 20),
-                          child: FittedBox(
-                              fit: BoxFit.contain,
-                              child: Text(
-                                  'This user does not exist in the database\nLogging you out in: $_countdown'))),
-                      Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 50, vertical: 10),
-                        child: CustomButton(
-                          buttonFunction: signOut,
-                          buttonText: 'Logout Now',
-                        ),
-                      )
-                    ],
+                        Container(
+                            margin: EdgeInsets.symmetric(vertical: 20),
+                            child: FittedBox(
+                                fit: BoxFit.contain,
+                                child: Text(
+                                    'This user does not exist in the database\nLogging you out in: $_countdown'))),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 50, vertical: 10),
+                          child: CustomButton(
+                            buttonFunction: signOut,
+                            buttonText: 'Logout Now',
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 )
               : SafeArea(
-                  child: Column(
-                    children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.only(left: 16, right: 16, top: 70),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                FittedBox(
-                                  fit: BoxFit.contain,
-                                  child: const Text(
-                                    "Hekayet Etr",
-                                    style: TextStyle(
-                                        fontSize: 30,
-                                        fontWeight: FontWeight.bold),
+                  child: WillPopScope(
+                    // ignore: missing_return
+                    onWillPop: () {
+                      AwesomeDialog(
+                        context: context,
+                        dialogType: DialogType.WARNING,
+                        borderSide: BorderSide(
+                            color: Theme.of(context).accentColor, width: 2),
+                        width: double.infinity,
+                        buttonsBorderRadius:
+                            BorderRadius.all(Radius.circular(2)),
+                        headerAnimationLoop: true,
+                        useRootNavigator: true,
+                        animType: AnimType.BOTTOMSLIDE,
+                        title: 'Are you sure?',
+                        desc: 'Are you sure you want to exit the app?',
+                        dismissOnBackKeyPress: true,
+                        btnOkText: 'Exit',
+                        btnOkOnPress: () {
+                          SystemNavigator.pop();
+                        },
+                        btnCancelText: 'Cancel',
+                        btnCancelOnPress: () {},
+                      )..show();
+                    },
+                    child: Column(
+                      children: <Widget>[
+                        Padding(
+                          padding:
+                              EdgeInsets.only(left: 16, right: 16, top: 70),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  FittedBox(
+                                    fit: BoxFit.contain,
+                                    child: const Text(
+                                      "Hekayet Etr",
+                                      style: TextStyle(
+                                          fontSize: 30,
+                                          fontWeight: FontWeight.bold),
+                                    ),
                                   ),
-                                ),
-                                FittedBox(
-                                  fit: BoxFit.contain,
-                                  child: Text(
-                                    'Welcome $_username!',
-                                    style: TextStyle(
-                                        color: Color(0xffa29aac),
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600),
+                                  FittedBox(
+                                    fit: BoxFit.contain,
+                                    child: Text(
+                                      'Welcome $_username!',
+                                      style: TextStyle(
+                                          color: Color(0xffa29aac),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600),
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            IconButton(
-                              alignment: Alignment.topCenter,
-                              icon: Icon(
-                                Icons.exit_to_app,
-                                //  color: Colors.white,
-                                size: 30,
+                                ],
                               ),
-                              onPressed: () => signOut(),
-                            )
-                          ],
+                              IconButton(
+                                alignment: Alignment.topCenter,
+                                icon: Icon(
+                                  Icons.exit_to_app,
+                                  //  color: Colors.white,
+                                  size: 30,
+                                ),
+                                onPressed: () => signOut(),
+                              )
+                            ],
+                          ),
                         ),
-                      ),
-                      SizedBox(
-                        height: screenMaxHeight * 0.05,
-                      ),
-                      GridDashboard(
-                        isAdmin: _adminPriv,
-                        username: _username,
-                      )
-                    ],
+                        SizedBox(
+                          height: screenMaxHeight * 0.05,
+                        ),
+                        GridDashboard(
+                          isAdmin: _adminPriv,
+                          username: _username,
+                        )
+                      ],
+                    ),
                   ),
                 ),
     );

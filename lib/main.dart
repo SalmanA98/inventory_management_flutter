@@ -15,7 +15,10 @@ void main() async {
   runApp(MaterialApp(
     //Splash screen animation
     home: AnimatedSplashScreen(
-        duration: 1000,
+        duration: 700,
+        centered: true,
+        splashTransition: SplashTransition.fadeTransition,
+        splashIconSize: 200,
         splash: Image.asset(
           'assets/images/logo.png',
         ),
@@ -35,33 +38,24 @@ void main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // Color.fromRGBO(18, 18, 18,1.0),
     return MaterialApp(
       theme: ThemeData(
         brightness: Brightness.light,
-        primaryColor: Colors.orange[800], //Color.fromRGBO(69, 54, 88, 1),
+        primaryColor: Colors.orange[800],
         accentColor: Colors.teal[700],
         scaffoldBackgroundColor: Colors.white,
         cardColor: Colors.grey[200],
         fontFamily: 'OpenSans',
         shadowColor: Colors.black,
-        // textTheme: TextTheme(
-        //   bodyText2: TextStyle(
-        //       color: Colors.black, fontSize: 50, fontWeight: FontWeight.bold),
-        // ),
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
-        primaryColor: Colors.orange[200], //Color.fromRGBO(69, 54, 88, 1),
+        primaryColor: Colors.orange[200],
         accentColor: Colors.teal[200],
         errorColor: Color.fromRGBO(207, 102, 121, 1),
         scaffoldBackgroundColor: Colors.black,
         cardColor: Color.fromRGBO(20, 20, 20, 1),
         fontFamily: 'OpenSans',
-        // textTheme: TextTheme(
-        //   bodyText2: TextStyle(
-        //       color: Colors.white, fontSize: 50, fontWeight: FontWeight.bold),
-        // ),
       ),
       debugShowCheckedModeBanner: false,
       home: HomePage(),

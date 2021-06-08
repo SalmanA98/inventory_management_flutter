@@ -127,10 +127,31 @@ class _SalesHistoryState extends State<SalesHistory> {
     });
   }
 
+  void _showSaveDialog(BuildContext context) {
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.SUCCES,
+      borderSide: BorderSide(color: Theme.of(context).accentColor, width: 2),
+      width: double.infinity,
+      buttonsBorderRadius: BorderRadius.all(Radius.circular(2)),
+      headerAnimationLoop: true,
+      useRootNavigator: true,
+      animType: AnimType.BOTTOMSLIDE,
+      title: 'Info on Invoice',
+      desc: 'Please save the excel sheet manually to not lose it!',
+      dismissOnBackKeyPress: true,
+      btnOkText: 'Got It!',
+      btnOkOnPress: () {},
+    )..show();
+  }
+
   @override
   void initState() {
     super.initState();
     _getAllLocations();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      _showSaveDialog(context);
+    });
   }
 
   @override

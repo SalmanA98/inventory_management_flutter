@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:progress_state_button/iconed_button.dart';
 import 'package:progress_state_button/progress_button.dart';
@@ -177,110 +178,116 @@ class _LoginPageState extends State<LoginPage> {
     bool _darkModeOn = _brightness == Brightness.dark;
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              alignment: Alignment.centerLeft,
-              padding: EdgeInsets.only(top: 100, left: 30),
-              child: FittedBox(
-                fit: BoxFit.contain,
-                child: RichText(
-                    text: TextSpan(
-                        children: [
-                      TextSpan(text: 'Welcome\n'),
-                      TextSpan(text: 'Back'),
-                      TextSpan(
-                          children: [TextSpan(text: '!')],
-                          style:
-                              TextStyle(color: Theme.of(context).primaryColor))
-                    ],
-                        style: TextStyle(
-                            fontSize: 50,
-                            fontWeight: FontWeight.bold,
-                            color: _darkModeOn ? Colors.white : Colors.black))),
-              ),
-            ),
-            Expanded(
-              child: GestureDetector(
-                onTap: () => WidgetsBinding.instance.focusManager.primaryFocus
-                    ?.unfocus(),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: <Widget>[
-                      Container(
-                        padding: EdgeInsets.all(10),
-                        margin: EdgeInsets.only(top: 50),
-                        width: 400,
-                        child: Column(
+        child: WillPopScope(
+          onWillPop: () => SystemNavigator.pop(),
+          child: Column(
+            children: [
+              Container(
+                width: double.infinity,
+                alignment: Alignment.centerLeft,
+                padding: EdgeInsets.only(top: 100, left: 30),
+                child: FittedBox(
+                  fit: BoxFit.contain,
+                  child: RichText(
+                      text: TextSpan(
                           children: [
-                            CustomTextField(
-                              textController: _usernameInput,
-                              textIcon: Icon(Icons.account_circle_outlined),
-                              textHint: 'Username',
-                              maximumLength: 7,
-                            ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            CustomTextField(
-                                textController: _pwdInput,
-                                keyboardType: TextInputType.visiblePassword,
-                                isPwd: true,
-                                pwdIcon: _toggleVisibilityIcon,
-                                showPassword: _toggleVisibility,
-                                hideText: _hidePwd,
-                                textIcon:
-                                    Icon(Icons.admin_panel_settings_outlined),
-                                textHint: 'Password'),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            Container(
-                              alignment: Alignment.centerRight,
-                              child: ProgressButton.icon(
-                                  radius: 16.0,
-                                  height: 50.0,
-                                  textStyle: TextStyle(
-                                      color: Theme.of(context)
-                                          .scaffoldBackgroundColor),
-                                  iconedButtons: {
-                                    ButtonState.idle: IconedButton(
-                                        text: 'login',
-                                        icon: Icon(Icons.login_rounded,
-                                            color: Theme.of(context)
-                                                .scaffoldBackgroundColor),
-                                        color: Theme.of(context).primaryColor),
-                                    ButtonState.loading: IconedButton(
-                                        text: "Loading",
-                                        color: Theme.of(context).primaryColor),
-                                    ButtonState.fail: IconedButton(
-                                        text: "Failed",
-                                        icon: Icon(Icons.cancel,
-                                            color: Colors.white),
-                                        color: Colors.red.shade300),
-                                    ButtonState.success: IconedButton(
-                                        text: "Success",
-                                        icon: Icon(
-                                          Icons.check_circle,
-                                          color: Colors.white,
-                                        ),
-                                        color: Colors.green.shade400)
-                                  },
-                                  onPressed: () {
-                                    _authenticateUser();
-                                  },
-                                  state: loginBtState),
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
+                        TextSpan(text: 'Welcome\n'),
+                        TextSpan(text: 'Back'),
+                        TextSpan(
+                            children: [TextSpan(text: '!')],
+                            style: TextStyle(
+                                color: Theme.of(context).primaryColor))
+                      ],
+                          style: TextStyle(
+                              fontSize: 50,
+                              fontWeight: FontWeight.bold,
+                              color:
+                                  _darkModeOn ? Colors.white : Colors.black))),
+                ),
+              ),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => WidgetsBinding.instance.focusManager.primaryFocus
+                      ?.unfocus(),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          padding: EdgeInsets.all(10),
+                          margin: EdgeInsets.only(top: 50),
+                          width: 400,
+                          child: Column(
+                            children: [
+                              CustomTextField(
+                                textController: _usernameInput,
+                                textIcon: Icon(Icons.account_circle_outlined),
+                                textHint: 'Username',
+                                maximumLength: 7,
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              CustomTextField(
+                                  textController: _pwdInput,
+                                  keyboardType: TextInputType.visiblePassword,
+                                  isPwd: true,
+                                  pwdIcon: _toggleVisibilityIcon,
+                                  showPassword: _toggleVisibility,
+                                  hideText: _hidePwd,
+                                  textIcon:
+                                      Icon(Icons.admin_panel_settings_outlined),
+                                  textHint: 'Password'),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Container(
+                                alignment: Alignment.centerRight,
+                                child: ProgressButton.icon(
+                                    radius: 16.0,
+                                    height: 50.0,
+                                    textStyle: TextStyle(
+                                        color: Theme.of(context)
+                                            .scaffoldBackgroundColor),
+                                    iconedButtons: {
+                                      ButtonState.idle: IconedButton(
+                                          text: 'login',
+                                          icon: Icon(Icons.login_rounded,
+                                              color: Theme.of(context)
+                                                  .scaffoldBackgroundColor),
+                                          color:
+                                              Theme.of(context).primaryColor),
+                                      ButtonState.loading: IconedButton(
+                                          text: "Loading",
+                                          color:
+                                              Theme.of(context).primaryColor),
+                                      ButtonState.fail: IconedButton(
+                                          text: "Failed",
+                                          icon: Icon(Icons.cancel,
+                                              color: Colors.white),
+                                          color: Colors.red.shade300),
+                                      ButtonState.success: IconedButton(
+                                          text: "Success",
+                                          icon: Icon(
+                                            Icons.check_circle,
+                                            color: Colors.white,
+                                          ),
+                                          color: Colors.green.shade400)
+                                    },
+                                    onPressed: () {
+                                      _authenticateUser();
+                                    },
+                                    state: loginBtState),
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
