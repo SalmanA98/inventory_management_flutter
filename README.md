@@ -48,7 +48,7 @@ Resources used in the app:
 - Path Provider [To find common(IOS & Android) path used by the app]: https://pub.dev/packages/path_provider
 - Flutter Launcher Icons [To create launch icon (cross-platform) easily]: https://pub.dev/packages/flutter_launcher_icons
 - Progress State Button [Animated loading button]: https://pub.dev/packages/progress_state_button
-- Giffy Dialog [Fancy dialog box]: https://pub.dev/packages/giffy_dialog  
+- Awesome Dialog [Fancy dialog box]: https://pub.dev/packages/awesome_dialog
 
 For help getting started with Flutter, view
 [online documentation](https://flutter.dev/docs), which offers tutorials,
