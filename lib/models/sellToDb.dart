@@ -97,11 +97,12 @@ class WriteSaleToDb {
             'Seller': employeeID.toLowerCase().startsWith('a')
                 ? 'Super Admin(${employeeID.toUpperCase()})'
                 : employeeID.toUpperCase(),
-            'Number of products': (finalItems.length + 1),
-            'Final Price': totalPrice.toStringAsFixed(2),
+            'Number of products': finalItems.length,
+            'Final Price': double.tryParse(totalPrice.toStringAsFixed(2)),
             'Refunded Amount': 0,
             'Sale ID': saleID,
-            'Total After Refund': totalPrice.toStringAsFixed(2),
+            'Total After Refund':
+                double.tryParse(totalPrice.toStringAsFixed(2)),
           }).then((_) {
             for (int i = 0; i < finalItems.length; i++) {
               databaseReference
@@ -112,8 +113,9 @@ class WriteSaleToDb {
                   .child((i + 1).toString())
                   .child(finalItems[i].name)
                   .update({
-                'Base Price': finalItems[i].price,
-                'Qty': finalItems[i].qty,
+                'Base Price': double.tryParse(
+                    int.tryParse(finalItems[i].price).toStringAsFixed(2)),
+                'Qty': int.tryParse(finalItems[i].qty),
                 'Refunded': 'No',
                 'Refunded Qty': 0,
               }).then((_) {

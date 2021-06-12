@@ -27,7 +27,6 @@ getUser() async {
   }
 }
 
-//Done except username!
 Future<void> uploadProduct(
     BuildContext context, Products product, String username) async {
   String _shopLocation;
@@ -42,7 +41,7 @@ Future<void> uploadProduct(
       .child('Products')
       .child(product.name)
       .set({
-    'Price': product.price,
+    'Price': double.tryParse(int.tryParse(product.price).toStringAsFixed(2)),
     'Qty': product.qty,
     'Last Change': 'Uploaded Product',
     'Last Changed By': username.toUpperCase(),
@@ -59,29 +58,5 @@ Future<void> uploadProduct(
     });
   }).onError((error, stacktrace) {
     Fluttertoast.showToast(msg: error.toString());
-  });
-}
-
-Future<void> getSaleInfo(
-    BuildContext context, String date, String time, String shopLocation) async {
-  List<Products> soldProducts = [];
-  await databaseReference
-      .child(shopLocation)
-      .child('Sales')
-      .child(date)
-      .child(time)
-      .once()
-      .then((DataSnapshot datasnapshot) {
-    Map<dynamic, dynamic> values = datasnapshot.value;
-    values.forEach((key, value) {
-      if (int.tryParse(key.toString()) != null) {
-        value.forEach((product, details) {
-          soldProducts.add(Products(
-              name: product,
-              price: details['Base Price'].toString(),
-              qty: details['Qty'].toString()));
-        });
-      }
-    });
   });
 }

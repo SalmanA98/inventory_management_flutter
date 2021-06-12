@@ -38,6 +38,8 @@ class _RefundProductsState extends State<RefundProducts> {
   Future<void> _getSaleInfo(
       BuildContext context, String date, String time) async {
     String _shopLocation;
+    _products.clear();
+    _paymentDetails.clear();
 
     if (widget._username.toLowerCase().startsWith('a')) {
       _shopLocation = widget._username.substring(1, 2).toUpperCase();
@@ -56,7 +58,6 @@ class _RefundProductsState extends State<RefundProducts> {
       values.forEach((key, value) {
         if (int.tryParse(key.toString()) == null &&
             key.toString() != 'Refund Details') {
-          print(key);
           if (key == 'Discount') {
             _discount = value;
           }
@@ -66,7 +67,7 @@ class _RefundProductsState extends State<RefundProducts> {
           if (key == 'Refunded Amount') {
             _refundedPrice = value.toString();
           }
-          if (key == 'Total After Refund') {
+          if (key == 'Final Price') {
             _totalPrice = value.toString();
           }
           setState(() {
@@ -74,6 +75,7 @@ class _RefundProductsState extends State<RefundProducts> {
                 PaymentDetails(title: key.toString(), value: value.toString()));
           });
         }
+
         if (int.tryParse(key.toString()) != null) {
           value.forEach((product, details) {
             if (details['Refunded'].toString() != 'Yes') {
@@ -81,13 +83,19 @@ class _RefundProductsState extends State<RefundProducts> {
                 _products.add(Products(
                     name: product,
                     price: details['Base Price'].toString(),
-                    qty: details['Qty'].toString()));
+                    qty: details['Qty'].toString(),
+                    refundedQty: details['Refunded Qty'].toString()));
               });
             }
           });
         }
       });
     });
+    if (int.tryParse(_totalPrice?.toString()) == 0) {
+      setState(() {
+        _products.clear();
+      });
+    }
   }
 
   void _onSelectedItem(int index, Products chosenProduct) {
@@ -129,6 +137,7 @@ class _RefundProductsState extends State<RefundProducts> {
       btnCancelOnPress: () {},
       btnOkText: 'Confirm',
       btnOkOnPress: () {
+        _qtyController.clear();
         if (refundedAll) {
           databaseReference
               .child(_shopLocation)
@@ -138,42 +147,34 @@ class _RefundProductsState extends State<RefundProducts> {
               .once()
               .then((result) {
             Map<dynamic, dynamic> values = result.value;
-            values.forEach((prodNum, value) {
-              if (int.tryParse(prodNum.toString()) != null) {
-                if (value[product.name] != null) {
-                  //Update db
-                  setState(() {
-                    databaseReference
-                        .child(_shopLocation)
-                        .child('Sales')
-                        .child(widget._date)
-                        .child(widget._time)
-                        .child(prodNum)
-                        .child(product.name)
-                        .update({
-                      'Qty': 0,
-                      'Refunded': 'Yes',
-                      'Refunded Qty': product.qty,
-                    });
-
-                    databaseReference
-                        .child(_shopLocation)
-                        .child('Sales')
-                        .child(widget._date)
-                        .child(widget._time)
-                        .update({
-                      'Refunded Amount': _totalPrice,
-                      'Total After Refund': 0,
-                    });
-
-                    _products.clear();
-                    _paymentDetails.clear();
-                    getSaleInfo(
-                        context, widget._date, widget._time, _shopLocation);
-                  });
-                }
+            int i = 0;
+            values.forEach((key, value) {
+              if (int.tryParse(key.toString()) != null) {
+                databaseReference
+                    .child(_shopLocation)
+                    .child('Sales')
+                    .child(widget._date)
+                    .child(widget._time)
+                    .child(key)
+                    .child(_products[i].name)
+                    .update({
+                  'Qty': 0,
+                  'Refunded': 'Yes',
+                  'Refunded Qty': _products[i].qty,
+                });
+                i++;
               }
             });
+            databaseReference
+                .child(_shopLocation)
+                .child('Sales')
+                .child(widget._date)
+                .child(widget._time)
+                .update({
+              'Refunded Amount': _totalPrice,
+              'Total After Refund': 0,
+            });
+            _getSaleInfo(context, widget._date, widget._time);
           }).onError((error, stackTrace) => null);
         } else {
           if (qtyToRefud.isEmpty || int.tryParse(qtyToRefud) < 1) {
@@ -194,36 +195,41 @@ class _RefundProductsState extends State<RefundProducts> {
               values.forEach((prodNum, value) {
                 if (int.tryParse(prodNum.toString()) != null) {
                   if (value[product.name] != null) {
-                    int finalQty =
-                        int.tryParse(product.qty) - int.tryParse(qtyToRefud);
+                    if (int.tryParse(_products[_selectedIndex].qty) >=
+                        int.tryParse(qtyToRefud)) {
+                      int finalQty =
+                          int.tryParse(_products[_selectedIndex].qty) -
+                              int.tryParse(qtyToRefud);
+                      product.refundedQty = (int.tryParse(product.refundedQty) +
+                              int.tryParse(qtyToRefud))
+                          .toString();
 
-                    //Calculations
-                    _discount = _discount.substring(0, _discount.length - 1);
+                      //Calculations
+                      _discount = _discount.substring(0, _discount.length - 1);
+                      _vat = _vat.substring(0, _vat.length - 1);
 
-                    _vat = _vat.substring(0, _vat.length - 1);
-                    priceForQty = double.tryParse(product.price) *
-                        int.tryParse(product.qty);
-                    //If there is discount
-                    if (int.tryParse(_discount) > 0) {
-                      priceAfterDiscount = priceForQty -
-                          ((priceForQty * int.tryParse(_discount)) / 100);
-                    } else {
-                      priceAfterDiscount = priceForQty;
-                    }
-                    //If there is vat
-                    if (int.tryParse(_vat) > 0) {
-                      priceAfterVat = priceAfterDiscount +
-                          ((priceForQty * int.tryParse(_vat)) / 100);
-                    } else {
-                      priceAfterVat = priceAfterDiscount;
-                    }
-                    totalRefunded =
-                        priceAfterVat + double.tryParse(_refundedPrice);
-                    totalAfterRefund =
-                        double.tryParse(_totalPrice) - totalRefunded;
+                      priceForQty = double.tryParse(product.price) *
+                          int.tryParse(qtyToRefud);
+                      //If there is discount
+                      if (int.tryParse(_discount) > 0) {
+                        priceAfterDiscount = priceForQty -
+                            ((priceForQty * int.tryParse(_discount)) / 100);
+                      } else {
+                        priceAfterDiscount = priceForQty;
+                      }
+                      //If there is vat
+                      if (int.tryParse(_vat) > 0) {
+                        priceAfterVat = priceAfterDiscount +
+                            ((priceAfterDiscount * int.tryParse(_vat)) / 100);
+                      } else {
+                        priceAfterVat = priceAfterDiscount;
+                      }
+                      totalRefunded =
+                          priceAfterVat + double.tryParse(_refundedPrice);
+                      totalAfterRefund =
+                          double.tryParse(_totalPrice) - totalRefunded;
 
-                    //Update db
-                    setState(() {
+                      // Update db
                       databaseReference
                           .child(_shopLocation)
                           .child('Sales')
@@ -234,7 +240,7 @@ class _RefundProductsState extends State<RefundProducts> {
                           .update({
                         'Qty': finalQty,
                         'Refunded': finalQty == 0 ? 'Yes' : 'Partial',
-                        'Refunded Qty': qtyToRefud,
+                        'Refunded Qty': int.tryParse(product.refundedQty),
                       }).then((_) {
                         databaseReference
                             .child(_shopLocation)
@@ -242,8 +248,10 @@ class _RefundProductsState extends State<RefundProducts> {
                             .child(widget._date)
                             .child(widget._time)
                             .update({
-                          'Refunded Amount': totalRefunded,
-                          'Total After Refund': totalAfterRefund,
+                          'Refunded Amount':
+                              double.tryParse(totalRefunded.toStringAsFixed(2)),
+                          'Total After Refund': double.tryParse(
+                              totalAfterRefund.toStringAsFixed(2)),
                         }).then((_) {
                           databaseReference
                               .child(_shopLocation)
@@ -267,7 +275,7 @@ class _RefundProductsState extends State<RefundProducts> {
                                 databaseReference
                                     .child(_shopLocation)
                                     .child('Employees')
-                                    .child(username.toUpperCase())
+                                    .child(widget._username.toUpperCase())
                                     .update({
                                   'Last Activity': 'Refunded ${widget._saleID}',
                                   'Last Activity Time':
@@ -275,10 +283,6 @@ class _RefundProductsState extends State<RefundProducts> {
                                           .format(DateTime.now())
                                           .toString(),
                                 });
-                                _products.clear();
-                                _paymentDetails.clear();
-                                getSaleInfo(context, widget._date, widget._time,
-                                    _shopLocation);
 
                                 Fluttertoast.showToast(
                                     msg: 'Refund Success',
@@ -286,14 +290,26 @@ class _RefundProductsState extends State<RefundProducts> {
                                     toastLength: Toast.LENGTH_SHORT,
                                     timeInSecForIosWeb: 1,
                                     fontSize: 16.0);
+
+                                //If a product has been refunded completely, disselect
+                                if (finalQty == 0) {
+                                  _selectedIndex = -1;
+                                }
+
+                                //Reload from db
+                                _getSaleInfo(
+                                    context, widget._date, widget._time);
                               });
                         });
                       });
-                    });
+                    } else {
+                      Fluttertoast.showToast(
+                          msg: 'Qty cannot be more than sold!');
+                    }
                   }
                 }
               });
-            }).onError((error, stackTrace) => Fluttertoast.showToast(
+            }).catchError((error) => Fluttertoast.showToast(
                     msg: error.toString(),
                     toastLength: Toast.LENGTH_SHORT,
                     timeInSecForIosWeb: 1,
@@ -323,8 +339,9 @@ class _RefundProductsState extends State<RefundProducts> {
                 subtitle: 'Sale ID: ${widget._saleID}'),
             Expanded(
               child: GestureDetector(
-                onTap: () => WidgetsBinding.instance.focusManager.primaryFocus
-                    ?.unfocus(),
+                onTap: () {
+                  WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+                },
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
@@ -337,7 +354,7 @@ class _RefundProductsState extends State<RefundProducts> {
                               padding: EdgeInsets.all(10),
                               child: ListTile(
                                 leading: Icon(Icons.info_outline),
-                                subtitle: const Text(
+                                title: const Text(
                                     'Refund should be completed by admins only'),
                               )),
                         ),
@@ -380,9 +397,7 @@ class _RefundProductsState extends State<RefundProducts> {
                                         child: Text(element.value)),
                                   ],
                                 ),
-                                Divider(
-                                  color: Colors.black,
-                                )
+                                Divider(color: Theme.of(context).primaryColor)
                               ],
                             ));
                       }),
@@ -431,7 +446,9 @@ class _RefundProductsState extends State<RefundProducts> {
                                                 _products.indexOf(product)
                                         ? new RoundedRectangleBorder(
                                             side: new BorderSide(
-                                                color: Colors.blue, width: 2.0),
+                                                color: Theme.of(context)
+                                                    .accentColor,
+                                                width: 2.0),
                                             borderRadius:
                                                 BorderRadius.circular(4.0))
                                         : new RoundedRectangleBorder(
@@ -480,7 +497,26 @@ class _RefundProductsState extends State<RefundProducts> {
                                 ));
                           },
                         ),
-                      if (_refundEach && _products.isNotEmpty)
+                      if (_refundEach &&
+                          _products.isNotEmpty &&
+                          _selectedIndex >= 0)
+                        Container(
+                          margin: EdgeInsets.only(top: 10),
+                          width: double.infinity,
+                          padding: EdgeInsets.all(10),
+                          alignment: Alignment.centerLeft,
+                          child: FittedBox(
+                            fit: BoxFit.contain,
+                            child: const Text(
+                              'Quantity Details',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      if (_refundEach &&
+                          _products.isNotEmpty &&
+                          _selectedIndex >= 0)
                         Container(
                           padding: EdgeInsets.all(10),
                           child: CustomTextField(
@@ -489,24 +525,43 @@ class _RefundProductsState extends State<RefundProducts> {
                               keyboardType: TextInputType.number,
                               textIcon: Icon(Icons.refresh)),
                         ),
-                      if (!_refundEach)
-                        Container(
-                          margin: EdgeInsets.symmetric(horizontal: 10),
-                          width: double.infinity,
-                          child: Card(
-                            elevation: 3,
-                            child: Container(
-                                padding: EdgeInsets.all(10),
-                                child: ListTile(
-                                  leading: const Icon(Icons.info_outline),
-                                  subtitle: _products.isEmpty
-                                      ? const Text(
-                                          'All products have been refunded')
-                                      : const Text(
-                                          'This will refund all the products'),
-                                )),
-                          ),
-                        ),
+                      !_refundEach
+                          ? Container(
+                              margin: EdgeInsets.symmetric(horizontal: 10),
+                              width: double.infinity,
+                              child: Card(
+                                elevation: 3,
+                                child: Container(
+                                    padding: EdgeInsets.all(10),
+                                    child: ListTile(
+                                      leading: const Icon(Icons.info_outline),
+                                      title: _products.isEmpty
+                                          ? const Text(
+                                              'All products have been refunded')
+                                          : const Text(
+                                              'This will refund all the products'),
+                                    )),
+                              ),
+                            )
+                          : _products.isEmpty
+                              ? Container(
+                                  margin: EdgeInsets.symmetric(horizontal: 10),
+                                  width: double.infinity,
+                                  child: Card(
+                                    elevation: 3,
+                                    child: Container(
+                                        padding: EdgeInsets.all(10),
+                                        child: ListTile(
+                                          leading:
+                                              const Icon(Icons.info_outline),
+                                          title: _products.isEmpty
+                                              ? const Text(
+                                                  'All products have been refunded')
+                                              : const Text(
+                                                  'This will refund all the products'),
+                                        )),
+                                  ))
+                              : Container(),
                       Padding(
                           padding: EdgeInsets.symmetric(
                               horizontal: 10, vertical: 20),

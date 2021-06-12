@@ -69,6 +69,12 @@ class _RefundSaleIDState extends State<RefundSaleID> {
                           saleID,
                           widget._username,
                         )));
+          } else {
+            Fluttertoast.showToast(
+                msg: 'Payment made through card',
+                toastLength: Toast.LENGTH_SHORT,
+                timeInSecForIosWeb: 1,
+                fontSize: 16.0);
           }
         }).onError((error, stackTrace) => Fluttertoast.showToast(
                 msg: error.toString(),
